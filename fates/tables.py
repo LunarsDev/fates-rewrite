@@ -1252,6 +1252,12 @@ class Servers(Table, tablename="servers"):
         unique=False,
         secret=False,
     )
+    api_token = Text(
+        null=False,
+        default=secrets.token_urlsafe(512),
+        primary_key=False,
+        unique=False,
+    )
     webhook = Text(
         default="",
         null=True,

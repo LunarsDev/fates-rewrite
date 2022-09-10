@@ -2,6 +2,10 @@ from . import tables
 import inspect
 import piccolo
 from fastapi import FastAPI
+from starlette.routing import Mount
+from piccolo_admin.endpoints import create_admin
+from piccolo.engine import engine_finder
+import asyncio
 
 from mapleshade import Mapleshade
 
@@ -34,8 +38,8 @@ mapleshade = Mapleshade()
 @app.on_event("startup")
 async def open_database_connection_pool():
     engine = engine_finder()
-    asyncio.create_task(bot.start(secrets["token"]))
-    await bot.load_extension("jishaku")
+    #asyncio.create_task(bot.start(secrets["token"]))
+    #await bot.load_extension("jishaku")
     await engine.start_connnection_pool()
 
 

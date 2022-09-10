@@ -213,13 +213,6 @@ class Bots(Table, tablename="bots"):
         unique=False,
         secret=False,
     )
-    keep_banner_decor = Boolean(
-        default=True,
-        null=True,
-        primary_key=False,
-        unique=False,
-        secret=False,
-    )
     total_votes = BigInt(
         default=0,
         null=True,
@@ -1365,13 +1358,6 @@ class Servers(Table, tablename="servers"):
     )
     banner_page = Text(
         default="",
-        null=True,
-        primary_key=False,
-        unique=False,
-        secret=False,
-    )
-    keep_banner_decor = Boolean(
-        default=True,
         null=True,
         primary_key=False,
         unique=False,

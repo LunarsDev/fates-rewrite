@@ -1,0 +1,4 @@
+ruamel.yaml
+fastapi[all]
+pydantic # Just in case
+piccolo-admin # this already pulls in piccolo ORM as well

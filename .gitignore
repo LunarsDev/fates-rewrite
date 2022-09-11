@@ -1,2 +1,12 @@
 **/__pycache__
 config.yaml
+
+# DB Seeder
+seedman/bin/**
+/seedman/bin/**
+seedman/bin
+/seedman/bin
+seedman/schema.sql 
+seedman/seed_data.json
+seedman/*.json
+seedman/schema.sql

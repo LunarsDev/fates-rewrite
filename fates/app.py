@@ -4,10 +4,10 @@ from . import tags
 import inspect
 import piccolo
 from fastapi import FastAPI, HTTPException
+from fastapi.responses import ORJSONResponse
 from starlette.routing import Mount
 from piccolo_admin.endpoints import create_admin
 from piccolo.engine import engine_finder
-import asyncio
 
 from mapleshade import Mapleshade
 
@@ -22,6 +22,7 @@ for obj in tables_dict.values():
         _tables.append(obj)
 
 app = FastAPI(
+    default_response_class=ORJSONResponse,
     routes=[
         Mount(
             "/admin/",

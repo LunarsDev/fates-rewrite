@@ -91,9 +91,8 @@ class Mapleshade():
             return None
         
         # Add action logs
-        action_logs = await tables.UserBotLogs.select().where(tables.UserBotLogs.bot_id == bot_id)
+        bot["action_logs"] = (await tables.UserBotLogs.select().where(tables.UserBotLogs.bot_id == bot_id)) or []
 
-        bot['action_logs'] = [models.UserBotLogs(**log) for log in action_logs]
         bot['long_description_raw'] = bot['long_description']
         bot['long_description'] = self.sanitize(bot['long_description'])
         

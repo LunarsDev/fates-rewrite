@@ -1,0 +1,30 @@
+{
+  "name": "Fates List - Codespaces Configuration",
+  "build": {
+    "dockerfile": "Dockerfile",
+    // Update 'VARIANT' to pick a Node version: 18, 16, 14.
+    // Append -bullseye or -buster to pin to an OS version.
+    // Use -bullseye variants on local on arm64/Apple Silicon.
+    "args": {
+      "VARIANT": "16-bullseye"
+    }
+  },
+  "settings": {},
+  "extensions": [
+    "dbaeumer.vscode-eslint",
+    "svelte.svelte-vscode",
+    "ms-vsliveshare.vsliveshare",
+    "github.copilot"
+  ],
+  "postCreateCommand": "npm install",
+  "remoteUser": "node",
+  "portsAttributes": {
+    "5000": {
+      "label": "HTTP",
+      "protocol": "http",
+      "visibility": "public"
+    }
+  },
+  "forwardPorts": [5000],
+  "features": {}
+}

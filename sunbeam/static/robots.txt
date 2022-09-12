@@ -1,0 +1,3 @@
+User-agent: *
+Disallow: /frostpaw/tos
+Sitemap: https://fateslist.xyz/sitemap.xml

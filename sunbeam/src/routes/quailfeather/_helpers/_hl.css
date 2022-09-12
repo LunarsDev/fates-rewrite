@@ -1,0 +1,157 @@
+.h2 {
+  font-size: 1.5em;
+}
+
+.h3 {
+  font-size: 1.3em;
+}
+
+.header-anchor {
+  display: none;
+  color: #81e69b !important;
+}
+.h2:hover > .header-anchor {
+  display: initial;
+}
+.h3:hover > .header-anchor {
+  display: initial;
+}
+
+.info,
+.warning,
+.aonly,
+.guidelines,
+.generic {
+  border: 3px solid;
+  margin-bottom: 3px;
+  padding: 3px;
+}
+
+.info:before {
+  content: 'Info';
+  font-size: 26px;
+  font-weight: bold;
+  color: cyan;
+}
+
+.guidelines:before {
+  content: 'Guidelines';
+  font-size: 26px;
+  font-weight: bold;
+  color: green;
+}
+
+.warning:before {
+  content: 'Warning';
+  font-size: 26px;
+  font-weight: bold;
+  color: red;
+}
+
+.generic {
+  margin-top: 20px;
+  margin-bottom: 20px;
+}
+
+.aonly:before {
+  content: 'Admin Only!';
+  font-size: 26px;
+  font-weight: bold;
+  color: yellow;
+}
+
+.info {
+  border-color: blue;
+  background-color: rgba(0, 0, 255, 0.1);
+}
+
+.warning {
+  border-color: red;
+  background-color: rgba(255, 0, 0, 0.1);
+}
+
+.generic {
+  border-color: red;
+  background-color: rgba(255, 20, 10, 0.1);
+}
+
+.aonly {
+  border-color: yellow;
+  background-color: rgba(255, 255, 0, 0.1);
+}
+
+.guidelines {
+  border-color: green;
+  background-color: rgba(255, 0, 0, 0.1);
+}
+
+.admin-only {
+  display: none;
+}
+
+.refresh-btn {
+  position: fixed !important;
+  bottom: 0;
+  right: 0;
+  background-color: white;
+  color: black;
+  border: none;
+  border-radius: 50% 50% 50% 50%;
+  box-shadow: -1px 0px 1px 1px inset;
+  width: 50px;
+  height: 50px;
+}
+
+.blockquote .h3 {
+  color: cyan !important;
+}
+
+.blockquote {
+  border-left: cyan !important;
+}
+
+.table,
+.ul,
+.li {
+  color: white !important;
+}
+
+.thead {
+  border-bottom: 1px solid white !important;
+}
+
+.tr:hover {
+  background-color: rgba(255, 255, 255, 0.1) !important;
+}
+
+.button-quail {
+  display: block;
+  width: 100px;
+  background-color: red !important;
+  color: white;
+  border: none;
+  border-radius: 5px;
+  margin-top: 10px;
+  padding: 10px;
+  cursor: pointer;
+}
+
+.hljs-snip {
+  color: lightgreen;
+  width: auto;
+  font-weight: bold;
+  top: 0px;
+  right: 0px;
+  float: right;
+}
+
+.hljs-quail-block {
+  background: rgba(255, 255, 255, 0.1);
+  padding: 3px;
+}
+
+.docs-quail {
+  padding: 7px;
+  margin-left: 50px;
+  margin-right: 50px;
+}

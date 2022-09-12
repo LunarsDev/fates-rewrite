@@ -3,6 +3,7 @@
 ## Components
 
 - ``Mapleshade`` - The core API implementations of fates list
+- ``Sunbeam`` - Fates List Frontend
 
 ## Requirements
 

@@ -1,0 +1,374 @@
+$card-scale: 1.025;
+$form-radius: 4px;
+$form-mw: 94%; // Max width for form
+$link-size: 20px; // Link size
+$link-opacity: 0.63;
+
+@font-face {
+  font-family: 'Lexend Deca';
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+  src: url(https://fonts.gstatic.com/s/lexenddeca/v13/K2FifZFYk-dHSE0UPPuwQ7CrD94i-NCKm-U48M1ArA.ttf)
+    format('truetype');
+}
+
+.seg {
+  overflow-x: hidden !important;
+  background-color: #1d1e23;
+  margin: 0px;
+  padding: 0px;
+}
+
+html,
+body {
+  background-color: #1d1e23;
+  margin: 0px;
+  padding: 0px;
+}
+
+main,
+body,
+#long-description,
+.tabs-v2,
+.tabcontent,
+.tabdesign-alt {
+  overflow-x: hidden !important;
+}
+
+h1,
+h2,
+h3,
+h4,
+h5,
+h6,
+p,
+nav,
+.fform,
+a,
+ol,
+.tab {
+  color: white !important;
+  font-family: 'Lexend Deca';
+}
+
+ul,
+body,
+html {
+  font-family: 'Lexend Deca';
+}
+
+textarea,
+input {
+  font-size: 18px;
+}
+
+h1 {
+  font-size: 35px;
+  margin: 0px;
+}
+
+.fform-white::placeholder {
+  color: grey !important;
+}
+
+.fform::placeholder {
+  color: rgba(255, 255, 255, 0.75);
+}
+
+.fform {
+  transition: transform 0.2s;
+  background: black !important;
+  color: white !important;
+  border: white !important;
+  border-style: solid !important;
+  border-width: thin !important;
+  margin-top: 7px !important;
+  margin-bottom: 30px !important;
+  margin: auto;
+  width: 100%;
+  border-radius: $form-radius $form-radius $form-radius $form-radius;
+  overflow-y: scroll !important;
+}
+
+select,
+:global(.multiselect) {
+  margin-bottom: 30px !important;
+  margin-top: 7px !important;
+  width: 100%;
+  border-radius: $form-radius $form-radius $form-radius $form-radius;
+}
+
+.fform-white {
+  color: black !important;
+}
+
+.fform-select,
+.select-pure-fl {
+  transition: transform 0.2s;
+  --background-color: black !important;
+  --color: white !important;
+  --hover-background-color: rgba(100, 100, 100, 0.63) !important;
+  --hover-color: white !important;
+  --selected-background-color: grey !important;
+  --selected-color: white !important;
+}
+
+.select-pure-fl:hover {
+  --color: white !important;
+}
+
+.fform-white {
+  background: white !important;
+}
+
+.fform:hover:not(.fform-select),
+.fform:focus:not(.fform-select) {
+  border-color: grey !important;
+  transform: scale($card-scale);
+}
+
+.btn_s {
+  display: inline !important;
+}
+
+label {
+  color: white !important;
+  font-weight: bold !important;
+  font-size: 16px !important;
+  text-align: left !important;
+  width: $form-mw;
+  max-width: $form-mw;
+}
+
+.tip {
+  width: $form-mw;
+  max-width: $form-mw;
+}
+
+.tip-blue {
+  background: #259db0 !important;
+}
+
+.tip-red {
+  background: #ee4b2b !important;
+}
+
+textarea {
+  max-width: $form-mw;
+  min-height: 20px !important;
+  height: 300px !important;
+  resize: none !important;
+}
+.profile-card:hover {
+  transform: scale($card-scale, $card-scale) perspective(1px) translateZ(0);
+}
+
+.btn {
+  border-radius: $form-radius $form-radius $form-radius $form-radius !important;
+}
+label {
+  font-size: 14px;
+}
+
+::selection {
+  background: #ffb7b7 !important; /* WebKit/Blink Browsers */
+}
+::-moz-selection {
+  background: #ffb7b7 !important; /* Gecko Browsers */
+}
+
+a {
+  color: white !important;
+  opacity: $link-opacity !important;
+  font-size: $link-size !important;
+  text-decoration: none !important;
+}
+
+/* a:visited {
+	color: yellow !important; 
+	font-size: $link-size !important;
+	text-decoration: none !important;
+} */
+
+@media screen and (min-width: 768px) {
+  .index-fl {
+    justify-content: center;
+    text-align: center;
+  }
+  .content-mobileonly {
+    display: none !important;
+  }
+}
+
+.content-nomobile {
+  display: none !important;
+}
+
+@media (min-width: 600px) {
+  .content-nomobile {
+    display: block !important;
+  }
+}
+
+.select-fl {
+  text-decoration: none !important;
+  background: white !important;
+  padding: 8px;
+  border-radius: $form-radius $form-radius $form-radius $form-radius !important;
+}
+
+@media screen and (max-width: 768px) {
+  .index-fl {
+    justify-content: center;
+    text-align: center;
+  }
+  .content-nomobile {
+    display: none !important;
+  }
+}
+
+.form {
+  display: inline-block;
+  background-color: white;
+  padding: 15px;
+  border-radius: 50px 50px 50px 50px !important;
+  text-align: center;
+  justify-content: center;
+}
+
+.select_tags,
+input,
+.wtype {
+  border-radius: $form-radius $form-radius $form-radius $form-radius !important;
+  padding: 10px !important;
+}
+
+textarea {
+  border-radius: $form-radius $form-radius $form-radius $form-radius !important;
+  padding: 10px !important;
+  height: 500px;
+}
+.highlight {
+  background-color: black;
+  font-weight: bold;
+}
+
+.desc-info {
+  background-color: blue;
+}
+
+/* Utlity */
+.white-bold {
+  color: white;
+  font-weight: bold;
+}
+
+.invite-link {
+  margin-left: 6.5%;
+}
+
+.hr-is {
+  font-size: 20px;
+  border-top-width: 1px;
+  border-top-color: #eee;
+  width: 90%;
+}
+
+.title-is {
+  color: rgba(255, 255, 255, 0.87);
+  margin-left: 15px;
+  font-size: 32px;
+}
+.div-is {
+  width: 90%;
+  margin: 30px 5%;
+}
+.white {
+  color: white !important;
+}
+.bold {
+  font-weight: bold;
+}
+
+pre {
+  white-space: pre-wrap;
+}
+
+@keyframes pulse {
+  0% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(1.1);
+  }
+  100% {
+    transform: scale(1);
+  }
+}
+
+.button {
+  opacity: 1 !important;
+  border: solid thin !important;
+  border-radius: 6px !important;
+  background: black !important;
+  color: white !important;
+  font-weight: normal !important;
+}
+
+.button:hover {
+  animation: pulse 0.5s infinite;
+}
+
+select {
+  transition: transform 0.2s;
+  background-color: black !important;
+  color: white !important;
+  width: 100%;
+  -webkit-appearance: menulist-button;
+  padding: 3px;
+  height: 30px;
+}
+
+.bot-card-actions-link {
+  width: 45%;
+  font-weight: bold;
+  border: solid thin !important;
+  outline: none !important;
+  opacity: 1 !important;
+  font-size: 10px;
+}
+
+// CSS Reset Fix
+details summary {
+  cursor: pointer;
+}
+
+details summary > * {
+  display: inline;
+}
+
+// CSS for rules="all"
+table.rules-all {
+  border-collapse: collapse;
+}
+
+.rules-all td {
+  border: 1px solid black;
+}
+
+.rules-all td:first-child {
+  border-left: none;
+}
+
+.rules-all td:last-child {
+  border-right: none;
+}
+
+.rules-all tr:first-child td {
+  border-top: none;
+}
+
+.rules-all tr:last-child td {
+  border-bottom: none;
+}

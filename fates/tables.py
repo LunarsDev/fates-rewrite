@@ -61,7 +61,7 @@ class Bots(Table, tablename="bots"):
         unique=False,
         secret=False,
     )
-    bot_library = Text(
+    library = Text(
         default="",
         null=True,
         primary_key=False,

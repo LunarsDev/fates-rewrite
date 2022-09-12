@@ -20,3 +20,9 @@ Then, pen ``psql``, then run the following:
 
 \copy bots FROM 'seed_data/seed.csv' DELIMITER ',' CSV;
 ```
+
+## DB Changes
+
+**Sept 12th 2022** 
+
+- ``bot_library`` renamed to ``library``

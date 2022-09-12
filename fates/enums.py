@@ -71,9 +71,9 @@ class UserBotAction(IntEnum):
     unverify = 11
     requeue = 12
 
-class LongDescType(IntEnum):
-    html = 0
-    markdown_serverside = 1
+class LongDescriptionType(IntEnum):
+    Html = 0
+    MarkdownServerSide = 1
 
 class WebhookType(IntEnum):
     vote = 0

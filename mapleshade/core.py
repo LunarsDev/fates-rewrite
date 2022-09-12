@@ -92,13 +92,15 @@ class Mapleshade():
         
         # Add action logs
         bot["action_logs"] = (await tables.UserBotLogs.select().where(tables.UserBotLogs.bot_id == bot_id)) or []
+        
+        # Fix extra_links not being a dict (despite being JSONB, this is just stupid)
+        bot["extra_links"] = orjson.loads(bot["extra_links"])
 
         bot['long_description_raw'] = bot['long_description']
         bot['long_description'] = self.sanitize(bot['long_description'])
         
         # Pydantic memes
         bot_m = models.Bot(**bot)
-        bot_m.extra_links = orjson.dumps(bot_m.extra_links)
 
         return bot_m
     

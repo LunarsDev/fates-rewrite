@@ -174,7 +174,6 @@ class Bots(Table, tablename="bots"):
         secret=False,
     )
     verifier = BigInt(
-        default=0,
         null=True,
         primary_key=False,
         unique=False,

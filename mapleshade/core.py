@@ -109,9 +109,8 @@ class Mapleshade():
         bot_tags = await tables.BotTags.select(tables.BotTags.tag).where(tables.BotTags.bot_id == bot_id)
 
         for tag in bot_tags:
-            tags.append(
-                await tables.BotListTags.select().where(tables.BotListTags.id == tag["tag"]).first()
-            )
+            tag_data = await tables.BotListTags.select().where(tables.BotListTags.id == tag["tag"]).first()
+            tags.append(tag_data)
 
         bot["tags"] = models.Tag.to_list(tags)
         

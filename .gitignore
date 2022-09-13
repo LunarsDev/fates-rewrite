@@ -10,3 +10,6 @@ seedman/schema.sql
 seedman/seed_data.json
 seedman/*.json
 seedman/schema.sql
+
+build
+**/*.so

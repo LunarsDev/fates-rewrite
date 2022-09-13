@@ -59,7 +59,7 @@
   import Button from '$lib/base/Button.svelte';
   import { enums } from '$lib/enums/enums';
   import * as logger from '$lib/logger';
-  import { session } from '$app/stores';
+  import { page } from '$app/stores';
 
   export let perms;
   export let apps;
@@ -171,10 +171,10 @@
                   json[key] = value.toLines(index);
                 });
 
-                let res = await fetch(`${lynxUrl}/staff-apps?user_id=${$session.session.user.id}`, {
+                let res = await fetch(`${lynxUrl}/staff-apps?user_id=${$page.data.user.id}`, {
                   method: 'POST',
                   headers: {
-                    Authorization: $session.session.token,
+                    Authorization: $page.data.token,
                     'Content-Type': 'application/json'
                   },
                   body: JSON.stringify({

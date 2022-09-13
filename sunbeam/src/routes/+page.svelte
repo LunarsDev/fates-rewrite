@@ -1,30 +1,3 @@
-<script context="module" lang="ts">
-  import { fetchFates } from '$lib/request';
-  import { roll } from '$lib/request';
-  export const prerender = false;
-  /** @type {import('@sveltejs/kit@next').Load} */
-  export async function load({ params, fetch, stuff }) {
-    const url = `/index?target_type=0`;
-    const res = await fetchFates(url, '', fetch, false, true);
-
-    let data = await res.json();
-
-    if (res.ok) {
-      return {
-        props: {
-          data: data,
-          randomBot: data.random
-        }
-      };
-    }
-
-    return {
-      status: res.status,
-      error: new Error(`Could not load ${url}`)
-    };
-  }
-</script>
-
 <script lang="ts">
   import SearchBar from '$lib/base/SearchBar.svelte';
   import Tag from '$lib/base/Tag.svelte';
@@ -35,9 +8,9 @@
   import BristlefrostMeta from '$lib/base/BristlefrostMeta.svelte';
   import Section from '$lib/base/Section.svelte';
   import Intl from '$lib/base/Intl.svelte';
-  export let data: BotIndex;
-  export let randomBot: any;
-  //
+  export let data: { index: BotIndex, randomBot: any };
+  
+  console.log(data.index, "is index HALLL")
 </script>
 
 <BristlefrostMeta
@@ -53,12 +26,13 @@
 </section>
 
 <SearchBar type="bot" query="" />
-<Tag targetType="bot" tags={data.tags} />
-<RandomBot type="bot" randomBot={randomBot} />
+<Tag targetType="bot" tags={data.index.tags} />
+
+<RandomBot type="bot" randomBot={data.randomBot} />
 
 <Section icon="fa-solid:certificate" title="Certified" id="certified-index">
   <CardContainer>
-    {#each data.certified as bot}
+    {#each data.index.certified as bot}
       <BotCard data={bot} type="bot" rand={false} />
     {/each}
   </CardContainer>
@@ -66,7 +40,7 @@
 
 <Section icon="fa-solid:sort-amount-up" title="Top Voted" id="top-voted-index">
   <CardContainer>
-    {#each data.top_voted as bot}
+    {#each data.index.top_voted as bot}
       <BotCard data={bot} type="bot" rand={false} />
     {/each}
   </CardContainer>
@@ -74,7 +48,7 @@
 
 <Section icon="fa-solid:plus" title="New Bots" id="new-bots">
   <CardContainer>
-    {#each data.new as bot}
+    {#each data.index.new as bot}
       <BotCard data={bot} type="bot" rand={false} />
     {/each}
   </CardContainer>

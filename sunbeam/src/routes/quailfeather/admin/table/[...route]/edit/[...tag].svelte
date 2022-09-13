@@ -1,7 +1,7 @@
 <script context="module">
   /** @type {import('@sveltejs/kit').ErrorLoad} */
   import { apiUrl, lynxUrl, electroUrl } from '$lib/config';
-  import { checkAdminSession } from '$lib/request';
+  import { checkAdminpage } from '$lib/request';
   export const prerender = false;
   export async function load({ params, session }) {
     let id = '0';
@@ -131,7 +131,7 @@
   export let rows: any;
   import * as logger from '$lib/logger';
   import { enums } from '$lib/enums/enums';
-  import { session } from '$app/stores';
+  import { page } from '$app/stores';
   import Button from '$lib/base/Button.svelte';
 
   /*
@@ -146,11 +146,11 @@ import Tip from '$lib/base/Tip.svelte';
       type: enums.AlertType.Prompt,
       submit: async (value) => {
         // First check their ratelimits
-        let raven = await fetch(`${lynxUrl}/ap/raven?user_id=${$session.session.user.id}`, {
+        let raven = await fetch(`${lynxUrl}/ap/raven?user_id=${$page.data.user.id}`, {
           method: 'GET',
           headers: {
             'Frostpaw-ID': $session.adminData,
-            Authorization: $session.session.token
+            Authorization: $page.data.token
           }
         });
 
@@ -174,12 +174,12 @@ import Tip from '$lib/base/Tip.svelte';
         logger.info('AdminPanel', 'Setting new content to:', { content });
 
         let res = await fetch(
-          `${lynxUrl}/ap/tables/${tableName}/tag/${lynxTag}?user_id=${$session.session.user.id}`,
+          `${lynxUrl}/ap/tables/${tableName}/tag/${lynxTag}?user_id=${$page.data.user.id}`,
           {
             method: 'PATCH',
             headers: {
               'Frostpaw-ID': $session.adminData,
-              Authorization: $session.session.token,
+              Authorization: $page.data.token,
               'Content-Type': 'application/json'
             },
             body: JSON.stringify({

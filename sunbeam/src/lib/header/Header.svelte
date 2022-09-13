@@ -1,11 +1,11 @@
 <script lang="ts">
-  import { page, session } from '$app/stores';
+  import { page } from '$app/stores';
   import * as logger from '$lib/logger';
-  logger.info('Header', 'Session from header', $session);
+  logger.info('Header', 'Session from header', $page.data);
   import { loginUser, logoutUser } from '$lib/request';
   import { goto } from '$app/navigation';
   import { apiUrl, nextUrl, lynxUrl } from '$lib/config';
-  import { browser } from '$app/env';
+  import { browser } from '$app/environment';
   import menustore from '$lib/menustore';
   import navigationState from '$lib/navigationState';
   import { enums } from '$lib/enums/enums';
@@ -15,11 +15,11 @@
   let userID = null;
   let avatar = null;
 
-  if ($session.session.user) {
-    username = $session.session.user.username;
-    userID = $session.session.user.id;
-    if ($session.session.user.avatar) {
-      avatar = `https://cdn.discordapp.com/avatars/${userID}/${$session.session.user.avatar}.webp`;
+  if ($page.data.user) {
+    username = $page.data.user.username;
+    userID = $page.data.user.id;
+    if ($page.data.user.avatar) {
+      avatar = `https://cdn.discordapp.com/avatars/${userID}/${$page.data.user.avatar}.webp`;
     } else {
       avatar = 'https://cdn.discordapp.com/embed/avatars/4.png';
     }
@@ -62,9 +62,9 @@
           let token = '';
           let userId = '';
 
-          if ($session.session.token) {
-            userId = $session.session.user.id;
-            token = $session.session.token;
+          if ($page.data.token) {
+            userId = $page.data.user.id;
+            token = $page.data.token;
           }
 
           fetch(`${lynxUrl}/eternatus`, {
@@ -227,10 +227,10 @@
         />
       </li>
       <li class:active={$page.url.pathname === '/partners'}>
-        <a sveltekit:prefetch href="/partners">Partners</a>
+        <a data-sveltekit-prefetch href="/partners">Partners</a>
       </li>
       <li class:active={$page.url.pathname === '/servers'}>
-        <a sveltekit:prefetch href="/servers">Servers</a>
+        <a data-sveltekit-prefetch href="/servers">Servers</a>
       </li>
       <li class:active={$page.url.pathname === '/'}><a sveltekit:prefetch href="/">Bots</a></li>
     </ul>

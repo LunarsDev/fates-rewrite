@@ -33,7 +33,7 @@
 </script>
 
 <script lang="ts">
-  import { browser } from '$app/env';
+  import { browser } from '$app/environment';
   import BotSettings from '$lib/pages/BotSettings.svelte';
   import { loginUser } from '$lib/request';
   export let failed: boolean;

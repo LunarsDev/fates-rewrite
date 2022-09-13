@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { browser } from '$app/env';
+  import { browser } from '$app/environment';
 
   import FormInput from '$lib/base/FormInput.svelte';
   import Button from '$lib/base/Button.svelte';

@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { session } from '$app/stores';
+  import { page } from '$app/stores';
   import alertstore from '$lib/alertstore';
   import Tag from '$lib/base/Tag.svelte';
 
@@ -18,10 +18,10 @@
   export let limited = false;
 
   async function voteBot() {
-    let token = $session.session.token;
+    let token = $page.data.token;
     let userID = '';
     if (token) {
-      userID = $session.session.user.id;
+      userID = $page.data.user.id;
     }
     $loadstore = 'Voting...';
     $navigationState = 'loading';
@@ -95,7 +95,7 @@ If you have previously invited Squirrelflight, please remove and add Fates List 
       ></span
     >
   </Button>
-  {#if $session.session.token && $session.session.user_experiments.includes(enums.UserExperiments.BotReport)}
+  {#if $page.data.token && $page.data.user_experiments.includes(enums.UserExperiments.BotReport)}
     <Button
       onclick={() => {
         alert({
@@ -112,13 +112,13 @@ If you still wish to report, type the reason for reporting this ${type} below. R
             multiline: true,
             function: async (value) => {
               const res = await fetch(
-                `${nextUrl}/users/${$session.session.user.id}/${type}s/${data.user.id}/appeal`,
+                `${nextUrl}/users/${$page.data.user.id}/${type}s/${data.user.id}/appeal`,
                 {
                   method: 'POST',
                   headers: {
                     'Content-Type': 'application/json',
                     Frostpaw: '0.1.0',
-                    Authorization: $session.session.token
+                    Authorization: $page.data.token
                   },
                   body: JSON.stringify({
                     request_type: 2, // 2 means report

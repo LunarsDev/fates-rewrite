@@ -31,7 +31,7 @@
   import Section from '$lib/base/Section.svelte';
   import { enums } from '$lib/enums/enums';
   import Button from '$lib/base/Button.svelte';
-  import { session } from '$app/stores';
+  import { page } from '$app/stores';
   import { genError } from '$lib/strings';
   import QuailTree from './_helpers/QuailTree.svelte';
   import Tip from '$lib/base/Tip.svelte';
@@ -409,13 +409,13 @@
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
-        Authorization: $session.session.token
+        Authorization: $page.data.token
       },
       body: JSON.stringify({
         id: id,
         reason: reason,
         action: action,
-        user_id: $session.session.user.id,
+        user_id: $page.data.user.id,
         context: context
       })
     });

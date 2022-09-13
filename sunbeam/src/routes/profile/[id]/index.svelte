@@ -29,7 +29,7 @@
 <script lang="ts">
   import BotCard from '$lib/cards/BotCard.svelte';
   import CardContainer from '$lib/cards/CardContainer.svelte';
-  import { page, session } from '$app/stores';
+  import { page } from '$app/stores';
   import BristlefrostMeta from '$lib/base/BristlefrostMeta.svelte';
   import BotPack from '$lib/base/BotPack.svelte';
   import Badge from '$lib/base/Badge.svelte';
@@ -38,13 +38,13 @@
   export let systemBots: boolean;
 
   let loggedIn = false;
-  if ($session.session.user) {
+  if ($page.data.user) {
     loggedIn = true;
   }
 
   let personal = false;
 
-  if (loggedIn && $session.session.user.id == data.user.id) {
+  if (loggedIn && $page.data.user.id == data.user.id) {
     personal = true;
   }
 

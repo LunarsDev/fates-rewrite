@@ -5,7 +5,7 @@
 
   import { onMount } from 'svelte';
   import Icon from '@iconify/svelte'; // For later
-  import { session } from '$app/stores';
+  import { page } from '$app/stores';
   import { enums } from '$lib/enums/enums';
   import { logoutUser } from '$lib/request';
 
@@ -233,12 +233,12 @@ in the staff guide, you will just be told to reread the staff guide!`.replaceAll
                   let code = value.toString();
                   logger.info(code, 'Code');
                   let res = await fetch(
-                    `${electroUrl}/ap/newcat?user_id=${$session.session.user.id}`,
+                    `${electroUrl}/ap/newcat?user_id=${$page.data.user.id}`,
                     {
                       method: 'POST',
                       headers: {
                         'Content-Type': 'application/json',
-                        Authorization: $session.session.token
+                        Authorization: $page.data.token
                       },
                       body: code
                     }
@@ -296,11 +296,11 @@ Please enter <code>${data.totp_shared_key}</code> in Google Authenticator or Aut
                 message: 'Enter 2FA code here',
                 type: enums.AlertType.Prompt,
                 submit: async (v) => {
-                  let res = await fetch(`${lynxUrl}/reset?user_id=${$session.session.user.id}`, {
+                  let res = await fetch(`${lynxUrl}/reset?user_id=${$page.data.user.id}`, {
                     method: 'POST',
                     headers: {
                       'Content-Type': 'application/json',
-                      Authorization: $session.session.token,
+                      Authorization: $page.data.token,
                       'Frostpaw-MFA': v.toRaw()
                     }
                   });

@@ -3,7 +3,7 @@
   import * as logger from '$lib/logger';
   import { storage } from '$lib/supabase';
   import TextEditor from '$lib/base/TextEditor.svelte';
-  import { session } from '$app/stores';
+  import { page } from '$app/stores';
   import { AlertType, enums } from '$lib/enums/enums';
 
   export let show: boolean;
@@ -16,8 +16,8 @@
 
   export let supabase;
 
-  if ($session.session.token) {
-    supabase = new storage($session.session.user.id, $session.session.token, false);
+  if ($page.data.token) {
+    supabase = new storage($page.data.user.id, $page.data.token, false);
   } else {
     supabase = new storage(null, null, false);
   }

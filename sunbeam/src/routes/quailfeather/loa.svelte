@@ -24,7 +24,7 @@
 </script>
 
 <script lang="ts">
-  import { session } from '$app/stores';
+  import { page } from '$app/stores';
 
   import Button from '$lib/base/Button.svelte';
   import QuailTree from './_helpers/QuailTree.svelte';
@@ -33,15 +33,15 @@
   export let perms;
 
   async function sendLoa() {
-    if (!$session.session.token) {
+    if (!$page.data.token) {
       alert('Not logged in...');
     }
 
-    let res = await fetch(`${lynxUrl}/loa?user_id=${$session.session.user.id}`, {
+    let res = await fetch(`${lynxUrl}/loa?user_id=${$page.data.user.id}`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
-        Authorization: $session.session.token
+        Authorization: $page.data.token
       },
       body: JSON.stringify({
         reason: (document.querySelector('#reason') as HTMLInputElement).value,

@@ -34,7 +34,7 @@
 
 <script lang="ts">
   import Tab from '$lib/base/Tab.svelte';
-  import { page, session } from '$app/stores';
+  import { page } from '$app/stores';
   import SelectOption from '$lib/base/SelectOption.svelte';
   import Button from '$lib/base/Button.svelte';
   import Tip from '$lib/base/Tip.svelte';
@@ -89,14 +89,14 @@
   function showUserToken() {
     let b = document.querySelector('#user-token-show-btn');
     if (!firstTimeShowedWarning) {
-      userToken = $session.session.token;
+      userToken = $page.data.token;
       popup('Warning: Do not share this with anyone', 'Important');
       firstTimeShowedWarning = true;
       b.textContent = 'Hide';
       return;
     }
     if (b.textContent == 'Show') {
-      userToken = $session.session.token;
+      userToken = $page.data.token;
       b.textContent = 'Hide';
     } else {
       userToken = 'Hidden';
@@ -106,7 +106,7 @@
 
   async function regenUserToken() {
     let url = `${nextUrl}/users/${data.user.id}/token`;
-    let headers = { Authorization: `User ${$session.session.token}` };
+    let headers = { Authorization: `User ${$page.data.token}` };
     let res = await fetch(url, {
       method: 'DELETE',
       headers: headers
@@ -164,7 +164,7 @@
     };
     logger.info('ProfileSettings', 'New settings object is: ', JSON.stringify(payload));
     let url = `${nextUrl}/profiles/${data.user.id}`;
-    let headers = { Authorization: $session.session.token, 'Content-Type': 'application/json' };
+    let headers = { Authorization: $page.data.token, 'Content-Type': 'application/json' };
     let res = await fetch(url, {
       method: 'PATCH',
       headers: headers,
@@ -212,7 +212,7 @@
           description: ''
         };
       });
-    let headers = { Authorization: $session.session.token, 'Content-Type': 'application/json' };
+    let headers = { Authorization: $page.data.token, 'Content-Type': 'application/json' };
     let res = await fetch(`${nextUrl}/users/${data.user.id}/packs`, {
       method: 'POST',
       headers: headers,
@@ -232,7 +232,7 @@
       popup('No Pack ID given');
       return;
     }
-    let headers = { Authorization: $session.session.token };
+    let headers = { Authorization: $page.data.token };
     let res = await fetch(`${nextUrl}/users/${data.user.id}/packs/${packId}`, {
       method: 'DELETE',
       headers: headers
@@ -247,7 +247,7 @@
   }
 
   async function revokeClient(cliId) {
-    let headers = { Authorization: $session.session.token };
+    let headers = { Authorization: $page.data.token };
     let res = await fetch(`${nextUrl}/users/${data.user.id}/frostpaw/clients/${cliId}`, {
       method: 'DELETE',
       headers: headers
@@ -263,7 +263,7 @@
 
   async function getOldRoles() {
     let url = `${nextUrl}/profiles/${data.user.id}/old-roles`;
-    let headers = { Authorization: $session.session.token };
+    let headers = { Authorization: $page.data.token };
     let res = await fetch(url, {
       method: 'PUT',
       headers: headers

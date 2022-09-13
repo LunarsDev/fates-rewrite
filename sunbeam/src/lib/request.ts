@@ -1,8 +1,9 @@
-import { browser } from '$app/env';
+import { browser } from '$app/environment';
 import { apiUrl, nextUrl, lynxUrl, electroUrl } from './config';
 import { genError } from './strings';
 import * as logger from './logger';
-import { encode, decode } from '@cfworker/base64url';
+import Base64 from "./b64"
+//import { encode, decode } from '@cfworker/base64url';
 
 // Parse review state from number
 export function parseState(v) {
@@ -21,6 +22,7 @@ export function parseState(v) {
   return state;
 }
 
+// Deprecated
 export async function fetchFates(
   url: string,
   auth: string,
@@ -85,7 +87,7 @@ export async function loginUser(_: boolean = false) {
 
   modifier['version'] = 11;
 
-  window.location.href = `${json.context}&state=${json.reason}.${encode(JSON.stringify(modifier))}`;
+  window.location.href = `${json.context}&state=${json.reason}.${Base64.encode(JSON.stringify(modifier))}`;
 }
 
 export function logoutUser() {
@@ -266,7 +268,7 @@ export const dhsRetrip = async (userId: string, token: string, alertOrg: string)
 
   if (json) {
     const data = json['cia.black.site'];
-    const decoded = decode(data.slice(0, data.length - 2));
+    const decoded = Base64.decode(data.slice(0, data.length - 2));
     return decoded.slice(0, decoded.length - 2);
   } else return undefined;
 };

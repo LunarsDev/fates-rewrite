@@ -1,7 +1,7 @@
 <script lang="ts">
-  import { browser } from '$app/env';
+  import { browser } from '$app/environment';
 
-  import { session } from '$app/stores';
+  import { page } from '$app/stores';
   import { enums } from '$lib/enums/enums';
   import loadstore from '$lib/loadstore';
   import navigationState from '$lib/navigationState';
@@ -15,12 +15,12 @@
   async function addReview() {
     $loadstore = 'Adding...';
     $navigationState = 'loading';
-    let token = $session.session.token;
+    let token = $page.data.token;
     if (!token) {
       loginUser(false);
       return false;
     }
-    let userID = $session.session.user.id;
+    let userID = $page.data.user.id;
 
     let review = document.querySelector('#review-text');
     let starRating = document.querySelector('#star-rating');

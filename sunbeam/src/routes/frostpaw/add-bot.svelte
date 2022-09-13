@@ -29,10 +29,10 @@
 </script>
 
 <script lang="ts">
-  import { browser } from '$app/env';
+  import { browser } from '$app/environment';
   import BotSettings from '$lib/pages/BotSettings.svelte';
   import { loginUser } from '$lib/request';
-  import { session } from '$app/stores';
+  import { page } from '$app/stores';
   import { apiUrl } from '$lib/config';
   export let context: any;
   export let data: any;
@@ -46,14 +46,14 @@
   data.flags = [];
   data.owners = [];
 
-  if (!$session.session.token) {
+  if (!$page.data.token) {
     if (browser) {
       loginUser(false);
     }
   }
 </script>
 
-{#if $session.session.token}
+{#if $page.data.token}
   <BotSettings mode="add" data={data} context={context} />
 {:else}
   <p>Logging you in, please wait...</p>

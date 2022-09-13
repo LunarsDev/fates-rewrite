@@ -1,6 +1,6 @@
 <script lang="ts">
   import { loginUser, addReviewHandler } from '$lib/request';
-  import { session } from '$app/stores';
+  import { page } from '$app/stores';
   import loadstore from '$lib/loadstore';
   import navigationState from '$lib/navigationState';
   import Button from '$lib/base/Button.svelte';
@@ -38,12 +38,12 @@ import Icon from '@iconify/svelte';
   }
 
   async function voteReview(reviewID: string, upvote: boolean) {
-    let token = $session.session.token;
+    let token = $page.data.token;
     if (!token) {
       loginUser(false);
       return;
     }
-    let userID = $session.session.user.id;
+    let userID = $page.data.user.id;
     let res = await fetch(`${nextUrl}/reviews/${reviewID}/votes`, {
       method: 'PATCH',
       headers: {
@@ -65,12 +65,12 @@ import Icon from '@iconify/svelte';
   async function replyReview(id) {
     $loadstore = 'Replying...';
     $navigationState = 'loading';
-    let token = $session.session.token;
+    let token = $page.data.token;
     if (!token) {
       loginUser(false);
       return false;
     }
-    let userID = $session.session.user.id;
+    let userID = $page.data.user.id;
 
     let reviewText = document.querySelector(`#review-${review.id}-reply`) as HTMLInputElement;
     let starRating = document.querySelector(`#rating-${review.id}-reply`) as HTMLInputElement;
@@ -109,8 +109,8 @@ import Icon from '@iconify/svelte';
 
   async function editReview() {
     // User is logged in
-    let userID = $session.session.user.id;
-    let token = $session.session.token;
+    let userID = $page.data.user.id;
+    let token = $page.data.token;
 
     $loadstore = 'Editing...';
     $navigationState = 'loading';
@@ -153,7 +153,7 @@ import Icon from '@iconify/svelte';
 
   async function deleteReview() {
     // User is already logged in
-    let userID = $session.session.user.id;
+    let userID = $page.data.user.id;
 
     let type = 0;
     if (targetType == 'server') {
@@ -165,7 +165,7 @@ import Icon from '@iconify/svelte';
       headers: {
         'Content-Type': 'application/json',
         Frostpaw: '0.1.0',
-        Authorization: $session.session.token
+        Authorization: $page.data.token
       }
     });
 
@@ -232,7 +232,7 @@ import Icon from '@iconify/svelte';
           <i class="material-icons">star</i>
           <span>{Number(parseFloat(review.star_rating)).toFixed(1)}/10.0</span>
         </span>
-        {#if $session.session.token && edittable}
+        {#if $page.data.token && edittable}
           <a
             class="long-desc-link"
             style="color: white !important"
@@ -242,7 +242,7 @@ import Icon from '@iconify/svelte';
             <span class="white" style="margin-left: 3px;">Reply</span>
           </a>
         {/if}
-        {#if $session.session.token && $session.session.user.id == review.user.id && edittable}
+        {#if $page.data.token && $page.data.user.id == review.user.id && edittable}
           <a
             href={'javascript:void(0);'}
             style="font-weight: bold; margin-left: 3px;"
@@ -256,7 +256,7 @@ import Icon from '@iconify/svelte';
         style="margin-left: 30px !important; color: white"
         id="review_text-{review.id}">{review.review_text}</span
       >
-      {#if $session.session.token && edittable}
+      {#if $page.data.token && edittable}
         <section id="reviewreply-{review.id}" class="white review-reply-section">
           <label for="rating">On a scale of 1 to 10, how much do you like this bot?</label><br />
           <input
@@ -288,7 +288,7 @@ import Icon from '@iconify/svelte';
           >
         </section>
       {/if}
-      {#if $session.session.token && $session.session.user.id == review.user.id && edittable}
+      {#if $page.data.token && $page.data.user.id == review.user.id && edittable}
         <div id="reviewopt-{review.id}" style="display: none;">
           <section id="reviewedit-{review.id}" style="width: 100%;" class="white">
             <label for="rating">On a scale of 1 to 10, how much do you like this bot?</label><br />

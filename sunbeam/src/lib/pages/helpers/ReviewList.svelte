@@ -1,7 +1,7 @@
 <script lang="ts">
-  import { browser } from '$app/env';
+  import { browser } from '$app/environment';
 
-  import { session } from '$app/stores';
+  import { page } from '$app/stores';
 
   export let data: any;
   export let type: string;
@@ -32,8 +32,8 @@
 
     let url = `${nextUrl}/reviews/${data.user.id}?page=${page}&target_type=${targetType}`;
 
-    if ($session.session.token) {
-      url += `&user_id=${$session.session.user.id}`;
+    if ($page.data.token) {
+      url += `&user_id=${$page.data.user.id}`;
     }
 
     let res = await fetch(url);

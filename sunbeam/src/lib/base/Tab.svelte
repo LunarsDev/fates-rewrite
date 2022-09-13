@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { browser } from '$app/env';
+  import { browser } from '$app/environment';
   import * as logger from '$lib/logger';
 
   export let tabs: any;

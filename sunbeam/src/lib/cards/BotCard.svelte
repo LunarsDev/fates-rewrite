@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { session } from '$app/stores';
+  import { page } from '$app/stores';
   import { apiUrl } from '$lib/config';
   import Icon from '@iconify/svelte';
   import Button from '$lib/base/Button.svelte';
@@ -12,6 +12,7 @@
   if (data.id && !data.user) {
     data.user = { id: data.id };
   }
+  
   data.banner = data.banner || `${apiUrl}/static/assets/prod/banner.webp?v=2`;
 
   if(data.description && data.description.length > 150) {
@@ -87,7 +88,7 @@
           onclick={() => {}}
           >{#if type == 'server'}Join{:else}Invite{/if}</Button
         >
-      {:else if $session.session.token && data.user.id == $session.session.user.id}
+      {:else if $page.data.token && data.user.id == $page.data.user.id}
         <Button
           id="bot-card-action-settings-{data.user.id}"
           ariaLabel="Settings"

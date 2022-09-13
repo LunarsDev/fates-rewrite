@@ -1,8 +1,8 @@
 <script context="module">
   /** @type {import('@sveltejs/kit').ErrorLoad} */
   import { apiUrl, lynxUrl, electroUrl } from '$lib/config';
-  import { checkAdminSession } from '$lib/request';
-  import { browser } from '$app/env';
+  import { checkAdminpage } from '$lib/request';
+  import { browser } from '$app/environment';
   export const prerender = false;
   export async function load({ params, session }) {
     let id = '0';
@@ -140,7 +140,7 @@
   export let count: number;
   import * as logger from '$lib/logger';
   import Button from '$lib/base/Button.svelte';
-  import { session } from '$app/stores';
+  import { page } from '$app/stores';
   import FormInput from '$lib/base/FormInput.svelte';
   import Tip from '$lib/base/Tip.svelte';
   import { goto } from '$app/navigation';
@@ -156,13 +156,13 @@
       // Get new total count expected for this query
       let countReq = await fetch(
         `${electroUrl}/ap/tables/${tableName}?user_id=${
-          $session.session.user.id
+          $page.data.user.id
         }&limit=${limit}&offset=${(nextPage - 1) * limit}&${extQuery}&count=true`,
         {
           method: 'GET',
           headers: {
             'Frostpaw-ID': $session.adminData,
-            Authorization: $session.session.token
+            Authorization: $page.data.token
           }
         }
       );
@@ -176,13 +176,13 @@
     }
     let cols = await fetch(
       `${electroUrl}/ap/tables/${tableName}?user_id=${
-        $session.session.user.id
+        $page.data.user.id
       }&limit=${limit}&offset=${(nextPage - 1) * limit}&${extQuery}`,
       {
         method: 'GET',
         headers: {
           'Frostpaw-ID': $session.adminData,
-          Authorization: $session.session.token
+          Authorization: $page.data.token
         }
       }
     );

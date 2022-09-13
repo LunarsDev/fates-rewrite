@@ -115,7 +115,7 @@
 
 <script lang="ts">
   import QuailTree from '../_helpers/QuailTree.svelte';
-  import { browser } from '$app/env';
+  import { browser } from '$app/environment';
   import { lynxUrl, apiUrl, electroUrl } from '$lib/config';
 
   export let data: any;

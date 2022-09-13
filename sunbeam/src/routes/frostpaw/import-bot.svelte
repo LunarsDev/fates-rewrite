@@ -27,10 +27,10 @@
 </script>
 
 <script lang="ts">
-  import { browser } from '$app/env';
+  import { browser } from '$app/environment';
   import BotSettings from '$lib/pages/BotSettings.svelte';
   import { loginUser } from '$lib/request';
-  import { session } from '$app/stores';
+  import { page } from '$app/stores';
   import { apiUrl } from '$lib/config';
   import Tip from '$lib/base/Tip.svelte';
   import FormInput from '$lib/base/FormInput.svelte';
@@ -41,7 +41,7 @@
   import { genError } from '$lib/strings';
   import { enums } from '$lib/enums/enums';
   export let sources: any;
-  if (!$session.session.token) {
+  if (!$page.data.token) {
     if (browser) {
       loginUser(false);
     }
@@ -124,7 +124,7 @@
         if (extData['additional_owners']) {
           extData['owners'] = extData['additional_owners'];
         } else {
-          extData['owners'] = [$session.session.user.id];
+          extData['owners'] = [$page.data.user.id];
         }
       }
       if (!extData['description']) {
@@ -167,11 +167,11 @@
     }
 
     let res = await fetch(
-      `${apiUrl}/users/${$session.session.user.id}/bots/${botId}/import?src=${source}${extQuery}`,
+      `${apiUrl}/users/${$page.data.user.id}/bots/${botId}/import?src=${source}${extQuery}`,
       {
         method: 'POST',
         headers: {
-          Authorization: $session.session.token,
+          Authorization: $page.data.token,
           'Content-Type': 'application/json'
         },
         body: JSON.stringify({ ext_data: extData })
@@ -206,7 +206,7 @@
   let source: string;
 </script>
 
-{#if $session.session.token}
+{#if $page.data.token}
   <h1 class="text-center">Import A Bot!</h1>
   <div id="source-view">
     <Tip>

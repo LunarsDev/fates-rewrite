@@ -4,6 +4,7 @@ from . import tags
 import inspect
 import piccolo
 from fastapi import FastAPI, HTTPException
+from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import ORJSONResponse
 from starlette.routing import Mount
 from piccolo_admin.endpoints import create_admin
@@ -37,6 +38,15 @@ app = FastAPI(
         ),
     ],
 )
+
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"],
+    allow_methods=["GET", "POST", "PUT", "PATCH" "DELETE", "OPTIONS"],
+    allow_headers=["Frostpaw-Auth"],
+    allow_credentials=True,
+)
+
 mapleshade = Mapleshade()
 
 @app.on_event("startup")

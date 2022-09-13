@@ -1,12 +1,12 @@
 <script lang="ts">
   import Button from '$lib/base/Button.svelte';
   import { subNotifs } from '$lib/request';
-  import { session } from '$app/stores';
-  let token = $session.session.token;
+  import { page } from '$app/stores';
+  let token = $page.data.token;
   let id = '';
 
   if (token) {
-    id = $session.session.user.id;
+    id = $page.data.user.id;
   }
 </script>
 

@@ -6,6 +6,10 @@
   export let modWidth = true; // Whether to set width to 90% or not, needed in bot pages to make showing tags look decent
   export let buttonTag = false; // Button tag or not
 
+  if(!tags) {
+    tags = [];
+  }
+
   // Add first maxTags to initial render view
   let maxTags = 4;
   let classList = 'tag-container';

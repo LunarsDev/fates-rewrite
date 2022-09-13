@@ -9,7 +9,7 @@ interface UserInterface {
   avatar: string;
 }
 
-interface SessionInterface {
+interface PageData {
   user: UserInterface;
   token: string;
   css: string?;
@@ -31,10 +31,16 @@ declare global {
 
     interface Platform {}
 
-    interface Session {
-      session: SessionInterface;
-      adminData: any;
-    }
+    interface PageData { 
+      user: UserInterface;
+      token: string;
+      css: string?;
+      refresh_token: string?;
+      user_experiments: number[];
+      site_lang: string;
+      admin_ticket: string;
+      url: string
+    };
 
     interface Stuff {}
   }

@@ -6,7 +6,7 @@
   import { enums } from '$lib/enums/enums';
   import Icon from '@iconify/svelte';
   import Button from '$lib/base/Button.svelte';
-  import { page, session } from '$app/stores';
+  import { page } from '$app/stores';
   import { voteHandler } from '$lib/request';
   import loadstore from '$lib/loadstore';
   import navigationState from '$lib/navigationState';
@@ -18,7 +18,7 @@
   import { apiUrl, nextUrl } from '$lib/config';
   import Checkbox from '$lib/base/Checkbox.svelte';
   import Owner from '$lib/base/Owner.svelte';
-  import { browser } from '$app/env';
+  import { browser } from '$app/environment';
   import alertstore from '$lib/alertstore';
   import AuditLogs from '$lib/base/AuditLogs.svelte';
   import { genError } from '$lib/strings';
@@ -131,10 +131,10 @@
   }
 
   async function appealBot() {
-    let url = `${nextUrl}/users/${$session.session.user.id}/bots/${data.bot_id}/appeal`;
+    let url = `${nextUrl}/users/${$page.data.user.id}/bots/${data.bot_id}/appeal`;
     let headers = {
       'Content-Type': 'application/json',
-      Authorization: $session.session.token
+      Authorization: $page.data.token
     };
     let res = await fetch(url, {
       method: 'POST',
@@ -166,10 +166,10 @@
   }
 
   async function requestCertification() {
-    let url = `${nextUrl}/users/${$session.session.user.id}/bots/${data.bot_id}/appeal`;
+    let url = `${nextUrl}/users/${$page.data.user.id}/bots/${data.bot_id}/appeal`;
     let headers = {
       'Content-Type': 'application/json',
-      Authorization: $session.session.token
+      Authorization: $page.data.token
     };
     let res = await fetch(url, {
       method: 'POST',
@@ -260,10 +260,10 @@
             return;
           }
 
-          let url = `${nextUrl}/users/${$session.session.user.id}/bots/${data.bot_id}/main-owner`;
+          let url = `${nextUrl}/users/${$page.data.user.id}/bots/${data.bot_id}/main-owner`;
           let headers = {
             'Content-Type': 'application/json',
-            Authorization: $session.session.token
+            Authorization: $page.data.token
           };
           let res = await fetch(url, {
             method: 'PATCH',
@@ -327,9 +327,9 @@
             return;
           }
 
-          let url = `${nextUrl}/users/${$session.session.user.id}/bots/${data.bot_id}`;
+          let url = `${nextUrl}/users/${$page.data.user.id}/bots/${data.bot_id}`;
           let headers = {
-            Authorization: $session.session.token
+            Authorization: $page.data.token
           };
           let res = await fetch(url, {
             method: 'DELETE',
@@ -583,7 +583,7 @@
   async function sendTestWebhook() {
     $loadstore = 'Voting...';
     $navigationState = 'loading';
-    await voteHandler($session.session.user.id, $session.session.token, data.bot_id, true, 'bot');
+    await voteHandler($page.data.user.id, $page.data.token, data.bot_id, true, 'bot');
     $navigationState = 'loaded';
     return;
   }
@@ -792,10 +792,10 @@
 
       logger.info('Settings', 'Got bot object', bot);
 
-      let url = `${nextUrl}/users/${$session.session.user.id}/bots`;
+      let url = `${nextUrl}/users/${$page.data.user.id}/bots`;
       let headers = {
         'Content-Type': 'application/json',
-        Authorization: $session.session.token
+        Authorization: $page.data.token
       };
       let updateRes = await fetch(url, {
         method: method,

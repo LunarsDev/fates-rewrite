@@ -5,7 +5,6 @@
     "gentypes": "echo 'npx openapi-to-ts -i https://api.fateslist.xyz/docs/openapi -o src/lib/apiTypes.ts'",
     "dev": "vite dev --port 5000 --host",
     "build": "vite build",
-    "prepare": "svelte-kit sync",
     "package": "svelte-kit package",
     "start": "vite build && vite preview --port 5000 --host",
     "preview": "vite preview --port 5000 --host",
@@ -73,7 +72,7 @@
     "svelte-quill": "^1.2.0",
     "tailwindcss-all": "^0.0.2",
     "tw-elements": "^1.0.0-alpha12",
-    "vite": "^2.9.14"
+    "vite": "3.1.0"
   },
   "browser": {
     "crypto": false

@@ -30,7 +30,7 @@
 <script lang="ts">
   import { enums } from '$lib/enums/enums';
   import QuailTree from '../_helpers/QuailTree.svelte';
-  import { session } from '$app/stores';
+  import { page } from '$app/stores';
   export let perms: any;
   import * as logger from '$lib/logger';
 </script>
@@ -48,14 +48,14 @@
           let mfa = v.toSingleLine('mfa-key');
           logger.info('AdminPanel', { pwd, mfa });
           let loginSession = await fetch(
-            `${electroUrl}/ap/pouncecat?user_id=${$session.session.user.id}`,
+            `${electroUrl}/ap/pouncecat?user_id=${$page.data.user.id}`,
             {
               method: 'POST',
               headers: {
                 'Content-Type': 'application/json',
                 'Frostpaw-Pass': pwd,
                 'Frostpaw-MFA': mfa.padStart(6, 0),
-                Authorization: $session.session.token
+                Authorization: $page.data.token
               }
             }
           );

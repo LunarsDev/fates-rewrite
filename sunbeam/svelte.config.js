@@ -20,12 +20,10 @@ const config = {
 
   kit: {
     adapter: adapter(),
-
     prerender: {
-      default: false,
       enabled: false
     }
-  }
+  }, 
 };
 
 export default config;

@@ -1,5 +1,5 @@
 <script context="module" lang="ts">
-  import { encode, decode } from '@cfworker/base64url';
+  //import { decode } from '@cfworker/base64url';
   import { apiUrl } from '$lib/config';
 
   export const prerender = false;
@@ -174,7 +174,7 @@
 
     return {
       props: {
-        cookie: encode(JSON.stringify(json)),
+        cookie: JSON.stringify(json),
         href: modifierInfo['href'] || '/',
         modifier: modifierInfo
       }
@@ -193,7 +193,7 @@
 
   import Button from '$lib/base/Button.svelte';
   import { enums } from '$lib/enums/enums';
-  import { browser } from '$app/env';
+  import { browser } from '$app/environment';
 
   const sleep = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));
 

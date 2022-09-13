@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { browser } from '$app/env';
+  import { browser } from '$app/environment';
   import inputstore from '$lib/inputstore';
   import RedStar from '$lib/base/RedStar.svelte';
   export let required = false;

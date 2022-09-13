@@ -1,7 +1,7 @@
 <script context="module">
   /** @type {import('@sveltejs/kit').ErrorLoad} */
   import { apiUrl, lynxUrl } from '$lib/config';
-  import { checkAdminSession } from '$lib/request';
+  import { checkAdminpage } from '$lib/request';
   export const prerender = false;
   export async function load({ session }) {
     let id = '0';
@@ -62,7 +62,7 @@
   import Button from '$lib/base/Button.svelte';
 
   import FormInput from '$lib/base/FormInput.svelte';
-  import { session } from '$app/stores';
+  import { page } from '$app/stores';
 
   interface Args {
     type?: string;
@@ -194,11 +194,11 @@
         type: enums.AlertType.Prompt,
         submit: async (value) => {
           // First check their ratelimits
-          let raven = await fetch(`${lynxUrl}/ap/raven?user_id=${$session.session.user.id}`, {
+          let raven = await fetch(`${lynxUrl}/ap/raven?user_id=${$page.data.user.id}`, {
             method: 'GET',
             headers: {
               'Frostpaw-ID': $session.adminData,
-              Authorization: $session.session.token
+              Authorization: $page.data.token
             }
           });
 
@@ -219,11 +219,11 @@
 
           let mfa = value.toSingleLine('mfa-key');
 
-          let res = await fetch(`${lynxUrl}/ap/evalsql?user_id=${$session.session.user.id}`, {
+          let res = await fetch(`${lynxUrl}/ap/evalsql?user_id=${$page.data.user.id}`, {
             method: 'POST',
             headers: {
               'Frostpaw-ID': $session.adminData,
-              Authorization: $session.session.token,
+              Authorization: $page.data.token,
               'Content-Type': 'application/json',
               'Frostpaw-MFA': mfa
             },

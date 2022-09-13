@@ -1,13 +1,13 @@
 <script lang="ts">
-  import { session } from '$app/stores';
+  import { page } from '$app/stores';
   import { getIntlString } from '$lib/strings';
 
   export let key: string;
 
   let lang = 'en';
 
-  if ($session.session.user) {
-    lang = $session.session.site_lang;
+  if ($page.data.user) {
+    lang = $page.data.site_lang;
   }
 
   if (!lang) {

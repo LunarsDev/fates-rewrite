@@ -1,4 +1,6 @@
 <script lang="ts">
+  export const prerender = true;
+  
   import Header from '$lib/header/Header.svelte';
 
   import navigationState from '$lib/navigationState';
@@ -6,7 +8,7 @@
   import alertStore from '$lib/alertstore';
   import PageLoader from '$lib/base/PageLoader.svelte';
 
-  import { browser } from '$app/env';
+  import { browser } from '$app/environment';
   import loadstore from '$lib/loadstore';
   import alertstore from '$lib/alertstore';
   import { errorStore } from '$lib/alertstore';
@@ -14,7 +16,7 @@
   import * as logger from '$lib/logger';
   import menustore from '$lib/menustore';
 
-  import { navigating, session } from '$app/stores';
+  import { navigating, page } from '$app/stores';
 
   import './../css/tailwind.css';
   import { enums } from '$lib/enums/enums';
@@ -91,8 +93,8 @@
 
   $: {
     if ($navigating) {
-      logger.info('Nav', `isNavigating: ${$navigating.from} -> ${$navigating.to}`);
-      if ($navigating.to.host != $navigating.from.host) {
+      logger.info('Nav', `isNavigating: ${$navigating.from.url} -> ${$navigating.to.url}`);
+      if ($navigating.to.url.host != $navigating.from.url.host) {
         logger.info('Nav', 'navigating to different host');
         $navigationState = 'loaded';
       } else {
@@ -113,10 +115,10 @@
   // Insert alertstore into window
   if (browser) {
     window.user = () => {
-      if ($session.session.token) {
+      if ($page.data.token) {
         return {
-          id: $session.session.user.id,
-          token: $session.session.token,
+          id: $page.data.user.id,
+          token: $page.data.token,
           apiUrl: apiUrl,
           lynxUrl: lynxUrl
         };

@@ -5,18 +5,18 @@ from piccolo.utils.pydantic import create_pydantic_model
 from pydantic import BaseModel
 
 # Add models here
-BotBase = create_pydantic_model(Bots, deserialize_json=True, exclude_columns=(
+BotBase = create_pydantic_model(Bots, deserialize_json=True, exclude_columns=( 
     Bots.api_token,
     Bots.webhook_secret,
     Bots.webhook,
-))
+)) 
 UserBase = create_pydantic_model(Users, deserialize_json=True, exclude_columns=(
     Users.api_token,
 ))
 
 UserBotLogsBase = create_pydantic_model(UserBotLogs, deserialize_json=True)
 
-class UserBotLog(UserBotLogsBase):
+class UserBotLog(UserBotLogsBase): # type: ignore[valid-type, misc]
     bot_id: str
     user_id: str
 
@@ -25,7 +25,7 @@ class Entity:
     """The entity's ID"""
 
     @staticmethod
-    def to(_: dict) -> "Tag":
+    def to(_: dict) -> "Self":
         pass
 
     @classmethod
@@ -37,7 +37,7 @@ class Entity:
             return self.id == getattr(other, "id", None)
         return self.id == other
 
-class Tag(BaseModel, Entity):
+class Tag(BaseModel, Entity): 
     """Represents a tag"""
 
     id: str
@@ -53,7 +53,7 @@ class Tag(BaseModel, Entity):
     """The guild ID of the tags owner (server only)"""
 
     @staticmethod
-    def to(tag: dict) -> "Tag":
+    def to(tag: dict) -> "Self":
         """Returns all tags for a bot"""
         return Tag(
             id=tag["id"],
@@ -78,7 +78,7 @@ class Feature(Entity, BaseModel):
     """Feature description"""
 
     @staticmethod
-    def to(feature: dict) -> "Feature":
+    def to(feature: dict) -> "Self":
         """Returns all features for a bot"""
         return Feature(
             id=feature["id"],
@@ -87,7 +87,7 @@ class Feature(Entity, BaseModel):
             description=feature["description"]
         )
 
-class Bot(BotBase):
+class Bot(BotBase): # type: ignore[misc, valid-type]
     """Represents a bot"""
     # These fields have the wrong type set for API response, change them
     bot_id: str
@@ -109,5 +109,5 @@ class Bot(BotBase):
     tags: list[Tag]
 
 
-class User(UserBase):
+class User(UserBase): # type: ignore[valid-type, misc]
     pass

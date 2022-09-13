@@ -1,15 +1,18 @@
 from enum import Enum, IntEnum
 
+
 class WidgetType(Enum):
     bot = "bot"
     server = "server"
+
 
 class WidgetFormat(Enum):
     json = "json"
     html = "html"
     png = "png"
     webp = "webp"
-        
+
+
 class BotFlag(IntEnum):
     unlocked = 0
     edit_locked = 1
@@ -21,11 +24,13 @@ class BotFlag(IntEnum):
     keep_banner_decor = 7
     nsfw = 8
 
+
 class UserFlag(IntEnum):
     Unknown = 0
     VotesPrivate = 1
     Staff = 2
     AvidVoter = 3
+
 
 class UserState(IntEnum):
     normal = 0
@@ -33,6 +38,7 @@ class UserState(IntEnum):
     profile_edit_ban = 2
     ddr_ban = 3
     api_ban = 4
+
 
 # LYNX
 class BotState(IntEnum):
@@ -47,14 +53,17 @@ class BotState(IntEnum):
     private_viewable = 8
     private_staff_only = 9
 
+
 class EventType(IntEnum):
     promotion = 0
     maintenance = 1
     announcement = 2
 
+
 class Vanity(IntEnum):
     server = 0
     bot = 1
+
 
 class UserBotAction(IntEnum):
     approve = 0
@@ -71,22 +80,27 @@ class UserBotAction(IntEnum):
     unverify = 11
     requeue = 12
 
+
 class LongDescriptionType(IntEnum):
     Html = 0
     MarkdownServerSide = 1
 
+
 class WebhookType(IntEnum):
     vote = 0
     discord = 1
+
 
 class CommandType(IntEnum):
     regular = 0
     guild_slash = 1
     global_slash = 2
 
+
 class ReviewType(IntEnum):
     bot = 0
     server = 1
+
 
 class PageStyle(IntEnum):
     tabs = 0

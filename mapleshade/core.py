@@ -7,24 +7,34 @@ import cmarkgfm
 import msgpack
 import aiohttp
 
+
 class SilverException(Exception):
     """Base exception for Silverpelt"""
+
     ...
+
 
 class SilverRespError(SilverException):
     """Exception for when a response is not okay (200)"""
+
     def __init__(self, endpoint: str, kwargs: dict, resp: aiohttp.ClientResponse):
         self.resp = resp
         self.endpoint = endpoint
         self.kwargs = kwargs
-        super().__init__(f"Silverpelt returned {resp.status} on {endpoint} with kwargs {kwargs}")
+        super().__init__(
+            f"Silverpelt returned {resp.status} on {endpoint} with kwargs {kwargs}"
+        )
+
 
 class SilverNoData(SilverException):
     """Exception for when there is no data"""
+
     ...
 
-class Mapleshade():
-    __slots__=['yaml', 'config', 'sanitize_tags', 'sanitize_attrs']
+
+class Mapleshade:
+    __slots__ = ["yaml", "config", "sanitize_tags", "sanitize_attrs"]
+
     def __init__(self):
         self.yaml = YAML()
 
@@ -33,8 +43,23 @@ class Mapleshade():
 
         # Sanitize tags for bleach
         self.sanitize_tags = bleach.sanitizer.ALLOWED_TAGS + [
-            "span", "img", "video", "iframe", "style", "p", "br", "center", "div", "h1", "h2",
-            "h3", "h4", "h5", "section", "article", "fl-lang",
+            "span",
+            "img",
+            "video",
+            "iframe",
+            "style",
+            "p",
+            "br",
+            "center",
+            "div",
+            "h1",
+            "h2",
+            "h3",
+            "h4",
+            "h5",
+            "section",
+            "article",
+            "fl-lang",
         ]
 
         # Sanitize attributes for bleach
@@ -52,11 +77,7 @@ class Mapleshade():
                 "data-height",
                 "code",
             ],
-            "iframe": [
-                "src", 
-                "height", 
-                "width"
-            ],
+            "iframe": ["src", "height", "width"],
             "img": [
                 "src",
                 "alt",
@@ -66,9 +87,8 @@ class Mapleshade():
                 "referrerpolicy",
                 "sizes",
                 "srcset",
-            ]
+            ],
         }
-
 
     def parse_dict(self, d: dict | object) -> dict | object:
         """Parse dict for handling bigints in DDR's etc"""
@@ -79,17 +99,17 @@ class Mapleshade():
         elif isinstance(d, list):
             return [self.parse_dict(i) for i in d]
         elif isinstance(d, dict):
-            nd = {} # New dict
+            nd = {}  # New dict
             for k, v in d.items():
                 nd[k] = self.parse_dict(v)
             return nd
         else:
             return d
-    
+
     def sanitize(
-        self, 
-        s: str, 
-        long_description_type: enums.LongDescriptionType = enums.LongDescriptionType.MarkdownServerSide
+        self,
+        s: str,
+        long_description_type: enums.LongDescriptionType = enums.LongDescriptionType.MarkdownServerSide,
     ) -> str:
         """Sanitize a string for use in HTML/MD accordingly"""
         if long_description_type == enums.LongDescriptionType.MarkdownServerSide:
@@ -114,8 +134,10 @@ class Mapleshade():
         except SilverNoData:
             return None
 
-        owners = await tables.BotOwner.select(tables.BotOwner.owner, tables.BotOwner.main).where(tables.BotOwner.bot_id == bot_id)
-        
+        owners = await tables.BotOwner.select(
+            tables.BotOwner.owner, tables.BotOwner.main
+        ).where(tables.BotOwner.bot_id == bot_id)
+
         owners_list: list = []
 
         for owner in owners:
@@ -123,31 +145,41 @@ class Mapleshade():
                 owner_user = await self.silverpelt_req(f"users/{owner['owner']}")
             except SilverNoData:
                 continue
-                
+
             owners_list.append(models.Owner(user=owner_user, main=owner["main"]))
-        
+
         bot["owners"] = owners_list
 
         # Add action logs
-        bot["action_logs"] = (await tables.UserBotLogs.select().where(tables.UserBotLogs.bot_id == bot_id)) or []
-        
+        bot["action_logs"] = (
+            await tables.UserBotLogs.select().where(tables.UserBotLogs.bot_id == bot_id)
+        ) or []
+
         # Fix extra_links not being a dict (despite being JSONB, this is just stupid)
         bot["extra_links"] = orjson.loads(bot["extra_links"])
 
         # Sanitize long description
-        bot['long_description_raw'] = bot['long_description']
-        bot['long_description'] = self.sanitize(bot['long_description'])
+        bot["long_description_raw"] = bot["long_description"]
+        bot["long_description"] = self.sanitize(bot["long_description"])
 
         # Sanitize CSS
         bot["css_raw"] = bot["css"]
-        bot['css'] = self.sanitize("<style>" + (bot['css'] or "") + "</style>", enums.LongDescriptionType.Html)
+        bot["css"] = self.sanitize(
+            "<style>" + (bot["css"] or "") + "</style>", enums.LongDescriptionType.Html
+        )
 
         # Tags
         tags = []
-        bot_tags = await tables.BotTags.select(tables.BotTags.tag).where(tables.BotTags.bot_id == bot_id)
+        bot_tags = await tables.BotTags.select(tables.BotTags.tag).where(
+            tables.BotTags.bot_id == bot_id
+        )
 
         for tag in bot_tags:
-            tag_data = await tables.BotListTags.select().where(tables.BotListTags.id == tag["tag"]).first()
+            tag_data = (
+                await tables.BotListTags.select()
+                .where(tables.BotListTags.id == tag["tag"])
+                .first()
+            )
             tags.append(tag_data)
 
         bot["tags"] = models.Tag.to_list(tags)
@@ -155,38 +187,48 @@ class Mapleshade():
         # Features
         features = []
         for feature in bot["features"]:
-            feature_data = await tables.Features.select().where(tables.Features.id == feature).first()
+            feature_data = (
+                await tables.Features.select()
+                .where(tables.Features.id == feature)
+                .first()
+            )
             features.append(feature_data)
-        
+
         bot["features"] = models.Feature.to_list(features)
-        
+
         # Pydantic memes
         bot_m = models.Bot(**bot)
 
         return bot_m
-    
+
     async def user(self, user_id: int) -> Optional[models.User]:
         """Returns a user from the database"""
-        user = await tables.Users.select().where(tables.Users.user_id == user_id).first()
+        user = (
+            await tables.Users.select().where(tables.Users.user_id == user_id).first()
+        )
 
         if not user:
             return None
 
         return models.User(**user)
-    
+
     async def silverpelt_req(self, endpoint: str, **kwargs) -> dict:
         """Makes a request to Silverpelt"""
         async with aiohttp.ClientSession() as session:
             try:
-                async with session.get(f"http://127.0.0.1:3030/{endpoint}", **kwargs) as resp:
+                async with session.get(
+                    f"http://127.0.0.1:3030/{endpoint}", **kwargs
+                ) as resp:
                     if not resp.ok:
                         raise SilverRespError(endpoint, kwargs, resp)
                     body_bytes = await resp.read()
                     bytes: dict = msgpack.unpackb(body_bytes)
 
                     if not bytes:
-                        raise SilverNoData(f"Silverpelt returned no data on {endpoint} with kwargs {kwargs}")
-                    
+                        raise SilverNoData(
+                            f"Silverpelt returned no data on {endpoint} with kwargs {kwargs}"
+                        )
+
                     return bytes
             except aiohttp.ClientConnectorError:
                 raise SilverException("Could not connect to Silverpelt")

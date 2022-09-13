@@ -25,11 +25,11 @@ class Entity:
     """The entity's ID"""
 
     @staticmethod
-    def to(_: dict) -> "Self":
+    def to(_: dict) -> "Entity":
         pass
 
     @classmethod
-    def to_list(cls, obj: list[dict]) -> list[Self]:
+    def to_list(cls, obj: list[dict]) -> list["Entity"]:
         return [cls.to(e) for e in obj]
 
     def __eq__(self, other):
@@ -53,7 +53,7 @@ class Tag(BaseModel, Entity):
     """The guild ID of the tags owner (server only)"""
 
     @staticmethod
-    def to(tag: dict) -> "Self":
+    def to(tag: dict) -> "Tag":
         """Returns all tags for a bot"""
         return Tag(
             id=tag["id"],
@@ -78,7 +78,7 @@ class Feature(Entity, BaseModel):
     """Feature description"""
 
     @staticmethod
-    def to(feature: dict) -> "Self":
+    def to(feature: dict) -> "Feature":
         """Returns all features for a bot"""
         return Feature(
             id=feature["id"],

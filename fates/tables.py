@@ -550,7 +550,7 @@ class WsEvents(Table, tablename="ws_events"):
 
 class BotEvents(Table, tablename="bot_events"):
     id = UUID(
-        default=UUID4,
+        default=UUID4(),
         primary_key=True,
     )
     bot_id = ForeignKey(
@@ -675,7 +675,7 @@ class UserConnection(Table, tablename="user_connections"):
 
     expires_on = Timestamptz(
         null=False,
-        default=TimestamptzNow
+        default=TimestamptzNow()
     )
 
 

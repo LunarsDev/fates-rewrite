@@ -5,3 +5,4 @@ piccolo-admin # this already pulls in piccolo ORM as well
 orjson
 bleach
 cmarkgfm
+msgpack

@@ -4,6 +4,8 @@ from ruamel.yaml import YAML
 import orjson
 import bleach
 import cmarkgfm
+import msgpack
+import aiohttp
 
 class Mapleshade():
     __slots__=['yaml', 'config', 'sanitize_tags', 'sanitize_attrs']
@@ -127,3 +129,12 @@ class Mapleshade():
             return None
 
         return models.User(**user)
+    
+    async def silverpelt_req(self, endpoint: str, **kwargs) -> dict:
+        """Makes a request to Silverpelt"""
+        async with aiohttp.ClientSession() as session:
+            async with session.get(f"http://127.0.0.1:3030/{endpoint}", **kwargs) as resp:
+                if not resp.ok:
+                    raise Exception(f"Silverpelt returned {resp.status} on {endpoint} with kwargs {kwargs}")
+                body_bytes = await resp.read()
+                return msgpack.unpackb(body_bytes)

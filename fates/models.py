@@ -62,7 +62,7 @@ class Tag(BaseModel, Entity):
             owner_guild=tag.get("owner_guild", None)
         )
 
-class Feature(Entity, BaseModel):
+class Feature(BaseModel, Entity):
     """Represents a feature"""
     
     id: str

@@ -2,12 +2,23 @@
 
 ## Components
 
+### Backend
+
 - ``Mapleshade`` - The core API implementations of fates list
+- ``Silverpelt`` - A IPC service to handle all discord API actions (using fastapi and msgpack)
+
+### Frontend
+
 - ``Sunbeam`` - Fates List Frontend
 
 ## Requirements
 
 - Python 3.10+
+
+## Running
+
+1. Run ``uvicorn silverpelt.app:app --port 3030`` to start silverpelt
+2. Then run ``uvicorn fates.app:app`` to start main API
 
 ## Database Seeding
 

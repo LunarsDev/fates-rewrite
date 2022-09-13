@@ -57,3 +57,7 @@ async def get_bot(bot_id: int):
     if not bot:
         raise HTTPException(status_code=404, detail="Not Found")
     return bot
+
+@app.get("/test/@me")
+async def test_sv_resp():
+    return await mapleshade.silverpelt_req("@me")

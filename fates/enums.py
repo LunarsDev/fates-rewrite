@@ -78,7 +78,6 @@ class LongDescriptionType(IntEnum):
 class WebhookType(IntEnum):
     vote = 0
     discord = 1
-    fc = 2
 
 class CommandType(IntEnum):
     regular = 0

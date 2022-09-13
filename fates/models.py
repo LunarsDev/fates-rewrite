@@ -21,6 +21,9 @@ class UserBotLog(UserBotLogsBase):
     user_id: str
 
 class Entity:
+    id: str
+    """The entity's ID"""
+
     @staticmethod
     def to(_: dict) -> "Tag":
         pass
@@ -29,10 +32,16 @@ class Entity:
     def to_list(cls, obj: list[dict]) -> list[Self]:
         return [cls.to(e) for e in obj]
 
+    def __eq__(self, other):
+        if getattr(other, "id", None):
+            return self.id == getattr(other, "id", None)
+        return self.id == other
+
 class Tag(BaseModel, Entity):
     """Represents a tag"""
+
     id: str
-    """The tag ID"""
+    """The tag's ID"""
 
     iconify_data: str
     """The tag's iconify class"""
@@ -53,10 +62,11 @@ class Tag(BaseModel, Entity):
             owner_guild=tag.get("owner_guild", None)
         )
 
-class Feature(BaseModel, Entity):
+class Feature(Entity, BaseModel):
     """Represents a feature"""
+    
     id: str
-    """Feature ID"""
+    """The feature's ID"""
 
     name: str
     """Feature Name"""

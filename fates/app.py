@@ -33,7 +33,7 @@ app = FastAPI(
                 site_name="Fates Admin",
                 production=True,
                 # Required when running under HTTPS, change when done
-                allowed_hosts=['rewrite.fateslist.xyz']
+                allowed_hosts=["rewrite.fateslist.xyz"],
             ),
         ),
     ],
@@ -49,11 +49,12 @@ app.add_middleware(
 
 mapleshade = Mapleshade()
 
+
 @app.on_event("startup")
 async def open_database_connection_pool():
     engine = engine_finder()
-    #asyncio.create_task(bot.start(secrets["token"]))
-    #await bot.load_extension("jishaku")
+    # asyncio.create_task(bot.start(secrets["token"]))
+    # await bot.load_extension("jishaku")
     await engine.start_connnection_pool()
 
 
@@ -62,6 +63,7 @@ async def close_database_connection_pool():
     engine = engine_finder()
     await engine.close_connnection_pool()
 
+
 @app.get("/bots/{bot_id}", tags=[tags.bot], response_model=models.Bot)
 async def get_bot(bot_id: int):
     bot = await mapleshade.bot(bot_id)
@@ -69,10 +71,12 @@ async def get_bot(bot_id: int):
         raise HTTPException(status_code=404, detail="Not Found")
     return bot
 
+
 @app.get("/test/@me", response_model=silver_types.DiscordUser)
 async def test_sv_resp():
     req = await mapleshade.silverpelt_req("@me")
     return req
+
 
 @app.get("/blazefire/{id}", response_model=silver_types.DiscordUser)
 async def get_discord_user(id: int):

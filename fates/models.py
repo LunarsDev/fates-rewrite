@@ -1,6 +1,6 @@
 from typing import Literal, Optional
 from typing_extensions import Self
-from .tables import Bots, Users, UserBotLogs, BotListTags
+from .tables import Bots, Users, UserBotLogs
 from piccolo.utils.pydantic import create_pydantic_model
 from pydantic import BaseModel
 

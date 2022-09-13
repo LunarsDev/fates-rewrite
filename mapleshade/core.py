@@ -96,8 +96,24 @@ class Mapleshade():
         # Fix extra_links not being a dict (despite being JSONB, this is just stupid)
         bot["extra_links"] = orjson.loads(bot["extra_links"])
 
+        # Sanitize long description
         bot['long_description_raw'] = bot['long_description']
         bot['long_description'] = self.sanitize(bot['long_description'])
+
+        # Sanitize CSS
+        bot["css_raw"] = bot["css"]
+        bot['css'] = self.sanitize("<style>" + (bot['css'] or "") + "</style>", enums.LongDescriptionType.Html)
+
+        # Tags
+        tags = []
+        bot_tags = await tables.BotTags.select(tables.BotTags.tag).where(tables.BotTags.bot_id == bot_id)
+
+        for tag in bot_tags:
+            tags.append(
+                await tables.BotListTags.select().where(tables.BotListTags.id == tag["tag"]).first()
+            )
+
+        bot["tags"] = models.Tag.to_tag_list(tags)
         
         # Pydantic memes
         bot_m = models.Bot(**bot)

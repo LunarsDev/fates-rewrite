@@ -1039,7 +1039,6 @@ class BotTags(Table, tablename="bot_tags"):
         secret=False,
     )
 
-
 class BotVoters(Table, tablename="bot_voters"):
     bot_id = BigInt(
         default=0,

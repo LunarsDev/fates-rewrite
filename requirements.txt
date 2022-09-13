@@ -6,3 +6,4 @@ orjson
 bleach
 cmarkgfm
 msgpack
+aioredis

@@ -36,6 +36,6 @@ async def about_me():
         avatar=bot.user.avatar.url,
         bot=bot.user.bot,
         system=bot.user.system,
-        status=discord.Status.online,
+        status=discord.Status.online.value,
         flags=bot.user.public_flags.value
     )

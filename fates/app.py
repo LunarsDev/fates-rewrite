@@ -10,6 +10,7 @@ from piccolo_admin.endpoints import create_admin
 from piccolo.engine import engine_finder
 
 from mapleshade import Mapleshade
+import silverpelt.types.types as silver_types
 
 _tables = []
 
@@ -60,4 +61,5 @@ async def get_bot(bot_id: int):
 
 @app.get("/test/@me")
 async def test_sv_resp():
-    return await mapleshade.silverpelt_req("@me")
+    req = await mapleshade.silverpelt_req("@me")
+    return silver_types.DiscordUser(**req)

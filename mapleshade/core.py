@@ -52,7 +52,7 @@ class Mapleshade():
         }
 
 
-    def parse_dict(self, d: dict | object):
+    def parse_dict(self, d: dict | object) -> dict | object:
         """Parse dict for handling bigints in DDR's etc"""
         if isinstance(d, int):
             if d > 9007199254740991:

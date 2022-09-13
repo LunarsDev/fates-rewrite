@@ -33,3 +33,7 @@ class IDiscordUser(BaseModel):
 class DiscordUser(IDiscordUser):
     """Represents a discord user"""
     id: str
+
+def check_snow(id: int) -> bool:
+    """Checks if a snowflake is valid"""
+    return len(str(id)) >= 17 and len(str(id)) <= 20

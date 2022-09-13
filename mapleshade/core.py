@@ -13,7 +13,11 @@ class SilverException(Exception):
 
 class SilverRespError(SilverException):
     """Exception for when a response is not okay (200)"""
-    ...
+    def __init__(self, endpoint: str, kwargs: dict, resp: aiohttp.ClientResponse):
+        self.resp = resp
+        self.endpoint = endpoint
+        self.kwargs = kwargs
+        super().__init__(f"Silverpelt returned {resp.status} on {endpoint} with kwargs {kwargs}")
 
 class SilverNoData(SilverException):
     """Exception for when there is no data"""
@@ -145,13 +149,16 @@ class Mapleshade():
     async def silverpelt_req(self, endpoint: str, **kwargs) -> dict:
         """Makes a request to Silverpelt"""
         async with aiohttp.ClientSession() as session:
-            async with session.get(f"http://127.0.0.1:3030/{endpoint}", **kwargs) as resp:
-                if not resp.ok:
-                    raise SilverRespError(f"Silverpelt returned {resp.status} on {endpoint} with kwargs {kwargs}")
-                body_bytes = await resp.read()
-                bytes: dict = msgpack.unpackb(body_bytes)
+            try:
+                async with session.get(f"http://127.0.0.1:3030/{endpoint}", **kwargs) as resp:
+                    if not resp.ok:
+                        raise SilverRespError(endpoint, kwargs, resp)
+                    body_bytes = await resp.read()
+                    bytes: dict = msgpack.unpackb(body_bytes)
 
-                if not bytes:
-                    raise SilverNoData(f"Silverpelt returned no data on {endpoint} with kwargs {kwargs}")
-                
-                return bytes
+                    if not bytes:
+                        raise SilverNoData(f"Silverpelt returned no data on {endpoint} with kwargs {kwargs}")
+                    
+                    return bytes
+            except aiohttp.ClientConnectorError:
+                raise SilverException("Could not connect to Silverpelt")

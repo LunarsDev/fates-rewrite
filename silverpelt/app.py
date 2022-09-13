@@ -8,7 +8,7 @@ from ruamel.yaml import YAML
 import aioredis
 from pydantic import BaseModel
 
-from silverpelt.types.types import IDiscordUser, Status
+from silverpelt.types.types import IDiscordUser, Status, check_snow
 
 # We use messagepack for serialization
 class MsgpackResponse(JSONResponse):
@@ -32,7 +32,7 @@ with open("config.yaml") as doc:
 redis = aioredis.from_url(config["redis_url"])
 
 async def cache(value: Any, *, key: str, expiry: int = 8 * 60 * 60) -> Any:
-    """Cache a value in redis (8 hours is default for expiry"""
+    """Cache a value in redis (8 hours is default for expiry)"""
     if isinstance(value, BaseModel):
         value = value.dict()
     await redis.set(key, msgpack.packb(value), ex=expiry)
@@ -59,6 +59,18 @@ async def about_me():
 
 @app.get("/users/{id}")
 async def get_user(id: int):
+    """Get a user from discord"""
+
+    # An explanation on snowflakes
+    """
+    Joghurt
+
+    a 16 digit number would have been created before Jan 28th, 2015, and Discord started on May 13th, 2015.
+    So in practice IDs will have between 17 and 19 digits
+    """
+    if not check_snow(id):
+        return None
+
     # Check if in redis cache
     user = await redis.get(f"user:{id}")
 

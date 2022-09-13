@@ -107,7 +107,27 @@ class Mapleshade():
 
         if not bot:
             return None
+
+        # Get bot user
+        try:
+            bot["user"] = await self.silverpelt_req(f"users/{bot_id}")
+        except SilverNoData:
+            return None
+
+        owners = await tables.BotOwner.select(tables.BotOwner.owner, tables.BotOwner.main).where(tables.BotOwner.bot_id == bot_id)
         
+        owners_list: list = []
+
+        for owner in owners:
+            try:
+                owner_user = await self.silverpelt_req(f"users/{owner['owner']}")
+            except SilverNoData:
+                continue
+                
+            owners_list.append(models.Owner(user=owner_user, main=owner["main"]))
+        
+        bot["owners"] = owners_list
+
         # Add action logs
         bot["action_logs"] = (await tables.UserBotLogs.select().where(tables.UserBotLogs.bot_id == bot_id)) or []
         
@@ -131,6 +151,14 @@ class Mapleshade():
             tags.append(tag_data)
 
         bot["tags"] = models.Tag.to_list(tags)
+
+        # Features
+        features = []
+        for feature in bot["features"]:
+            feature_data = await tables.Features.select().where(tables.Features.id == feature).first()
+            features.append(feature_data)
+        
+        bot["features"] = models.Feature.to_list(features)
         
         # Pydantic memes
         bot_m = models.Bot(**bot)

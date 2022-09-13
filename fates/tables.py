@@ -1,5 +1,3 @@
-
-
 from piccolo.columns.base import OnDelete
 from piccolo.columns.base import OnUpdate
 from piccolo.columns.column_types import BigInt
@@ -25,6 +23,7 @@ from decimal import Decimal
 import secrets
 
 from . import enums
+
 
 class Bots(Table, tablename="bots"):
     bot_id = BigInt(
@@ -267,7 +266,8 @@ class Bots(Table, tablename="bots"):
         primary_key=False,
         unique=False,
         secret=False,
-    ) 
+    )
+
 
 class BotListTags(Table, tablename="bot_list_tags"):
     id = Text(
@@ -377,7 +377,6 @@ class Users(Table, tablename="users"):
         null=False,
         primary_key=True,
         unique=False,
-        
         secret=False,
     )
     user_id = BigInt(
@@ -385,7 +384,7 @@ class Users(Table, tablename="users"):
         primary_key=False,
         unique=True,
         secret=False,
-    )    
+    )
     api_token = Text(
         null=False,
         default=secrets.token_urlsafe(512),
@@ -548,6 +547,7 @@ class WsEvents(Table, tablename="ws_events"):
         secret=False,
     )
 
+
 class BotEvents(Table, tablename="bot_events"):
     id = UUID(
         default=UUID4(),
@@ -594,6 +594,7 @@ class BotEvents(Table, tablename="bot_events"):
         secret=False,
     )
 
+
 class Features(Table, tablename="features"):
     id = Text(
         default="",
@@ -624,28 +625,25 @@ class Features(Table, tablename="features"):
         secret=False,
     )
 
+
 class FrostpawClient(Table, tablename="frostpaw_clients"):
     id = Text(
-        primary_key=True,
-        default=lambda: secrets.token_urlsafe().replace(".", "")
+        primary_key=True, default=lambda: secrets.token_urlsafe().replace(".", "")
     )
-    
+
     name = Text(
         null=False,
     )
-    
+
     domain = Text(
         null=False,
     )
-    
+
     privacy_policy = Text(
         null=False,
     )
 
-    secret= Text(
-        null=False,
-        default=secrets.token_urlsafe
-    )
+    secret = Text(null=False, default=secrets.token_urlsafe)
 
     owner_id = ForeignKey(
         references=Users,
@@ -665,18 +663,11 @@ class UserConnection(Table, tablename="user_connections"):
         primary_key=True,
     )
 
-    client_id = Text(
-        null=False
-    )
+    client_id = Text(null=False)
 
-    refresh_token = Text(
-        null=False
-    )
+    refresh_token = Text(null=False)
 
-    expires_on = Timestamptz(
-        null=False,
-        default=TimestamptzNow()
-    )
+    expires_on = Timestamptz(null=False, default=TimestamptzNow())
 
 
 class LeaveOfAbsence(Table, tablename="leave_of_absence"):
@@ -727,7 +718,7 @@ class LeaveOfAbsence(Table, tablename="leave_of_absence"):
 class LynxData(Table, tablename="lynx_data"):
     default_user_experiments = Array(
         base_column=Integer(),
-        help_text="Do not modify this if you do not know what you are doing"
+        help_text="Do not modify this if you do not know what you are doing",
     )
 
 
@@ -800,6 +791,7 @@ class LynxSurveys(Table, tablename="lynx_surveys"):
         secret=False,
     )
 
+
 class PlatformMap(Table, tablename="platform_map"):
     fates_id = Numeric(
         default=Decimal("0"),
@@ -816,6 +808,7 @@ class PlatformMap(Table, tablename="platform_map"):
         unique=False,
         secret=False,
     )
+
 
 class ServerTags(Table, tablename="server_tags"):
     id = Text(
@@ -848,6 +841,7 @@ class ServerTags(Table, tablename="server_tags"):
         unique=False,
         secret=False,
     )
+
 
 class Vanity(Table, tablename="vanity"):
     id = Integer(
@@ -1011,6 +1005,7 @@ class BotOwner(Table, tablename="bot_owner"):
         secret=False,
     )
 
+
 class BotTags(Table, tablename="bot_tags"):
     id = Serial(
         null=False,
@@ -1038,6 +1033,7 @@ class BotTags(Table, tablename="bot_tags"):
         unique=False,
         secret=False,
     )
+
 
 class BotVoters(Table, tablename="bot_voters"):
     bot_id = BigInt(
@@ -1728,6 +1724,7 @@ class ServerAuditLogs(Table, tablename="server_audit_logs"):
         unique=False,
         secret=False,
     )
+
 
 class PushNotifications(Table, tablename="push_notifications"):
     id = UUID(

@@ -6,20 +6,26 @@ from pydantic import BaseModel
 import silverpelt.types.types as silver_types
 
 # Add models here
-BotBase = create_pydantic_model(Bots, deserialize_json=True, exclude_columns=( 
-    Bots.api_token,
-    Bots.webhook_secret,
-    Bots.webhook,
-)) 
-UserBase = create_pydantic_model(Users, deserialize_json=True, exclude_columns=(
-    Users.api_token,
-))
+BotBase = create_pydantic_model(
+    Bots,
+    deserialize_json=True,
+    exclude_columns=(
+        Bots.api_token,
+        Bots.webhook_secret,
+        Bots.webhook,
+    ),
+)
+UserBase = create_pydantic_model(
+    Users, deserialize_json=True, exclude_columns=(Users.api_token,)
+)
 
 UserBotLogsBase = create_pydantic_model(UserBotLogs, deserialize_json=True)
 
-class UserBotLog(UserBotLogsBase): # type: ignore[valid-type, misc]
+
+class UserBotLog(UserBotLogsBase):  # type: ignore[valid-type, misc]
     bot_id: str
     user_id: str
+
 
 class Entity:
     id: str
@@ -38,7 +44,8 @@ class Entity:
             return self.id == getattr(other, "id", None)
         return self.id == other
 
-class Tag(BaseModel, Entity): 
+
+class Tag(BaseModel, Entity):
     """Represents a tag"""
 
     id: str
@@ -46,7 +53,7 @@ class Tag(BaseModel, Entity):
 
     iconify_data: str
     """The tag's iconify class"""
-    
+
     name: str
     """The tag name"""
 
@@ -60,12 +67,13 @@ class Tag(BaseModel, Entity):
             id=tag["id"],
             iconify_data=tag["icon"],
             name=tag["id"].replace("_", "").title(),
-            owner_guild=tag.get("owner_guild", None)
+            owner_guild=tag.get("owner_guild", None),
         )
+
 
 class Feature(BaseModel, Entity):
     """Represents a feature"""
-    
+
     id: str
     """The feature's ID"""
 
@@ -85,19 +93,23 @@ class Feature(BaseModel, Entity):
             id=feature["id"],
             name=feature["name"],
             viewed_as=feature["viewed_as"],
-            description=feature["description"]
+            description=feature["description"],
         )
+
 
 class Owner(BaseModel):
     """Represents a bot owner"""
+
     user: silver_types.DiscordUser
     """The owner's user object"""
 
     main: bool
     """Whether the owner is the main owner"""
 
-class Bot(BotBase): # type: ignore[misc, valid-type]
+
+class Bot(BotBase):  # type: ignore[misc, valid-type]
     """Represents a bot"""
+
     user: silver_types.DiscordUser
     """The bot's user object"""
 
@@ -128,5 +140,5 @@ class Bot(BotBase): # type: ignore[misc, valid-type]
     features: list[Feature]
 
 
-class User(UserBase): # type: ignore[valid-type, misc]
+class User(UserBase):  # type: ignore[valid-type, misc]
     pass

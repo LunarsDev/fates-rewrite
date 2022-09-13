@@ -17,12 +17,15 @@ class MsgpackResponse(JSONResponse):
     def render(self, content: Any) -> bytes:
         return msgpack.packb(content)
 
+
 app = FastAPI(default_response_class=MsgpackResponse)
 bot = discord.Client(intents=discord.Intents(guilds=True, members=True, presences=True))
+
 
 @bot.event
 async def on_ready():
     print("Connected to discord successfully!")
+
 
 yaml = YAML()
 
@@ -31,6 +34,7 @@ with open("config.yaml") as doc:
 
 redis = aioredis.from_url(config["redis_url"])
 
+
 async def cache(value: Any, *, key: str, expiry: int = 8 * 60 * 60) -> Any:
     """Cache a value in redis (8 hours is default for expiry)"""
     if isinstance(value, BaseModel):
@@ -38,9 +42,11 @@ async def cache(value: Any, *, key: str, expiry: int = 8 * 60 * 60) -> Any:
     await redis.set(key, msgpack.packb(value), ex=expiry)
     return value
 
+
 @app.on_event("startup")
 async def start_bot():
     asyncio.create_task(bot.start(config["secrets"]["token"]))
+
 
 @app.get("/@me")
 async def about_me():
@@ -54,8 +60,9 @@ async def about_me():
         bot=bot.user.bot,
         system=bot.user.system,
         status=Status.online.value,
-        flags=bot.user.public_flags.value
+        flags=bot.user.public_flags.value,
     )
+
 
 @app.get("/users/{id}")
 async def get_user(id: int):
@@ -79,11 +86,11 @@ async def get_user(id: int):
 
         if not user_obj:
             return None
-        
+
         return IDiscordUser(**user_obj)
 
     await bot.wait_until_ready()
-    
+
     # Check if in dpy cache
     for guild in bot.guilds:
         print(guild)
@@ -99,11 +106,11 @@ async def get_user(id: int):
                     bot=user.bot,
                     system=user.system,
                     status=Status.new(user.status.value),
-                    flags=user.public_flags.value
+                    flags=user.public_flags.value,
                 ),
-                key = f"user:{id}"
+                key=f"user:{id}",
             )
-    
+
     # Fetch from API
     try:
         user = await bot.fetch_user(id)
@@ -116,9 +123,9 @@ async def get_user(id: int):
                 bot=user.bot,
                 system=user.system,
                 status=Status.offline,
-                flags=user.public_flags.value
+                flags=user.public_flags.value,
             ),
-            key = f"user:{id}"
+            key=f"user:{id}",
         )
     except Exception as exc:
         print(exc)

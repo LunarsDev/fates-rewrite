@@ -22,14 +22,18 @@ sitemap = f"""<?xml version="1.0" encoding="UTF-8"?>
 
 last_mod = os.path.getmtime("static/sitemap.xml")
 
+
 async def get_all_bots():
     db = await asyncpg.create_pool()
-    return await db.fetch("SELECT bot_id, last_updated_at FROM bots WHERE state = 0 OR state = 6 ORDER BY votes DESC, last_updated_at DESC, guild_count DESC, created_at DESC")
+    return await db.fetch(
+        "SELECT bot_id, last_updated_at FROM bots WHERE state = 0 OR state = 6 ORDER BY votes DESC, last_updated_at DESC, guild_count DESC, created_at DESC"
+    )
+
 
 bots = asyncio.run(get_all_bots())
 
-priority = Decimal('0.8')
-decr = Decimal('0.1')
+priority = Decimal("0.8")
+decr = Decimal("0.1")
 counter = 0
 
 for bot in bots:

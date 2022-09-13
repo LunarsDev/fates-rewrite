@@ -1,5 +1,6 @@
 import { apiUrl, origin } from '$lib/config';
 import * as logger from '$lib/logger';
+import { error } from '@sveltejs/kit';
 
 /** @type {import('./$types').PageLoad} */
 export async function load({ parent, fetch }) {
@@ -23,8 +24,5 @@ export async function load({ parent, fetch }) {
       };
     }
 
-    return {
-      status: res.status,
-      error: new Error(`Could not load ${url}`)
-    };
+    throw error(res.status, `Could not load ${url}`)
   }

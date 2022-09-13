@@ -9,7 +9,7 @@ from starlette.routing import Mount
 from piccolo_admin.endpoints import create_admin
 from piccolo.engine import engine_finder
 
-from mapleshade import Mapleshade
+from mapleshade import Mapleshade, SilverNoData
 import silverpelt.types.types as silver_types
 
 _tables = []
@@ -59,7 +59,15 @@ async def get_bot(bot_id: int):
         raise HTTPException(status_code=404, detail="Not Found")
     return bot
 
-@app.get("/test/@me")
+@app.get("/test/@me", response_model=silver_types.DiscordUser)
 async def test_sv_resp():
     req = await mapleshade.silverpelt_req("@me")
-    return silver_types.DiscordUser(**req)
+    return req
+
+@app.get("/blazefire/{id}", response_model=silver_types.DiscordUser)
+async def get_discord_user(id: int):
+    try:
+        req = await mapleshade.silverpelt_req(f"users/{id}")
+    except SilverNoData:
+        raise HTTPException(status_code=404, detail="Not Found")
+    return req

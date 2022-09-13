@@ -1,2 +1,4 @@
 secrets:
   token: # Discord token
+
+redis_url: "redis://127.0.0.1:5432" # Redis URL

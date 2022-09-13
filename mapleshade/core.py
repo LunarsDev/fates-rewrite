@@ -7,6 +7,18 @@ import cmarkgfm
 import msgpack
 import aiohttp
 
+class SilverException(Exception):
+    """Base exception for Silverpelt"""
+    ...
+
+class SilverRespError(SilverException):
+    """Exception for when a response is not okay (200)"""
+    ...
+
+class SilverNoData(SilverException):
+    """Exception for when there is no data"""
+    ...
+
 class Mapleshade():
     __slots__=['yaml', 'config', 'sanitize_tags', 'sanitize_attrs']
     def __init__(self):
@@ -135,6 +147,11 @@ class Mapleshade():
         async with aiohttp.ClientSession() as session:
             async with session.get(f"http://127.0.0.1:3030/{endpoint}", **kwargs) as resp:
                 if not resp.ok:
-                    raise Exception(f"Silverpelt returned {resp.status} on {endpoint} with kwargs {kwargs}")
+                    raise SilverRespError(f"Silverpelt returned {resp.status} on {endpoint} with kwargs {kwargs}")
                 body_bytes = await resp.read()
-                return msgpack.unpackb(body_bytes)
+                bytes: dict = msgpack.unpackb(body_bytes)
+
+                if not bytes:
+                    raise SilverNoData(f"Silverpelt returned no data on {endpoint} with kwargs {kwargs}")
+                
+                return bytes

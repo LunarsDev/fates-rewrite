@@ -113,7 +113,7 @@ class Mapleshade():
                 await tables.BotListTags.select().where(tables.BotListTags.id == tag["tag"]).first()
             )
 
-        bot["tags"] = models.Tag.to_tag_list(tags)
+        bot["tags"] = models.Tag.to_list(tags)
         
         # Pydantic memes
         bot_m = models.Bot(**bot)

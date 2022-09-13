@@ -1,4 +1,5 @@
-from typing import Optional
+from typing import Literal, Optional
+from typing_extensions import Self
 from .tables import Bots, Users, UserBotLogs, BotListTags
 from piccolo.utils.pydantic import create_pydantic_model
 from pydantic import BaseModel
@@ -19,7 +20,16 @@ class UserBotLog(UserBotLogsBase):
     bot_id: str
     user_id: str
 
-class Tag(BaseModel):
+class Entity:
+    @staticmethod
+    def to(_: dict) -> "Tag":
+        pass
+
+    @classmethod
+    def to_list(cls, obj: list[dict]) -> list[Self]:
+        return [cls.to(e) for e in obj]
+
+class Tag(BaseModel, Entity):
     """Represents a tag"""
     id: str
     """The tag ID"""
@@ -34,7 +44,7 @@ class Tag(BaseModel):
     """The guild ID of the tags owner (server only)"""
 
     @staticmethod
-    def to_tag(tag: dict) -> "Tag":
+    def to(tag: dict) -> "Tag":
         """Returns all tags for a bot"""
         return Tag(
             id=tag["id"],
@@ -43,10 +53,29 @@ class Tag(BaseModel):
             owner_guild=tag.get("owner_guild", None)
         )
 
+class Feature(BaseModel, Entity):
+    """Represents a feature"""
+    id: str
+    """Feature ID"""
+
+    name: str
+    """Feature Name"""
+
+    viewed_as: Literal["positive", "negative"]
+    """Whether the feature is viewed as positive or negative"""
+
+    description: str
+    """Feature description"""
+
     @staticmethod
-    def to_tag_list(tags: list[dict]) -> "list[Tag]":
-        """Returns all tags for a bot"""
-        return [Tag.to_tag(tag) for tag in tags]
+    def to(feature: dict) -> "Feature":
+        """Returns all features for a bot"""
+        return Feature(
+            id=feature["id"],
+            name=feature["name"],
+            viewed_as=feature["viewed_as"],
+            description=feature["description"]
+        )
 
 class Bot(BotBase):
     """Represents a bot"""

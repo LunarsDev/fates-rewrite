@@ -50,6 +50,9 @@ class CacheValue():
 
 class Cache():
     """Cache for Mapleshade with expiry"""
+
+    __slots__ = ["cache"]
+
     def __init__(self):
         self.cache: dict[str, CacheValue] = {}
     

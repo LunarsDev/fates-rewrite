@@ -153,10 +153,10 @@ class Bot(BotBase):  # type: ignore[misc, valid-type]
     """Features for the bot"""
 
     state: enums.BotServerState
-    """The bot's/server's state"""
+    """The bot's state"""
 
     flags: list[enums.BotServerFlag]
-    """The bot's/server's flags"""
+    """The bot's flags"""
 
 class User(UserBase):  # type: ignore[valid-type, misc]
     pass

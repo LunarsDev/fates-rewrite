@@ -8,6 +8,7 @@ import cmarkgfm
 import msgpack
 import aiohttp
 import asyncio
+from cmarkgfm.cmark import Options as cmarkgfmOptions
 
 
 class SilverException(Exception):
@@ -124,7 +125,7 @@ class BackendDoc:
             raise RuntimeError(f"BackendDoc {fn} not found. Have you run kitescratch/genassets?")
 
 class Mapleshade:
-    __slots__ = ["yaml", "config", "sanitize_tags", "sanitize_attrs", "cache"]
+    __slots__ = ["yaml", "config", "sanitize_tags", "sanitize_attrs", "cache", "cmark_opts", "cmark_exts"]
 
     def __init__(self):
         # In memory cache for bot data
@@ -134,6 +135,17 @@ class Mapleshade:
 
         with open("config.yaml") as doc:
             self.config = self.yaml.load(doc)
+        
+        # CMark options
+        self.cmark_opts = (
+            #cmarkgfmOptions.CMARK_OPT_LIBERAL_HTML_TAG |
+            cmarkgfmOptions.CMARK_OPT_UNSAFE |
+            cmarkgfmOptions.CMARK_OPT_SMART
+        )
+
+        self.cmark_exts = (
+            'table', 'autolink', 'strikethrough', 'tasklist'
+        )
 
         # Sanitize tags for bleach
         self.sanitize_tags = bleach.sanitizer.ALLOWED_TAGS + [
@@ -190,7 +202,7 @@ class Mapleshade:
             return cached_text.value()
         try:
             with open(f"backend_assets/{fn}.kitescratch") as doc:
-                f = cmarkgfm.github_flavored_markdown_to_html(doc.read())
+                f = cmarkgfm.markdown_to_html_with_extensions(doc.read(), options=self.cmark_opts, extensions=self.cmark_exts)
                 self.cache.set(f"doc:{fn}", f, expiry=360)
                 return f
         except FileNotFoundError:
@@ -221,7 +233,11 @@ class Mapleshade:
         """Sanitize a string for use in HTML/MD accordingly"""
         if long_description_type == enums.LongDescriptionType.MarkdownServerSide:
             # First parse markdown
-            s = cmarkgfm.github_flavored_markdown_to_html(s)
+            s = cmarkgfm.markdown_to_html_with_extensions(
+                s,
+                options=self.cmark_opts,
+                extensions=self.cmark_exts
+            )
         return bleach.clean(
             s,
             tags=self.sanitize_tags,

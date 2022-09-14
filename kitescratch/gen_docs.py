@@ -153,7 +153,38 @@ for line in lines:
 {docstring}
 """
 
+model_docs += """
+
+<style>
+html, body, p, span, div, h1, h2, h3, h4, h5, h6, a, ul, li, ol, blockquote, pre, code, table, thead, tbody, tfoot, tr, th, td, form, fieldset, input, textarea, button, label, select, option, img, dl, dt, dd, figure, figcaption, footer, header, nav, section, main, article, aside, details, dialog, menu, summary {
+    font-family: "Inter", sans-serif;
+}
+</style>
+
+<script>
+// OnReady
+function docReady(fn) {
+    // see if DOM is already available
+    if (document.readyState === "complete" || document.readyState === "interactive") {
+        // call on next available tick
+        setTimeout(fn, 1);
+    } else {
+        document.addEventListener("DOMContentLoaded", fn);
+    }
+}    
+
+
+docReady(function() {
+    document.querySelectorAll("h1, h2, h3, h4, h5, h6").forEach((e) => {
+        // Add id to element
+        e.id = e.innerText.toLowerCase().replace(/ /g, "-").replace(/[^a-z0-9-]/g, "")
+    })
+})
+</script>
+"""
+
 with open("backend_assets/models.kitescratch", "w") as f:
     f.write(model_docs)
+
 
 #print(model_docs)

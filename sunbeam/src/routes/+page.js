@@ -7,11 +7,16 @@ export async function load({ parent, fetch }) {
     let session = await parent();
     logger.info('Page', session);
     const url = `/index?target_type=0`;
-    const res = await fetch(`${apiUrl}${url}`, {
-        headers: {
-            origin: origin
-        }
-    });
+    let res = null
+    try {
+        res = await fetch(`${apiUrl}${url}`, {
+            headers: {
+                origin: origin
+            }
+        });
+    } catch (err) {
+        throw error(404, err)
+    }
 
     let data = await res.json();
 

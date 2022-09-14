@@ -1,6 +1,6 @@
 import cookie from 'cookie';
 import * as logger from '$lib/logger';
-
+import Base64 from "$lib/b64"
 
 /** @type {import('./$types').LayoutServerLoad} */
 export async function load({ request, setHeaders }) {
@@ -36,7 +36,7 @@ export async function load({ request, setHeaders }) {
       const newJwt = cookies['sunbeam-session'];
   
       try {
-        sessionData = JSON.parse(newJwt);
+        sessionData = JSON.parse(Base64.decode(newJwt));
         sessionData.admin_ticket = adminData;
         sessionData.url = request.url
       } catch (e) {

@@ -252,7 +252,6 @@
     name="keywords"
     content="discord bot, discord bot list, fateslist, fates list, bot list, discord list, list of bots, list of bot, bot, discord bots, fateslist bots, fates list"
   />
-  <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
 </svelte:head>
 
 <Header />

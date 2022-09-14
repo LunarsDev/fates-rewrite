@@ -1,7 +1,12 @@
 <script>
   import { getIntlString } from '$lib/strings';
-  import { page } from "$app/stores"
-import { error } from '@sveltejs/kit';
+  import { page } from "$app/stores";
+
+  if(!$page.error) {
+    $page.error = {
+      message: "Not Found"
+    };
+  }
 </script>
 
 {#if $page.status == 400 || $page.status == 502}

@@ -7,6 +7,7 @@ import bleach
 import cmarkgfm
 import msgpack
 import aiohttp
+import asyncio
 
 
 class SilverException(Exception):
@@ -32,9 +33,21 @@ class SilverNoData(SilverException):
 
 class CacheValue():
     """Mapleshade Cache value"""
-    def __init__(self, value: Any, *, expiry: int | float):
+    def __init__(self, parent: "Cache", key: str, value: Any, *, expiry: int | float):
         self._val = value
+        self.parent = parent
+        self.key = key
         self.expiry = expiry
+
+        # Start task to clear from cache when expired
+        asyncio.create_task(self._clear_cache())
+
+    async def _clear_cache(self):
+        """Clears the cache"""
+        while True:
+            if self.expired():
+                self.parent.remove(self.key)
+            await asyncio.sleep(360)
 
     def __repr__(self):
         return f"<CacheVal value={self._val} expiry={self.expiry}>"
@@ -46,7 +59,7 @@ class CacheValue():
         return self._val
     
     def expired(self):
-        return self.expiry > time.time()
+        return self.expiry < time.time()
 
 class Cache():
     """Cache for Mapleshade with expiry"""
@@ -55,21 +68,60 @@ class Cache():
 
     def __init__(self):
         self.cache: dict[str, CacheValue] = {}
+
+        # Start task to clear cache
+        asyncio.create_task(self._clear_cache())
+    
+    def remove(self, key: str) -> bool:
+        """Deletes a value from the cache"""
+        print(f"Removing {key} from cache")
+        try:
+            del self.cache[key]
+            return True
+        except:
+            return False
+    
+    async def _clear_cache(self):
+        """Clears the cache"""
+        while True:
+            to_remove = []
+            for key in self.cache:
+                if self.cache[key].expired():
+                    to_remove.append(key)
+            
+            for key in to_remove:
+                self.remove(key)
+            await asyncio.sleep(360)
     
     def get(self, key: str) -> Optional[CacheValue]:
         """Gets a snippet from the cache"""
         if key in self.cache:
             cached_data = self.cache[key]
             if cached_data.expired():
+                self.remove(key)
                 return None
             return cached_data
         return None
     
-    def set(self, key: str, value: CacheValue):
+    def set(self, key: str, value: Any, *, expiry: int, **kwargs) -> Any:
         """Sets a value in the cache"""
-        if not isinstance(value, CacheValue):
-            raise TypeError("Value must be of type CacheValue")
-        self.cache[key] = value
+        if isinstance(value, CacheValue):
+            raise TypeError("Value must not be of type CacheValue")
+        self.cache[key] = CacheValue(
+            self,
+            key,
+            value,
+            expiry=time.time() + expiry,
+            **kwargs
+        )
+
+class BackendDoc:
+    def __init__(self, fn: str):
+        try:
+            with open(f"backend_assets/{fn}.kitescratch") as doc:
+                doc.read()
+        except FileNotFoundError:
+            raise RuntimeError(f"BackendDoc {fn} not found. Have you run kitescratch/genassets?")
 
 class Mapleshade:
     __slots__ = ["yaml", "config", "sanitize_tags", "sanitize_attrs", "cache"]
@@ -131,6 +183,19 @@ class Mapleshade:
                 "srcset",
             ],
         }
+
+    def load_doc(self, fn: str) -> str:
+        cached_text = self.cache.get(f"doc:{fn}")
+        if cached_text:
+            return cached_text.value()
+        try:
+            with open(f"backend_assets/{fn}.kitescratch") as doc:
+                f = cmarkgfm.github_flavored_markdown_to_html(doc.read())
+                self.cache.set(f"doc:{fn}", f, expiry=360)
+                return f
+        except FileNotFoundError:
+            raise RuntimeError(f"BackendDoc {fn} not found. Have you run kitescratch/genassets?")
+
 
     def parse_dict(self, d: dict | object) -> dict | object:
         """Parse dict for handling bigints in DDR's etc"""

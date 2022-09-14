@@ -13,3 +13,5 @@ seedman/schema.sql
 
 build
 **/*.so
+**/*.kitescratch
+backend_assets

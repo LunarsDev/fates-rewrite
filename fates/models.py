@@ -33,15 +33,22 @@ BOT_SNIPPET_COLS = (
     Bots.state,
 )
 
+# kitescratch-begin
 
 class UserBotLog(UserBotLogsBase):  # type: ignore[valid-type, misc]
     bot_id: str
     user_id: str
 
+    # kitescratch-end
+
 
 class Entity:
+    """Base class for all entities"""
+
     id: str
     """The entity's ID"""
+
+    # kitescratch-end
 
     @staticmethod
     def to(_: dict) -> "Entity":
@@ -72,6 +79,8 @@ class Tag(BaseModel, Entity):
     owner_guild: Optional[str]
     """The guild ID of the tags owner (server only)"""
 
+    # kitescratch-end
+
     @staticmethod
     def to(tag: dict) -> "Tag":
         """Returns all tags for a bot"""
@@ -98,6 +107,8 @@ class Feature(BaseModel, Entity):
     description: str
     """Feature description"""
 
+    # kitescratch-end
+
     @staticmethod
     def to(feature: dict) -> "Feature":
         """Returns all features for a bot"""
@@ -117,6 +128,8 @@ class Owner(BaseModel):
 
     main: bool
     """Whether the owner is the main owner"""
+
+    # kitescratch-end
 
 
 class Bot(BotBase):  # type: ignore[misc, valid-type]
@@ -158,7 +171,10 @@ class Bot(BotBase):  # type: ignore[misc, valid-type]
     flags: list[enums.BotServerFlag]
     """The bot's flags"""
 
+    # kitescratch-end
+
 class User(UserBase):  # type: ignore[valid-type, misc]
+    """Represents a user"""
     pass
 
 class Snippet(BaseModel):
@@ -189,7 +205,11 @@ Represents a snippet which is essentially a miniature version of a bot/server wh
     guild_count: int
     """The bot's/server's guild count"""
 
+    # kitescratch-end
+
 class Index(BaseModel):
+    """Represents an index"""
+
     new: list[Snippet]
     """New bots/servers"""
 
@@ -198,3 +218,5 @@ class Index(BaseModel):
 
     certified: list[Snippet]
     """Certified bots/servers this week"""
+
+    # kitescratch-end

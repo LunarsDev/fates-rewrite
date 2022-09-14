@@ -6,6 +6,7 @@
 
 - ``Mapleshade`` - The core API implementations of fates list
 - ``Silverpelt`` - A IPC service to handle all discord API actions (using fastapi and msgpack)
+- ``Kitescratch`` - Contains helper scripts etc needed to develop and run the backend
 
 ### Frontend
 
@@ -17,6 +18,7 @@
 
 ## Running
 
+0. **Whenever a change is made to backend etc. run ``kitescratch/genassets`` to generate backend assets**
 1. Run ``uvicorn silverpelt.app:app --port 3030`` to start silverpelt
 2. Then run ``uvicorn fates.app:app`` to start main API
 

@@ -5,7 +5,7 @@ import inspect
 import piccolo
 from fastapi import FastAPI, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
-from fastapi.responses import ORJSONResponse
+from fastapi.responses import ORJSONResponse, HTMLResponse
 from starlette.routing import Mount
 from piccolo_admin.endpoints import create_admin
 from piccolo.engine import engine_finder
@@ -82,7 +82,7 @@ async def index(target_type: enums.TargetType):
                 await tables.Bots.select(*models.BOT_SNIPPET_COLS).where(tables.Bots.state == enums.BotServerState.Certified).order_by(tables.Bots.votes, ascending=False).limit(12)
             ),
         )
-        mapleshade.cache.set("bot_index", CacheValue(index, expiry=360))
+        mapleshade.cache.set("bot_index", index, expiry=30)
         return index
     else:
         raise HTTPException(400, "Not yet implemented")
@@ -108,3 +108,7 @@ async def get_discord_user(id: int):
     except SilverNoData:
         raise HTTPException(status_code=404, detail="Not Found")
     return req
+
+@app.get("/__docs/models")
+async def get_models():
+    return HTMLResponse(mapleshade.load_doc("models"))

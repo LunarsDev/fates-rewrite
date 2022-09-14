@@ -13,16 +13,17 @@ class WidgetFormat(Enum):
     webp = "webp"
 
 
-class BotFlag(IntEnum):
-    unlocked = 0
-    edit_locked = 1
-    staff_locked = 2
-    stats_locked = 3
-    vote_locked = 4
-    system = 5
-    whitelist_only = 6
-    keep_banner_decor = 7
-    nsfw = 8
+class BotServerFlag(IntEnum):
+    Unlocked = 0
+    EditLocked = 1
+    StaffLocked = 2
+    StatsLocked = 3
+    VoteLocked = 4
+    System = 5
+    WhitelistOnly = 6
+    KeepBannerDecor = 7
+    NSFW = 8
+    LoginRequired = 9
 
 
 class UserFlag(IntEnum):
@@ -33,25 +34,21 @@ class UserFlag(IntEnum):
 
 
 class UserState(IntEnum):
-    normal = 0
-    global_ban = 1
-    profile_edit_ban = 2
-    ddr_ban = 3
-    api_ban = 4
+    Normal = 0
+    GlobalBan = 1
+    ProfileEditBan = 2
 
-
-# LYNX
-class BotState(IntEnum):
-    approved = 0
-    pending = 1
-    denied = 2
-    hidden = 3
-    banned = 4
-    under_review = 5
-    certified = 6
-    archived = 7
-    private_viewable = 8
-    private_staff_only = 9
+class BotServerState(IntEnum):
+    Approved = 0
+    Pending = 1
+    Denied = 2
+    Hidden = 3
+    Banned = 4
+    UnderReview = 5
+    Certified = 6
+    Archived = 7
+    PrivateViewable = 8
+    PrivateStaffOnly = 9
 
 
 class EventType(IntEnum):
@@ -97,9 +94,9 @@ class CommandType(IntEnum):
     global_slash = 2
 
 
-class ReviewType(IntEnum):
-    bot = 0
-    server = 1
+class TargetType(IntEnum):
+    Bot = 0
+    Server = 1
 
 
 class PageStyle(IntEnum):

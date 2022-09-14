@@ -1,4 +1,5 @@
-from typing import Optional
+import time
+from typing import Any, Optional
 from fates import tables, models, enums
 from ruamel.yaml import YAML
 import orjson
@@ -10,9 +11,7 @@ import aiohttp
 
 class SilverException(Exception):
     """Base exception for Silverpelt"""
-
     ...
-
 
 class SilverRespError(SilverException):
     """Exception for when a response is not okay (200)"""
@@ -31,11 +30,51 @@ class SilverNoData(SilverException):
 
     ...
 
+class CacheValue():
+    """Mapleshade Cache value"""
+    def __init__(self, value: Any, *, expiry: int | float):
+        self._val = value
+        self.expiry = expiry
+
+    def __repr__(self):
+        return f"<CacheVal value={self._val} expiry={self.expiry}>"
+
+    def __str__(self):
+        return self.__repr__()
+    
+    def value(self):
+        return self._val
+    
+    def expired(self):
+        return self.expiry > time.time()
+
+class Cache():
+    """Cache for Mapleshade with expiry"""
+    def __init__(self):
+        self.cache: dict[str, CacheValue] = {}
+    
+    def get(self, key: str) -> Optional[CacheValue]:
+        """Gets a snippet from the cache"""
+        if key in self.cache:
+            cached_data = self.cache[key]
+            if cached_data.expired():
+                return None
+            return cached_data
+        return None
+    
+    def set(self, key: str, value: CacheValue):
+        """Sets a value in the cache"""
+        if not isinstance(value, CacheValue):
+            raise TypeError("Value must be of type CacheValue")
+        self.cache[key] = value
 
 class Mapleshade:
-    __slots__ = ["yaml", "config", "sanitize_tags", "sanitize_attrs"]
+    __slots__ = ["yaml", "config", "sanitize_tags", "sanitize_attrs", "cache"]
 
     def __init__(self):
+        # In memory cache for bot data
+        self.cache = Cache()
+
         self.yaml = YAML()
 
         with open("config.yaml") as doc:
@@ -232,3 +271,18 @@ class Mapleshade:
                     return bytes
             except aiohttp.ClientConnectorError:
                 raise SilverException("Could not connect to Silverpelt")
+
+    async def to_snippet(self, data: list[dict]) -> models.Snippet:
+        """Converts a dict to a snippet"""
+        snippet = []
+        for entity in data:
+            if entity.get("bot_id"):
+                # This is a bot
+                try:
+                    entity["user"] = await self.silverpelt_req(f"users/{entity['bot_id']}")
+                except:
+                    print(f"Failed to get user for bot {entity['bot_id']}")
+                    continue
+            snippet.append(models.Snippet(**entity))
+        
+        return snippet

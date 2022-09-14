@@ -119,7 +119,7 @@ async def get_user(id: int):
                 id=user.id,
                 username=user.name,
                 disc=user.discriminator,
-                avatar=user.avatar.url,
+                avatar=user.avatar.url if user.avatar else user.default_avatar.url,
                 bot=user.bot,
                 system=user.system,
                 status=Status.offline,

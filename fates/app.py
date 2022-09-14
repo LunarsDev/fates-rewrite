@@ -1,4 +1,4 @@
-from fates import models
+from fates import enums, models
 from . import tables
 from . import tags
 import inspect
@@ -10,7 +10,7 @@ from starlette.routing import Mount
 from piccolo_admin.endpoints import create_admin
 from piccolo.engine import engine_finder
 
-from mapleshade import Mapleshade, SilverNoData
+from mapleshade import Mapleshade, SilverNoData, CacheValue
 import silverpelt.types.types as silver_types
 
 _tables = []
@@ -63,6 +63,29 @@ async def close_database_connection_pool():
     engine = engine_finder()
     await engine.close_connnection_pool()
 
+@app.get("/index", response_model=models.Index)
+async def index(target_type: enums.TargetType):
+    if target_type == enums.TargetType.Bot:
+
+        cached_index = mapleshade.cache.get("bot_index")
+
+        if cached_index:
+            return cached_index.value()
+        index = models.Index(
+            top_voted=await mapleshade.to_snippet(
+                await tables.Bots.select().where(tables.Bots.state == enums.BotServerState.Approved).order_by(tables.Bots.votes, ascending=False).limit(12)
+            ),
+            new=await mapleshade.to_snippet(
+                await tables.Bots.select().where(tables.Bots.state == enums.BotServerState.Approved).order_by(tables.Bots.created_at, ascending=False).limit(12)
+            ),
+            certified=await mapleshade.to_snippet(
+                await tables.Bots.select().where(tables.Bots.state == enums.BotServerState.Certified).order_by(tables.Bots.votes, ascending=False).limit(12)
+            ),
+        )
+        mapleshade.cache.set("bot_index", CacheValue(index, expiry=360))
+        return index
+    else:
+        raise HTTPException(400, "Not yet implemented")
 
 @app.get("/bots/{bot_id}", tags=[tags.bot], response_model=models.Bot)
 async def get_bot(bot_id: int):

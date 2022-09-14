@@ -1396,7 +1396,7 @@ class Servers(Table, tablename="servers"):
         secret=False,
     )
     flags = Array(
-        base_column=Integer(),
+        base_column=Integer(choices=enums.BotServerFlag),
         null=False,
         primary_key=False,
         unique=False,

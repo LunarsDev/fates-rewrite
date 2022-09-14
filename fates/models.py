@@ -1,5 +1,7 @@
 from typing import Literal, Optional
 from typing_extensions import Self
+
+from fates import enums
 from .tables import Bots, Users, UserBotLogs
 from piccolo.utils.pydantic import create_pydantic_model
 from pydantic import BaseModel
@@ -138,7 +140,45 @@ class Bot(BotBase):  # type: ignore[misc, valid-type]
     """Tags for the bot"""
 
     features: list[Feature]
+    """Features for the bot"""
 
+    state: enums.BotServerState
+    """The bot's/server's state"""
+
+    flags: list[enums.BotServerFlag]
+    """The bot's/server's flags"""
 
 class User(UserBase):  # type: ignore[valid-type, misc]
     pass
+
+class Snippet(BaseModel):
+    user: silver_types.DiscordUser
+    """The bot's/server's user object"""
+
+    votes: int
+    """The bot's/server's vote count"""
+
+    description: str
+    """The bot's/server's short description"""
+
+    flags: list[enums.BotServerFlag]
+    """The bot's/server's flags"""
+
+    banner: Optional[str]
+    """The bot's/server's banner_card"""
+
+    state: enums.BotServerState
+    """The bot's/server's state"""
+
+    guild_count: int
+    """The bot's/server's guild count"""
+
+class Index(BaseModel):
+    new: list[Snippet]
+    """New bots/servers"""
+
+    top_voted: list[Snippet]
+    """Top voted bots/servers"""
+
+    certified: list[Snippet]
+    """Certified bots/servers this week"""

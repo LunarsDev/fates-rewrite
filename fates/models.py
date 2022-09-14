@@ -162,6 +162,12 @@ class User(UserBase):  # type: ignore[valid-type, misc]
     pass
 
 class Snippet(BaseModel):
+    """
+Represents a snippet which is essentially a miniature version of a bot/server where a full Bot is too expensive to return
+
+- This applies to both ``Bot`` and ``Server`` entities
+
+    """
     user: silver_types.DiscordUser
     """The bot's/server's user object"""
 

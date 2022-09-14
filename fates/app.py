@@ -73,13 +73,13 @@ async def index(target_type: enums.TargetType):
             return cached_index.value()
         index = models.Index(
             top_voted=await mapleshade.to_snippet(
-                await tables.Bots.select().where(tables.Bots.state == enums.BotServerState.Approved).order_by(tables.Bots.votes, ascending=False).limit(12)
+                await tables.Bots.select(*models.BOT_SNIPPET_COLS).where(tables.Bots.state == enums.BotServerState.Approved).order_by(tables.Bots.votes, ascending=False).limit(12)
             ),
             new=await mapleshade.to_snippet(
-                await tables.Bots.select().where(tables.Bots.state == enums.BotServerState.Approved).order_by(tables.Bots.created_at, ascending=False).limit(12)
+                await tables.Bots.select(*models.BOT_SNIPPET_COLS).where(tables.Bots.state == enums.BotServerState.Approved).order_by(tables.Bots.created_at, ascending=False).limit(12)
             ),
             certified=await mapleshade.to_snippet(
-                await tables.Bots.select().where(tables.Bots.state == enums.BotServerState.Certified).order_by(tables.Bots.votes, ascending=False).limit(12)
+                await tables.Bots.select(*models.BOT_SNIPPET_COLS).where(tables.Bots.state == enums.BotServerState.Certified).order_by(tables.Bots.votes, ascending=False).limit(12)
             ),
         )
         mapleshade.cache.set("bot_index", CacheValue(index, expiry=360))

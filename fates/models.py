@@ -23,6 +23,16 @@ UserBase = create_pydantic_model(
 
 UserBotLogsBase = create_pydantic_model(UserBotLogs, deserialize_json=True)
 
+BOT_SNIPPET_COLS = (
+    Bots.bot_id,
+    Bots.votes,
+    Bots.description,
+    Bots.flags,
+    Bots.guild_count,
+    Bots.banner_card,
+    Bots.state,
+)
+
 
 class UserBotLog(UserBotLogsBase):  # type: ignore[valid-type, misc]
     bot_id: str
@@ -164,7 +174,7 @@ class Snippet(BaseModel):
     flags: list[enums.BotServerFlag]
     """The bot's/server's flags"""
 
-    banner: Optional[str]
+    banner_card: Optional[str]
     """The bot's/server's banner_card"""
 
     state: enums.BotServerState

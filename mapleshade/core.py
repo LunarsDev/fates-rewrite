@@ -48,6 +48,7 @@ class CacheValue():
         while True:
             if self.expired():
                 self.parent.remove(self.key)
+                return
             await asyncio.sleep(360)
 
     def __repr__(self):
@@ -75,7 +76,6 @@ class Cache():
     
     def remove(self, key: str) -> bool:
         """Deletes a value from the cache"""
-        print(f"Removing {key} from cache")
         try:
             del self.cache[key]
             return True
@@ -203,7 +203,7 @@ class Mapleshade:
         try:
             with open(f"backend_assets/{fn}.kitescratch") as doc:
                 f = cmarkgfm.markdown_to_html_with_extensions(doc.read(), options=self.cmark_opts, extensions=self.cmark_exts)
-                self.cache.set(f"doc:{fn}", f, expiry=360)
+                self.cache.set(f"doc:{fn}", f, expiry=60)
                 return f
         except FileNotFoundError:
             raise RuntimeError(f"BackendDoc {fn} not found. Have you run kitescratch/genassets?")

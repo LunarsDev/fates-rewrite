@@ -28,7 +28,9 @@
 <SearchBar type="bot" query="" />
 <Tag targetType="bot" tags={data.index.tags} />
 
-<RandomBot type="bot" randomBot={data.randomBot} />
+{#if data.random}
+  <RandomBot type="bot" randomBot={data.random} />
+{/if}
 
 <Section icon="fa-solid:certificate" title="Certified" id="certified-index">
   <CardContainer>

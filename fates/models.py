@@ -4,8 +4,11 @@ from typing_extensions import Self
 from fates import enums
 from .tables import Bots, Users, UserBotLogs
 from piccolo.utils.pydantic import create_pydantic_model
+from piccolo.query import Select
 from pydantic import BaseModel
 import silverpelt.types.types as silver_types
+
+from fates import tables
 
 # Add models here
 BotBase = create_pydantic_model(
@@ -32,6 +35,10 @@ BOT_SNIPPET_COLS = (
     Bots.banner_card,
     Bots.state,
 )
+
+async def augment(c: Select, aug: str):
+    """Augment a SQL select with custom SQL"""
+    return await tables.Bots.raw(str(c) + aug)
 
 # kitescratch-begin
 
@@ -86,7 +93,7 @@ class Tag(BaseModel, Entity):
         """Returns all tags for a bot"""
         return Tag(
             id=tag["id"],
-            iconify_data=tag["icon"],
+            iconify_data=tag["icon"] if "icon" in tag else tag["iconify_data"],
             name=tag["id"].replace("_", "").title(),
             owner_guild=tag.get("owner_guild", None),
         )
@@ -101,8 +108,8 @@ class Feature(BaseModel, Entity):
     name: str
     """Feature Name"""
 
-    viewed_as: Literal["positive", "negative"]
-    """Whether the feature is viewed as positive or negative"""
+    viewed_as: str
+    """What the feature is viewed as"""
 
     description: str
     """Feature description"""
@@ -218,5 +225,29 @@ class Index(BaseModel):
 
     certified: list[Snippet]
     """Certified bots/servers this week"""
+
+    # kitescratch-end
+
+class BotListMeta(BaseModel):
+    """Core metadata about the bot list part of fates list"""
+
+    tags: list[Tag]
+    """All tags for a bot"""
+
+    features: list[Feature]
+    """All features for a bot"""
+
+class ServerListMeta(BaseModel):
+    """Core metadata about the server list part of fates list"""
+    
+    tags: list[Tag]
+    """All tags for a server"""
+
+class ListMeta(BaseModel):
+    """Core metadata (tags/features for servers and bots)"""
+
+    bot: BotListMeta
+
+    server: ServerListMeta
 
     # kitescratch-end

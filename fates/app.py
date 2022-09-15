@@ -3,7 +3,7 @@ from . import tables
 from . import tags
 import inspect
 import piccolo
-from fastapi import FastAPI, HTTPException
+from fastapi import FastAPI, HTTPException, Request
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import ORJSONResponse, HTMLResponse
 from starlette.routing import Mount
@@ -39,13 +39,14 @@ app = FastAPI(
     ],
 )
 
-app.add_middleware(
-    CORSMiddleware,
-    allow_origins=["*"],
-    allow_methods=["GET", "POST", "PUT", "PATCH" "DELETE", "OPTIONS"],
-    allow_headers=["Frostpaw-Auth"],
-    allow_credentials=True,
-)
+@app.middleware("http")
+async def cors(request: Request, call_next):
+    response = await call_next(request)
+    response.headers["Access-Control-Allow-Origin"] = request.headers.get("Origin") or "*"
+    response.headers["Access-Control-Allow-Methods"] = "GET, POST, PUT, DELETE, OPTIONS"
+    response.headers["Access-Control-Allow-Credentials"] = "true"
+    response.headers["Access-Control-Allow-Headers"] = "Content-Type, Authorization, Accept, Frostpaw-Auth, Frostpaw-Vote-Page"
+    return response
 
 mapleshade = Mapleshade()
 
@@ -62,6 +63,16 @@ async def open_database_connection_pool():
 async def close_database_connection_pool():
     engine = engine_finder()
     await engine.close_connnection_pool()
+
+@app.get("/random", response_model=models.Snippet)
+async def random_snippet(target_type: enums.TargetType = enums.TargetType.Bot):
+    if target_type == enums.TargetType.Bot:
+        return (await mapleshade.to_snippet(
+            await models.augment(
+                tables.Bots.select(*models.BOT_SNIPPET_COLS).where(tables.Bots.state == enums.BotServerState.Certified),
+                "ORDER BY RANDOM() LIMIT 1"
+            )
+        ))[0]
 
 @app.get("/index", response_model=models.Index)
 async def index(target_type: enums.TargetType):
@@ -108,6 +119,25 @@ async def get_discord_user(id: int):
     except SilverNoData:
         raise HTTPException(status_code=404, detail="Not Found")
     return req
+
+
+@app.get("/meta", response_model=models.ListMeta)
+async def get_meta():
+    return models.ListMeta(
+        bot=models.BotListMeta(
+            tags=models.Tag.to_list(
+                await tables.BotListTags.select()
+            ),
+            features=models.Feature.to_list(
+                await tables.Features.select()
+            )
+        ),
+        server=models.ServerListMeta(
+            tags=models.Tag.to_list(
+                await tables.ServerTags.select()
+            ),
+        )
+    )
 
 @app.get("/__docs/models")
 async def get_models():

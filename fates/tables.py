@@ -18,13 +18,12 @@ from piccolo.columns.defaults.interval import IntervalCustom
 from piccolo.columns.defaults.timestamp import TimestampNow
 from piccolo.columns.defaults.timestamptz import TimestamptzNow
 from piccolo.columns.defaults.uuid import UUID4
-from piccolo.table import Table
+from piccolo.table import Table, Column
 from decimal import Decimal
 import secrets
 
 from . import enums
-
-
+    
 class Bots(Table, tablename="bots"):
     bot_id = BigInt(
         default=0,

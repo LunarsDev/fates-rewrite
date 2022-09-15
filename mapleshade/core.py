@@ -8,7 +8,7 @@ import cmarkgfm
 import msgpack
 import aiohttp
 from cmarkgfm.cmark import Options as cmarkgfmOptions
-from maplecache import Cache
+from maplecache import *
 
 
 class SilverException(Exception):

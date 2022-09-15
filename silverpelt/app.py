@@ -89,6 +89,7 @@ async def get_user(id: int):
 
         return IDiscordUser(**user_obj)
 
+    print("Not in cache, fetching from discord")
     await bot.wait_until_ready()
 
     # Check if in dpy cache
@@ -113,6 +114,7 @@ async def get_user(id: int):
 
     # Fetch from API
     try:
+        print("fetching")
         user = await bot.fetch_user(id)
         return await cache(
             IDiscordUser(

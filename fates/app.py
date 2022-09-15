@@ -65,14 +65,30 @@ async def close_database_connection_pool():
     await engine.close_connnection_pool()
 
 @app.get("/random", response_model=models.Snippet)
-async def random_snippet(target_type: enums.TargetType = enums.TargetType.Bot):
+async def random_snippet(target_type: enums.TargetType = enums.TargetType.Bot, reroll: bool = False):
+    """
+- reroll: Whether to reroll and bypass cache
+    """
     if target_type == enums.TargetType.Bot:
-        return (await mapleshade.to_snippet(
-            await models.augment(
-                tables.Bots.select(*models.BOT_SNIPPET_COLS).where(tables.Bots.state == enums.BotServerState.Certified),
-                "ORDER BY RANDOM() LIMIT 1"
-            )
-        ))[0]
+        if not reroll:
+            cached = mapleshade.cache.get("random-bot")
+            if cached:
+                return cached.value()
+        flag = 0
+        while flag < 10:
+            try:
+                v = (await mapleshade.to_snippet(
+                    await models.augment(
+                        tables.Bots.select(*models.BOT_SNIPPET_COLS).where(tables.Bots.state == enums.BotServerState.Certified),
+                        "ORDER BY RANDOM() LIMIT 1"
+                    )
+                ))[0]
+                mapleshade.cache.set("random-bot", v, expiry=60 * 60 * 3)
+                return v
+            except Exception as exc:
+                print(exc)
+                flag += 1
+
 
 @app.get("/index", response_model=models.Index)
 async def index(target_type: enums.TargetType):

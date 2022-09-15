@@ -1,5 +1,5 @@
 import { browser } from '$app/environment';
-import { apiUrl, nextUrl, lynxUrl, electroUrl } from './config';
+import { api, apiUrl, nextUrl, lynxUrl, electroUrl } from './config';
 import { genError } from './strings';
 import * as logger from './logger';
 import Base64 from "./b64"
@@ -48,12 +48,22 @@ export async function fetchFates(
   return await fetch(capiUrl + url, { headers: headers });
 }
 
-export async function roll(type: string, fetch) {
-  const url = `/random-${type}`;
-  const res = await fetchFates(url, '', fetch, false, true);
-  const roll = await res.json();
-  logger.info('Poppypaw', roll);
-  return roll;
+export async function roll(type: string | number) {
+  if(type == "bot") {
+    type = 0
+  } else if(type == "server") {
+    type = 1
+  }
+  let res = await fetch(`${api}/random?target_type=${type}&reroll=true`, {
+    method: 'GET',
+  })
+
+  if(res.ok) {
+    return await res.json()
+  }
+
+  alert("Error: " + res.status + " " + res.statusText + " " + res.url)
+  return null
 }
 
 export function getCookie(name, cookie) {

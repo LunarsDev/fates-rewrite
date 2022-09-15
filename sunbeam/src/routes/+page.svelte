@@ -8,7 +8,7 @@
   import BristlefrostMeta from '$lib/base/BristlefrostMeta.svelte';
   import Section from '$lib/base/Section.svelte';
   import Intl from '$lib/base/Intl.svelte';
-  export let data: { index: BotIndex, randomBot: any };
+  export let data: { index: BotIndex, random: any };
   
   console.log(data.index, "is index HALLL")
 </script>

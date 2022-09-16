@@ -268,7 +268,6 @@
     inputs={$alertStore.inputs || []}
     buttons={$alertStore.buttons || []}
     show={$alertStore.show}
-    supabase={null}
     submit={$alertStore.submit}
     title={$alertStore.title}
     icon={$alertStore.icon}

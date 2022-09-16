@@ -1,7 +1,6 @@
 <script lang="ts">
   import quillstore from '$lib/quillstore';
   import * as logger from '$lib/logger';
-  import { storage } from '$lib/supabase';
   import TextEditor from '$lib/base/TextEditor.svelte';
   import { page } from '$app/stores';
   import { AlertType, enums } from '$lib/enums/enums';
@@ -13,20 +12,6 @@
   export let inputs: any[];
   export let buttons: any[];
   export let showError = false;
-
-  export let supabase;
-
-  if ($page.data.token) {
-    supabase = new storage($page.data.user.id, $page.data.token, false);
-  } else {
-    supabase = new storage(null, null, false);
-  }
-
-  setTimeout(() => {
-    supabase.getBucket('public').then((data) => {
-      logger.info('Supabase', data);
-    });
-  }, 5000);
 
   let editor; // We bind to this
   let error: string = '';
@@ -273,12 +258,6 @@
             let element = document.getElementById(
               `inp-${inp.getIndex(input.id)}`
             ) as HTMLInputElement;
-
-            /*const data = await supabase.uploadFiles('public', element.files).catch((err) => {
-							console.error(err);
-						});
-
-						console.log(data);*/
 
             console.log('Files cannot be uploaded at this time');
             break;

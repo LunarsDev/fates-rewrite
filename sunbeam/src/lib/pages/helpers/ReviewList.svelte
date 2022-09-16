@@ -19,8 +19,8 @@
 
   let userHasMovedReviewPage = false;
 
-  async function getReviewPage(page: number) {
-    if (page != 1) {
+  async function getReviewPage(ipage: number) {
+    if (ipage != 1) {
       $loadstore = 'Loading...';
       $navigationState = 'loading';
       userHasMovedReviewPage = true;
@@ -30,7 +30,7 @@
       targetType = enums.ReviewType.server;
     }
 
-    let url = `${nextUrl}/reviews/${data.user.id}?page=${page}&target_type=${targetType}`;
+    let url = `${nextUrl}/reviews/${data.user.id}?page=${ipage}&target_type=${targetType}`;
 
     if ($page.data.token) {
       url += `&user_id=${$page.data.user.id}`;
@@ -39,7 +39,7 @@
     let res = await fetch(url);
     if (res.ok) {
       reviews = await res.json();
-      reviewPage = page;
+      reviewPage = ipage;
     } else if (userHasMovedReviewPage) {
       let data = await res.json();
       alert(data.reason);

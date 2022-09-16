@@ -46,6 +46,9 @@ async def cors(request: Request, call_next):
     response.headers["Access-Control-Allow-Methods"] = "GET, POST, PUT, DELETE, OPTIONS"
     response.headers["Access-Control-Allow-Credentials"] = "true"
     response.headers["Access-Control-Allow-Headers"] = "Content-Type, Authorization, Accept, Frostpaw-Auth, Frostpaw-Vote-Page"
+    
+    if request.method == "OPTIONS":
+        response.status_code = 200
     return response
 
 mapleshade = Mapleshade()

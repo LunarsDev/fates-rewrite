@@ -71,7 +71,7 @@ class Entity:
 
     @classmethod
     def to_list(cls, obj: list[dict]) -> list["Entity"]:
-        return [cls.to(e) for e in obj]
+        return [cls.to(e) for e in obj if e]
 
     def __eq__(self, other):
         if getattr(other, "id", None):

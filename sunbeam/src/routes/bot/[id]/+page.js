@@ -1,29 +1,45 @@
+import { api, origin } from '$lib/config';
 import { fetchFates } from '$lib/request';
+import { error } from '@sveltejs/kit';
 export const prerender = false;
 
 /** @type {import('../../$types').PageLoad} */
-export async function load({ params, fetch }) {
+export async function load({ parent, params, fetch }) {
   const url = `/bots/${params.id}`;
 
   let auth = '';
 
-  if (session.session.user) {
-    auth = `${session.session.user.id}|${session.session.token}`;
-  }
+  let session = null
+  let res = null
 
-  const res = await fetchFates(url, auth, fetch, false, true);
+  try {
+    session = await parent();
+
+    if (session.user) {
+      auth = `${session.user.id}|${session.token}`;
+    }
+
+    let headers = {
+      origin: origin
+    }
+
+    if (auth) {
+      headers['authorization'] = auth;
+    }
+
+    res = await fetch(`${api}${url}`, {
+      headers: headers
+    })
+  } catch (err) {
+    throw error(404, err)
+  }
 
   if (res.ok) {
     let data = await res.json();
     return {
-      props: {
-        data: data
-      }
+      bot: data
     };
   }
 
-  return {
-    status: res.status,
-    error: new Error(`Bot Not Found`)
-  };
+  throw error(404, "Bot Not Found")
 }

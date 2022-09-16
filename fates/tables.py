@@ -21,9 +21,8 @@ from piccolo.columns.defaults.uuid import UUID4
 from piccolo.table import Table, Column
 from decimal import Decimal
 import secrets
+from fates import enums
 
-from . import enums
-    
 class Bots(Table, tablename="bots"):
     bot_id = BigInt(
         default=0,

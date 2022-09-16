@@ -39,3 +39,17 @@ Then, pen ``psql``, then run the following:
 **Sept 12th 2022** 
 
 - ``bot_library`` renamed to ``library``
+
+## Developer Docs
+
+### Authorization
+
+Due to several issues (including extremely long URLs), the ``Frostpaw-Auth`` header is now the preferred way for authorization although ``/bots/{ID}/stats`` will still support ``Authorization`` as well as the new header.
+
+**Format:**
+
+``auth type (user/bot/server)|auth id|auth token``
+
+**Example:**
+
+``user|123456|abcdiskfh``

@@ -3,7 +3,6 @@ import { api, apiUrl, nextUrl, lynxUrl, electroUrl } from './config';
 import { genError } from './strings';
 import * as logger from './logger';
 import Base64 from "./b64"
-//import { encode, decode } from '@cfworker/base64url';
 
 // Parse review state from number
 export function parseState(v) {
@@ -20,32 +19,6 @@ export function parseState(v) {
   else if (v < 10) state = 'Exceeds Expectations';
   else if (v == 10) state = 'Without a doubt, perfect';
   return state;
-}
-
-// Deprecated
-export async function fetchFates(
-  url: string,
-  auth: string,
-  fetch: any,
-  votePage = false,
-  nextApi = false
-) {
-  // Always use direct if browser
-  const headers = { Frostpaw: '0.1' };
-
-  if (auth) {
-    headers['Frostpaw-Auth'] = auth;
-    headers['Authorization'] = auth;
-  }
-  if (votePage) {
-    logger.info('Poppypaw', 'Adding vote page headers');
-    headers['Frostpaw-Vote-Page'] = '1';
-  }
-  let capiUrl = apiUrl;
-  if (nextApi) {
-    capiUrl = nextUrl;
-  }
-  return await fetch(capiUrl + url, { headers: headers });
 }
 
 export async function roll(type: string | number) {

@@ -1,5 +1,4 @@
 import { api, origin } from '$lib/config';
-import { fetchFates } from '$lib/request';
 import { error } from '@sveltejs/kit';
 export const prerender = false;
 

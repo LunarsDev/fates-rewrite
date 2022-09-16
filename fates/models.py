@@ -102,7 +102,7 @@ class Tag(BaseModel, Entity):
         return Tag(
             id=tag["id"],
             iconify_data=tag["icon"] if "icon" in tag else tag["iconify_data"],
-            name=tag["id"].replace("_", "").title(),
+            name=tag["id"].replace("_", " ").title(),
             owner_guild=tag.get("owner_guild", None),
         )
 

@@ -1,5 +1,4 @@
 <script lang="ts" context="module">
-  import { fetchFates } from '$lib/request';
   export const prerender = false;
   /** @type {import('@sveltejs/kit@next').Load} */
   export async function load({ params, fetch, session, stuff }) {
@@ -11,7 +10,11 @@
         }
       };
     }
-    let tagsRes = await fetchFates('/mini-index', '', fetch, false, true);
+    let tagsRes = await fetch('/meta', {
+      headers: {
+        origin: origin,
+      }
+    });
     if (!tagsRes.ok) {
       return {
         status: tagsRes.status,

@@ -6,7 +6,7 @@
 
 - ``Mapleshade`` - The core API implementations of fates list
 - ``Silverpelt`` - A IPC service to handle all discord API actions (using fastapi and msgpack)
-- ``Kitescratch`` - Contains helper scripts etc needed to develop and run the backend
+- ``Kitescratch`` - Contains the API documentation used by the site
 
 ### Frontend
 

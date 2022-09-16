@@ -5,6 +5,7 @@ import inspect
 import piccolo
 from fastapi import FastAPI, HTTPException, Request
 from fastapi.responses import ORJSONResponse
+from fastapi.staticfiles import StaticFiles
 from starlette.routing import Mount
 from piccolo_admin.endpoints import create_admin
 from piccolo.engine import engine_finder

@@ -235,6 +235,8 @@ class Mapleshade:
 
         bot["features"] = models.Feature.to_list(features)
 
+        bot["commands"] = await tables.BotCommands.select().where(tables.BotCommands.bot_id == bot_id)
+
         # Pydantic memes
         bot_m = models.Bot(**bot)
 

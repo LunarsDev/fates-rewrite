@@ -1,8 +1,7 @@
-from typing import Literal, Optional
-from typing_extensions import Self
+from typing import Optional
 
 from fates import enums
-from .tables import Bots, Users, UserBotLogs
+from .tables import BotCommands, Bots, Users, UserBotLogs
 from piccolo.utils.pydantic import create_pydantic_model
 from piccolo.query import Select
 from pydantic import BaseModel
@@ -26,6 +25,8 @@ UserBase = create_pydantic_model(
 
 UserBotLogsBase = create_pydantic_model(UserBotLogs, deserialize_json=True)
 
+BotCommandsBase = create_pydantic_model(BotCommands, deserialize_json=True)
+
 BOT_SNIPPET_COLS = (
     Bots.bot_id,
     Bots.votes,
@@ -48,6 +49,13 @@ class UserBotLog(UserBotLogsBase):  # type: ignore[valid-type, misc]
 
     # kitescratch-end
 
+class BotCommands(BotCommandsBase):
+    """Represents a command attached to a bot"""
+
+    bot_id: str
+    """The commands bot ID"""
+
+    # kitescratch-end
 
 class Entity:
     """Base class for all entities"""
@@ -177,6 +185,9 @@ class Bot(BotBase):  # type: ignore[misc, valid-type]
 
     flags: list[enums.BotServerFlag]
     """The bot's flags"""
+
+    commands: list[BotCommands]
+    """The bot's commands"""
 
     # kitescratch-end
 

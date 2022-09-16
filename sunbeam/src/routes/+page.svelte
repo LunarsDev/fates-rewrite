@@ -3,12 +3,11 @@
   import Tag from '$lib/base/Tag.svelte';
   import BotCard from '$lib/cards/BotCard.svelte';
   import CardContainer from '$lib/cards/CardContainer.svelte';
-  import type { BotIndex } from '$lib/apiTypes';
   import RandomBot from '$lib/base/RandomBot.svelte';
   import BristlefrostMeta from '$lib/base/BristlefrostMeta.svelte';
   import Section from '$lib/base/Section.svelte';
   import Intl from '$lib/base/Intl.svelte';
-  export let data: { index: BotIndex, random: any };
+  export let data: { index: any, random: any };
   
   console.log(data.index, "is index HALLL")
 </script>

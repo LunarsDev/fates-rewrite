@@ -64,15 +64,17 @@
         setTimeout(setupInputs, 300);
       }
 
+      let sliderEl = slider[i] as HTMLInputElement
+
       if (outputId == 'rating-desc-avg') {
         // Special case
-        let state = parseState(slider[i].value);
-        slider[i].innerHTML = el.innerHTML = state + ', ' + slider[i].value;
+        let state = parseState(sliderEl.value);
+        slider[i].innerHTML = el.innerHTML = state + ', ' + sliderEl.value;
         continue;
       }
 
       el.innerHTML = 'Drag the slider to change your rating'; // Display the default slider value
-      slider[i].oninput = function () {
+      sliderEl.oninput = function () {
         let output = document.getElementById(this.getAttribute('data-output'));
         logger.debug('ReviewList', 'Got oninput output of: ', output);
         let state = parseState(this.value);

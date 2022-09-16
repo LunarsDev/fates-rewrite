@@ -1,6 +1,5 @@
-import time
 from typing import Any, Optional
-from fates import tables, models, enums
+from fates import tables, models
 from ruamel.yaml import YAML
 import orjson
 import bleach
@@ -112,19 +111,6 @@ class Mapleshade:
             ],
         }
 
-    def load_doc(self, fn: str) -> str:
-        cached_text = self.cache.get(f"doc:{fn}")
-        if cached_text:
-            return cached_text.value()
-        try:
-            with open(f"backend_assets/{fn}.kitescratch") as doc:
-                f = cmarkgfm.markdown_to_html_with_extensions(doc.read(), options=self.cmark_opts, extensions=self.cmark_exts)
-                self.cache.set(f"doc:{fn}", f, expiry=60)
-                return f
-        except FileNotFoundError:
-            raise RuntimeError(f"BackendDoc {fn} not found. Have you run kitescratch/genassets?")
-
-
     def parse_dict(self, d: dict | object) -> dict | object:
         """Parse dict for handling bigints in DDR's etc"""
         if isinstance(d, int):
@@ -144,10 +130,10 @@ class Mapleshade:
     def sanitize(
         self,
         s: str,
-        long_description_type: enums.LongDescriptionType = enums.LongDescriptionType.MarkdownServerSide,
+        long_description_type: models.LongDescriptionType = models.LongDescriptionType.MarkdownServerSide,
     ) -> str:
         """Sanitize a string for use in HTML/MD accordingly"""
-        if long_description_type == enums.LongDescriptionType.MarkdownServerSide:
+        if long_description_type == models.LongDescriptionType.MarkdownServerSide:
             # First parse markdown
             s = cmarkgfm.markdown_to_html_with_extensions(
                 s,
@@ -204,7 +190,7 @@ class Mapleshade:
         # Sanitize CSS
         bot["css_raw"] = bot["css"]
         bot["css"] = self.sanitize(
-            "<style>" + (bot["css"] or "") + "</style>", enums.LongDescriptionType.Html
+            "<style>" + (bot["css"] or "") + "</style>", models.LongDescriptionType.Html
         )
 
         # Tags

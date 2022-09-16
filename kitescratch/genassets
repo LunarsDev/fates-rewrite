@@ -1,7 +1,0 @@
-#!/bin/bash
-
-rm -rf backend_assets
-
-mkdir backend_assets
-
-/usr/bin/env python3 kitescratch/gen_docs.py # Build the docs

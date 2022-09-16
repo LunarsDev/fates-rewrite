@@ -18,7 +18,6 @@
 
 ## Running
 
-0. **Whenever a change is made to backend etc. run ``kitescratch/genassets`` to generate backend assets**
 1. Run ``uvicorn silverpelt.app:app --port 3030`` to start silverpelt
 2. Then run ``uvicorn fates.app:app`` to start main API
 

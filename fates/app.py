@@ -1,16 +1,15 @@
-from fates import enums, models
+from fates import models
 from . import tables
 from . import tags
 import inspect
 import piccolo
 from fastapi import FastAPI, HTTPException, Request
-from fastapi.middleware.cors import CORSMiddleware
-from fastapi.responses import ORJSONResponse, HTMLResponse
+from fastapi.responses import ORJSONResponse
 from starlette.routing import Mount
 from piccolo_admin.endpoints import create_admin
 from piccolo.engine import engine_finder
 
-from mapleshade import Mapleshade, SilverNoData, CacheValue
+from mapleshade import Mapleshade, SilverNoData
 import silverpelt.types.types as silver_types
 
 _tables = []
@@ -68,11 +67,11 @@ async def close_database_connection_pool():
     await engine.close_connnection_pool()
 
 @app.get("/random", response_model=models.Snippet)
-async def random_snippet(target_type: enums.TargetType = enums.TargetType.Bot, reroll: bool = False):
+async def random_snippet(target_type: models.TargetType = models.TargetType.Bot, reroll: bool = False):
     """
 - reroll: Whether to reroll and bypass cache
     """
-    if target_type == enums.TargetType.Bot:
+    if target_type == models.TargetType.Bot:
         if not reroll:
             cached = mapleshade.cache.get("random-bot")
             if cached:
@@ -82,7 +81,7 @@ async def random_snippet(target_type: enums.TargetType = enums.TargetType.Bot, r
             try:
                 v = (await mapleshade.to_snippet(
                     await models.augment(
-                        tables.Bots.select(*models.BOT_SNIPPET_COLS).where(tables.Bots.state == enums.BotServerState.Certified),
+                        tables.Bots.select(*models.BOT_SNIPPET_COLS).where(tables.Bots.state == models.BotServerState.Certified),
                         "ORDER BY RANDOM() LIMIT 1"
                     )
                 ))[0]
@@ -94,8 +93,8 @@ async def random_snippet(target_type: enums.TargetType = enums.TargetType.Bot, r
 
 
 @app.get("/index", response_model=models.Index)
-async def index(target_type: enums.TargetType):
-    if target_type == enums.TargetType.Bot:
+async def index(target_type: models.TargetType):
+    if target_type == models.TargetType.Bot:
 
         cached_index = mapleshade.cache.get("bot_index")
 
@@ -103,13 +102,13 @@ async def index(target_type: enums.TargetType):
             return cached_index.value()
         index = models.Index(
             top_voted=await mapleshade.to_snippet(
-                await tables.Bots.select(*models.BOT_SNIPPET_COLS).where(tables.Bots.state == enums.BotServerState.Approved).order_by(tables.Bots.votes, ascending=False).limit(12)
+                await tables.Bots.select(*models.BOT_SNIPPET_COLS).where(tables.Bots.state == models.BotServerState.Approved).order_by(tables.Bots.votes, ascending=False).limit(12)
             ),
             new=await mapleshade.to_snippet(
-                await tables.Bots.select(*models.BOT_SNIPPET_COLS).where(tables.Bots.state == enums.BotServerState.Approved).order_by(tables.Bots.created_at, ascending=False).limit(12)
+                await tables.Bots.select(*models.BOT_SNIPPET_COLS).where(tables.Bots.state == models.BotServerState.Approved).order_by(tables.Bots.created_at, ascending=False).limit(12)
             ),
             certified=await mapleshade.to_snippet(
-                await tables.Bots.select(*models.BOT_SNIPPET_COLS).where(tables.Bots.state == enums.BotServerState.Certified).order_by(tables.Bots.votes, ascending=False).limit(12)
+                await tables.Bots.select(*models.BOT_SNIPPET_COLS).where(tables.Bots.state == models.BotServerState.Certified).order_by(tables.Bots.votes, ascending=False).limit(12)
             ),
         )
         mapleshade.cache.set("bot_index", index, expiry=30)
@@ -157,7 +156,3 @@ async def get_meta():
             ),
         )
     )
-
-@app.get("/__docs/models")
-async def get_models():
-    return HTMLResponse(mapleshade.load_doc("models"))

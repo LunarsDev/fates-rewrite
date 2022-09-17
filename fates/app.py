@@ -38,6 +38,9 @@ app = FastAPI(
             ),
         ),
     ],
+    description="""
+For more documentation on our API, see https://github.com/LunarsDev/fates-rewrite#developer-docs
+    """
 )
 
 @app.middleware("http")

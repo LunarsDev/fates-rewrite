@@ -131,11 +131,11 @@ export async function loginUser() {
   });
   const json = await res.json();
 
-  modifier['state'] = json.reason;
+  modifier['state'] = json.state;
 
   modifier['version'] = 11;
 
-  window.location.href = `${json.context}&state=${json.reason}.${Base64.encode(JSON.stringify(modifier))}`;
+  window.location.href = `${json.url}&state=${json.state}.${Base64.encode(JSON.stringify(modifier))}`;
 }
 
 export function logoutUser() {

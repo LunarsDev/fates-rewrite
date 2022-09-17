@@ -1,3 +1,4 @@
+import uuid
 from fates import models
 from . import tables
 from . import tags
@@ -45,14 +46,13 @@ async def cors(request: Request, call_next):
     response.headers["Access-Control-Allow-Origin"] = "*"
     response.headers["Access-Control-Allow-Methods"] = "GET, POST, PUT, DELETE, OPTIONS"
     response.headers["Access-Control-Allow-Credentials"] = "false"
-    response.headers["Access-Control-Allow-Headers"] = "Content-Type, Authorization, Accept, Frostpaw-Auth, Frostpaw-Vote-Page"
+    response.headers["Access-Control-Allow-Headers"] = "Content-Type, Authorization, Accept, Frostpaw-Auth, Frostpaw-Vote-Page, Frostpaw-Invite, Frostpaw-Server"
     
     if request.method == "OPTIONS":
         response.status_code = 200
     return response
 
 mapleshade = Mapleshade()
-
 
 @app.on_event("startup")
 async def open_database_connection_pool():
@@ -157,3 +157,13 @@ async def get_meta():
             ),
         )
     )
+
+@app.get("/oauth2")
+async def oauth2(request: Request):
+    if not request.headers.get('Frostpaw-Server'):
+        raise HTTPException(400, "Missing Frostpaw-Server header")
+    state = str(uuid.uuid4())
+    return {
+        "state": state,
+        "url": f"https://discord.com/oauth2/authorize?client_id={mapleshade.config['secrets']['client_id']}&redirect_uri={request.headers.get('Frostpaw-Server')}/frostpaw/login&scope=identify&response_type=code",
+    }

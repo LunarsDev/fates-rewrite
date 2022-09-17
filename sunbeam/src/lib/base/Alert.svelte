@@ -259,7 +259,7 @@
               `inp-${inp.getIndex(input.id)}`
             ) as HTMLInputElement;
 
-            console.log('Files cannot be uploaded at this time');
+            alert('Files cannot be uploaded at this time');
             break;
 
           default:

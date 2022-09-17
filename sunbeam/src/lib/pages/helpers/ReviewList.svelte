@@ -7,11 +7,11 @@
   export let type: string;
 
   import Reviews from '$lib/base/Reviews.svelte';
-  import { nextUrl } from '$lib/config';
+  import { api, nextUrl } from '$lib/config';
   import { enums } from '$lib/enums/enums';
   import loadstore from '$lib/loadstore';
   import navigationState from '$lib/navigationState';
-  import { parseState } from '$lib/request';
+  import { parseState, request } from '$lib/request';
   import * as logger from '$lib/logger';
 
   let reviewPage = 1;
@@ -30,13 +30,18 @@
       targetType = enums.ReviewType.server;
     }
 
-    let url = `${nextUrl}/reviews/${data.user.id}?page=${ipage}&target_type=${targetType}`;
+    let url = `${api}/reviews/${data.user.id}?page=${ipage}&target_type=${targetType}`;
 
     if ($page.data.token) {
       url += `&user_id=${$page.data.user.id}`;
     }
 
-    let res = await fetch(url);
+    let res = await request(url, {
+      method: "GET",
+      endpointType: "user",
+      session: $page.data,
+      fetch: fetch
+    });
     if (res.ok) {
       reviews = await res.json();
       reviewPage = ipage;
@@ -74,7 +79,7 @@
       }
 
       el.innerHTML = 'Drag the slider to change your rating'; // Display the default slider value
-      sliderEl.oninput = function () {
+      sliderEl.oninput = function (this: any) {
         let output = document.getElementById(this.getAttribute('data-output'));
         logger.debug('ReviewList', 'Got oninput output of: ', output);
         let state = parseState(this.value);

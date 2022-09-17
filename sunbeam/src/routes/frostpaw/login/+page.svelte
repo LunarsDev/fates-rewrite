@@ -16,14 +16,14 @@
       data.href = "/"
     }
 
-    console.info(`Got login error: ${data.error}\nGot href: ${data.href}\nGot modifier: ${data.modifier}`)
+    error('Login', `Got login error: ${data.error}\nGot href: ${data.href}\nGot modifier: ${data.modifier}`)
   
     import Button from '$lib/base/Button.svelte';
     import { enums } from '$lib/enums/enums';
     import { browser } from '$app/environment';
     import { apiUrl } from '$lib/config';
     import Base64 from "$lib/b64";
-    import { info } from '$lib/logger';
+    import { error, info } from '$lib/logger';
   
     const sleep = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));
   

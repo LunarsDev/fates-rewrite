@@ -2,6 +2,7 @@
   import { enums } from '$lib/enums/enums';
   import Base64 from "$lib/b64";
   import { error } from '@sveltejs/kit';
+import { info } from '$lib/logger';
 
   export const prerender = false;
 
@@ -98,7 +99,7 @@ export async function load({ parent, fetch }) {
 
       let modifierInfo = {};
 
-      console.log(Base64.decode(modifier))
+      info("Login", Base64.decode(modifier))
 
       try {
         modifierInfo = JSON.parse(Base64.decode(modifier));
@@ -119,8 +120,6 @@ export async function load({ parent, fetch }) {
           error: 'Invalid login request, please try logging in again!!!'
         };
       }
-
-      console.log('ORIGIN:', url.origin);
 
       let res = await fetch(`${apiUrl}/oauth2`, {
         method: 'POST',

@@ -1,5 +1,5 @@
 <script lang="ts" context="module">
-  import { fetchFates } from '$lib/request';
+  import { fetchFates, logoutUser } from '$lib/request';
   import { enums } from '$lib/enums/enums';
   export const prerender = false;
   /** @type {import('@sveltejs/kit@next').Load} */
@@ -113,18 +113,7 @@
     });
     if (res.ok) {
       popup('Regenerated token, you will need to login again', 'Important');
-      fetch(`${nextUrl}/oauth2`, {
-        method: 'DELETE',
-        credentials: 'include',
-        headers: {
-          'Content-Type': 'application/json',
-          Frostpaw: '0.1.0'
-        }
-      })
-        .then((res) => res.json())
-        .then((json) => {
-          window.location.reload(); // Only place its really needed
-        });
+      logoutUser();
     } else {
       popup(`Error during token regeneration: ${res.status}`);
     }

@@ -4,6 +4,8 @@ import { browser } from '$app/environment';
 import { goto } from '$app/navigation';
 
 import { apiUrl } from '$lib/config';
+    import { request } from '$lib/request';
+    import { page } from '$app/stores';
 
   import FormInput from './FormInput.svelte';
 import SearchRes from './SearchRes.svelte';
@@ -31,7 +33,13 @@ import SearchRes from './SearchRes.svelte';
       return;
     }
     searching = true;
-    let res = await fetch(`${apiUrl}/search?q=${query}&gc_from=${gc_from}&gc_to=${gc_to}`);
+    let res = await request(`${apiUrl}/search?q=${query}&gc_from=${gc_from}&gc_to=${gc_to}`, {
+      method: 'GET',
+      endpointType: 'user',
+      auth: false,
+      session: $page.data,
+      fetch: fetch,
+    });
     data = await res.json();
     // update location silently to include new query params
     let url = new URL(window.location.href);

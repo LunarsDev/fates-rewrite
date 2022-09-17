@@ -1,10 +1,10 @@
 <script lang="ts">
-  import { loginUser, addReviewHandler } from '$lib/request';
+  import { loginUser, addReviewHandler, request } from '$lib/request';
   import { page } from '$app/stores';
   import loadstore from '$lib/loadstore';
   import navigationState from '$lib/navigationState';
   import Button from '$lib/base/Button.svelte';
-  import { nextUrl } from '$lib/config';
+  import { api } from '$lib/config';
   import { genError } from '$lib/strings';
   import * as logger from '$lib/logger';
   import { enums } from '$lib/enums/enums';
@@ -40,18 +40,16 @@ import Icon from '@iconify/svelte';
   async function voteReview(reviewID: string, upvote: boolean) {
     let token = $page.data.token;
     if (!token) {
-      loginUser(false);
+      loginUser();
       return;
     }
     let userID = $page.data.user.id;
-    let res = await fetch(`${nextUrl}/reviews/${reviewID}/votes`, {
+    let res = await request(`${api}/reviews/${reviewID}/votes`, {
       method: 'PATCH',
-      headers: {
-        'Content-Type': 'application/json',
-        Frostpaw: '0.1.0',
-        Authorization: token
-      },
-      body: JSON.stringify({ upvote: upvote, user_id: userID })
+      body: JSON.stringify({ upvote: upvote, user_id: userID }),
+      endpointType: "user",
+      session: $page.data,
+      fetch: fetch
     });
     if (res.ok) {
       alert('Successfully voted for this review');
@@ -67,7 +65,7 @@ import Icon from '@iconify/svelte';
     $navigationState = 'loading';
     let token = $page.data.token;
     if (!token) {
-      loginUser(false);
+      loginUser();
       return false;
     }
     let userID = $page.data.user.id;
@@ -76,8 +74,6 @@ import Icon from '@iconify/svelte';
     let starRating = document.querySelector(`#rating-${review.id}-reply`) as HTMLInputElement;
 
     let res = await addReviewHandler(
-      userID,
-      token,
       targetId,
       targetType,
       id,
@@ -119,8 +115,6 @@ import Icon from '@iconify/svelte';
     let starRating = document.querySelector(`#review-${review.id}-edit-slider`) as HTMLInputElement;
 
     let res = await addReviewHandler(
-      userID,
-      token,
       targetId,
       targetType,
       null,
@@ -160,13 +154,11 @@ import Icon from '@iconify/svelte';
       type = 1;
     }
 
-    let res = await fetch(`${nextUrl}/reviews/${review.id}?user_id=${userID}&target_type=${type}`, {
+    let res = await request(`${api}/reviews/${review.id}?user_id=${userID}&target_type=${type}`, {
       method: 'DELETE',
-      headers: {
-        'Content-Type': 'application/json',
-        Frostpaw: '0.1.0',
-        Authorization: $page.data.token
-      }
+      endpointType: "user",
+      session: $page.data,
+      fetch: fetch
     });
 
     if (res.ok) {
@@ -332,9 +324,9 @@ import Icon from '@iconify/svelte';
       {/if}
     </div>
     <div style="margin-left: 19px">
-      {#each review.replies as review, index}
+      {#each review.replies as r, index}
         <svelte:self
-          review={review}
+          review={r}
           index={index}
           reply={true}
           targetId={targetId}

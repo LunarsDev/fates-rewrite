@@ -43,7 +43,7 @@
   export let sources: any;
   if (!$page.data.token) {
     if (browser) {
-      loginUser(false);
+      loginUser();
     }
   }
 

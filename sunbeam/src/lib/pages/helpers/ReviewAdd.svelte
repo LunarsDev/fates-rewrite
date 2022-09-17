@@ -17,7 +17,7 @@
     $navigationState = 'loading';
     let token = $page.data.token;
     if (!token) {
-      loginUser(false);
+      loginUser();
       return false;
     }
     let userID = $page.data.user.id;
@@ -26,13 +26,11 @@
     let starRating = document.querySelector('#star-rating');
 
     let res = await addReviewHandler(
-      userID,
-      token,
       data.user.id,
       type,
       null,
-      review.value,
-      starRating.value
+      (review as HTMLInputElement).value,
+      (starRating as HTMLInputElement).value
     );
     $navigationState = 'loaded';
     if (res.ok) {

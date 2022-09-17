@@ -1,4 +1,5 @@
 import { api, origin } from '$lib/config';
+import { request } from '$lib/request';
 import { error } from '@sveltejs/kit';
 export const prerender = false;
 
@@ -14,20 +15,11 @@ export async function load({ parent, params, fetch }) {
   try {
     session = await parent();
 
-    if (session.user) {
-      auth = `${session.user.id}|${session.token}`;
-    }
-
-    let headers = {
-      origin: origin
-    }
-
-    if (auth) {
-      headers['authorization'] = auth;
-    }
-
-    res = await fetch(`${api}${url}`, {
-      headers: headers
+    res = await request(`${api}${url}`, {
+      method: "GET",
+      session: session,
+      endpointType: "user",
+      fetch: fetch,
     })
   } catch (err) {
     throw error(404, err)

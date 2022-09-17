@@ -3,13 +3,12 @@
   import Tag from '$lib/base/Tag.svelte';
   import BotCard from '$lib/cards/BotCard.svelte';
   import CardContainer from '$lib/cards/CardContainer.svelte';
-  import RandomBot from '$lib/base/RandomBot.svelte';
+  import RandomBot from '$lib/base/RandomCard.svelte';
   import BristlefrostMeta from '$lib/base/BristlefrostMeta.svelte';
   import Section from '$lib/base/Section.svelte';
   import Intl from '$lib/base/Intl.svelte';
+    import RandomCard from '$lib/base/RandomCard.svelte';
   export let data: { index: any, random: any };
-  
-  console.log(data.index, "is index HALLL")
 </script>
 
 <BristlefrostMeta
@@ -28,7 +27,7 @@
 <Tag targetType="bot" tags={data.index.tags} />
 
 {#if data.random}
-  <RandomBot type="bot" randomBot={data.random} />
+  <RandomCard type="bot" randomBot={data.random} />
 {/if}
 
 <Section icon="fa-solid:certificate" title="Certified" id="certified-index">

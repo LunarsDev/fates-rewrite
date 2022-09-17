@@ -2,19 +2,20 @@
   import Button from '$lib/base/Button.svelte';
   import BotCard from '$lib/cards/BotCard.svelte';
   import { roll } from '$lib/request';
+  import { page } from '$app/stores';
   export let type: string;
 
   export let randomBot: any;
 
   async function roller() {
-    randomBot = await roll(type, fetch);
+    randomBot = await roll(type, $page.data);
   }
 </script>
 
 <div class="flex">
   <BotCard type={type} rand={false} data={randomBot} />
   <Button
-    id="random-bot"
+    id="random-card"
     class="random-button white button"
     onclick={() => {
       roller();

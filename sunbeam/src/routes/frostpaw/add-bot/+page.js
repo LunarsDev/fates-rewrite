@@ -1,4 +1,5 @@
-import { api, origin } from '$lib/config';
+import { api } from '$lib/config';
+import { request } from '$lib/request';
 import { error } from '@sveltejs/kit';
 
 /** @type {import('../../$types').PageLoad} */
@@ -8,10 +9,11 @@ export async function load({ fetch, parent }) {
     return {}
   }
 
-  let tagsRes = await fetch(`${api}/meta`, {
-    headers: {
-      origin: origin,
-    }
+  let tagsRes = await request(`${api}/meta`, {
+    method: "GET",
+    session: session,
+    endpointType: "user",
+    fetch: fetch
   });
   if (!tagsRes.ok) {
     throw error(500, 'Could not fetch tags and features')

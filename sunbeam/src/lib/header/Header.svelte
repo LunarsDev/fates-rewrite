@@ -2,9 +2,9 @@
   import { page } from '$app/stores';
   import * as logger from '$lib/logger';
   logger.info('Header', 'Session from header', $page.data);
-  import { loginUser, logoutUser } from '$lib/request';
+  import { loginUser, logoutUser, request } from '$lib/request';
   import { goto } from '$app/navigation';
-  import { apiUrl, nextUrl, lynxUrl } from '$lib/config';
+  import { apiUrl, nextUrl, lynxUrl, api } from '$lib/config';
   import { browser } from '$app/environment';
   import menustore from '$lib/menustore';
   import navigationState from '$lib/navigationState';
@@ -67,12 +67,12 @@
             token = $page.data.token;
           }
 
-          fetch(`${lynxUrl}/eternatus`, {
+          request(`${api}/feedback`, {
             method: 'POST',
-            headers: {
-              Authorization: token,
-              'Content-Type': 'application/json'
-            },
+            auth: true,
+            fetch: fetch,
+            session: $page.data,
+            endpointType: 'user',
             body: JSON.stringify({
               user_id: userId,
               feedback: value,

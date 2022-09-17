@@ -8,7 +8,7 @@
   import { enums } from '$lib/enums/enums';
   import loadstore from '$lib/loadstore';
   import navigationState from '$lib/navigationState';
-  import { voteHandler } from '$lib/request';
+  import { request, voteHandler } from '$lib/request';
   import { genError } from '$lib/strings';
   import Icon from '@iconify/svelte';
   import Button from '$lib/base/Button.svelte';
@@ -25,7 +25,7 @@
     }
     $loadstore = 'Voting...';
     $navigationState = 'loading';
-    let res = await voteHandler(userID, token, data.user.id, false, type);
+    let res = await voteHandler(data.user.id, false, type);
     let jsonDat = await res.json();
     if (res.ok) {
       alert({
@@ -111,15 +111,13 @@ If you still wish to report, type the reason for reporting this ${type} below. R
             placeholder: `Be sure to have proof of why you're reporting!`,
             multiline: true,
             function: async (value) => {
-              const res = await fetch(
+              const res = await request(
                 `${nextUrl}/users/${$page.data.user.id}/${type}s/${data.user.id}/appeal`,
                 {
                   method: 'POST',
-                  headers: {
-                    'Content-Type': 'application/json',
-                    Frostpaw: '0.1.0',
-                    Authorization: $page.data.token
-                  },
+                  fetch: fetch,
+                  session: $page.data,
+                  endpointType: 'user',
                   body: JSON.stringify({
                     request_type: 2, // 2 means report
                     appeal: value.toString()

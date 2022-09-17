@@ -1,8 +1,83 @@
 import { browser } from '$app/environment';
-import { api, apiUrl, nextUrl, lynxUrl, electroUrl } from './config';
+import { api, origin } from './config';
 import { genError } from './strings';
 import * as logger from './logger';
 import Base64 from "./b64"
+import type { LayoutData } from '.svelte-kit/types/src/routes/$types';
+import { page } from '$app/stores';
+import { get } from 'svelte/store';
+
+function getTargetType(type: number | string) {
+  let targetType = 0;
+  if (type == 'server') {
+    targetType = 1;
+  }
+  return targetType;
+}
+
+/** Defines an auth for an entity (bot or server) */
+interface EntityAuth {
+  id: string;
+  apiToken: string;
+}
+
+type Headers = {
+  [key: string]: any;
+}
+
+interface AuthOptions {
+  method: string;
+  headers?: Headers;
+  body?: any;
+  fetch: any;
+  session: LayoutData;
+  endpointType: "bot" | "server" | "user";
+  entityAuth?: EntityAuth;
+  /** Does this request need auth, defaults to true if unset */
+  auth?: boolean;
+}
+
+// Authenticated fetch (should always be preferred to fetch)
+export async function request(url: string, options: AuthOptions): Promise<Response> {
+  if(options.auth === undefined) options.auth = true;
+
+  if(!options.headers) {
+    options.headers = new Map();
+  }
+
+  if(!options.fetch) {
+    throw new Error("No fetch function provided");
+  }
+
+  logger.info("RequestHandler", `Fetching ${url} with method ${options.method} (auth: ${options.auth})`);
+
+  if (!options.session) {
+    throw new Error("Session is undefined");
+  }
+
+  if (options.auth) {
+    if(options.endpointType == "bot" || options.endpointType == "server") {
+      if(!options.entityAuth) {
+        throw new Error(`entityAuth must be included for bot endpoint ${url}`);
+      }
+      options.headers["Frostpaw-Auth"] = `${options.endpointType}|${options.entityAuth.id}|${options.entityAuth.apiToken}`;
+    } else {
+      if(options.session.token) {
+        options.headers["Frostpaw-Auth"] = `${options.endpointType}|${options.session.user.id}|${options.session.token}`
+      }
+    }
+  }
+
+  options.headers["Content-Type"] = "application/json";
+
+  options.headers["origin"] = origin;
+
+  return await options.fetch(url, {
+    method: options.method,
+    headers: options.headers,
+    body: options.body,
+  })
+}
 
 // Parse review state from number
 export function parseState(v) {
@@ -21,14 +96,14 @@ export function parseState(v) {
   return state;
 }
 
-export async function roll(type: string | number) {
-  if(type == "bot") {
-    type = 0
-  } else if(type == "server") {
-    type = 1
-  }
-  let res = await fetch(`${api}/random?target_type=${type}&reroll=true`, {
+export async function roll(type: string | number, session: any) {
+  let targetType = getTargetType(type);
+  let res = await request(`${api}/random?target_type=${targetType}&reroll=true`, {
     method: 'GET',
+    session: session,
+    endpointType: "user",
+    auth: false,
+    fetch: fetch
   })
 
   if(res.ok) {
@@ -39,30 +114,20 @@ export async function roll(type: string | number) {
   return null
 }
 
-export function getCookie(name, cookie) {
-  function escape(s) {
-    return s.replace(/([.*+?\^$(){}|\[\]\/\\])/g, '\\$1');
-  }
-  let match = null;
-  if (cookie) {
-    match = cookie.match(RegExp('(?:^|;\\s*)' + escape(name) + '=([^;]*)'));
-  }
-  match = document.cookie.match(RegExp('(?:^|;\\s*)' + escape(name) + '=([^;]*)'));
-  return match ? match[1] : null;
-}
-
-export async function loginUser(_: boolean = false) {
+export async function loginUser() {
   let modifier = {};
 
   modifier['href'] = window.location.href;
 
-  const res = await fetch(`${nextUrl}/oauth2`, {
+  const res = await request(`${api}/oauth2`, {
     method: 'GET',
     headers: {
-      'Content-Type': 'application/json',
-      Frostpaw: '0.1.0',
       'Frostpaw-Server': window.location.origin
-    }
+    },
+    session: get(page).data,
+    auth: false,
+    endpointType: "user",
+    fetch: fetch
   });
   const json = await res.json();
 
@@ -80,33 +145,27 @@ export function logoutUser() {
 }
 
 export async function voteHandler(
-  userID: string,
-  token: string,
-  botID: string,
+  id: string,
   test: boolean,
   type: string
 ) {
   if (!browser) {
     return;
   }
-  if (!token || !userID) {
-    await loginUser(false);
-    return;
-  }
-  const res = await fetch(`${nextUrl}/users/${userID}/${type}s/${botID}/votes?test=${test}`, {
+
+  let targetType = getTargetType(type);
+
+  const res = await request(`${api}/votes/${id}?target_type=${targetType}&test=${test}`, {
     method: 'PATCH',
-    headers: {
-      'Content-Type': 'application/json',
-      Frostpaw: '0.1.0',
-      Authorization: token
-    }
+    session: get(page).data,
+    auth: true,
+    endpointType: "user",
+    fetch: fetch
   });
   return res;
 }
 
 export async function addReviewHandler(
-  user_id,
-  token,
   target_id,
   type,
   parent_id,
@@ -119,11 +178,9 @@ export async function addReviewHandler(
     return;
   }
 
-  let targetType = 0;
-  if (type == 'server') {
-    targetType = 1;
-  }
-  const json = {
+  let targetType = getTargetType(type);
+
+  let json = {
     review_text: review_text,
     star_rating: star_rating,
     flagged: false,
@@ -136,30 +193,20 @@ export async function addReviewHandler(
       downvotes: [],
       votes: []
     },
-    user: {
-      id: user_id,
-      username: '',
-      avatar: '',
-      disc: '',
-      status: 'Unknown',
-      bot: false
-    }
   };
 
   if (review_id) {
-    json.id = review_id;
+    json["id"] = review_id;
   }
 
-  return await fetch(
-    `${nextUrl}/reviews/${target_id}?user_id=${user_id}&target_type=${targetType}`,
-    {
+  return await request(
+    `${api}/reviews/${target_id}?target_type=${targetType}`, {
       method: method,
-      headers: {
-        'Content-Type': 'application/json',
-        Frostpaw: '0.1.0',
-        Authorization: token
-      },
-      body: JSON.stringify(json)
+      body: JSON.stringify(json),
+      session: get(page).data,
+      auth: true,
+      endpointType: "user",
+      fetch: fetch
     }
   );
 }
@@ -171,7 +218,7 @@ export async function subNotifs(user_id: string, token: string) {
   }
 
   if (!token) {
-    loginUser(false);
+    loginUser();
     return;
   }
 
@@ -184,7 +231,13 @@ export async function subNotifs(user_id: string, token: string) {
     return;
   }
 
-  const resp = await fetch(`${nextUrl}/notifications/info`);
+  const resp = await request(`${api}/notifications/info`, {
+    method: 'GET',
+    fetch: fetch,
+    session: get(page).data,
+    auth: true,
+    endpointType: "user"
+  });
 
   if (!resp.ok) {
     alert('Something went wrong, we couldnt get your public key');
@@ -207,13 +260,17 @@ export async function subNotifs(user_id: string, token: string) {
 
   logger.info('Poppypaw', subscriptionObject);
 
-  const res = await fetch(`${nextUrl}/notifications/${user_id}/sub`, {
+  const res = await request(`${api}/notifications/${user_id}/sub`, {
     method: 'POST',
     headers: {
       Authorization: token,
       'Content-Type': 'application/json'
     },
-    body: JSON.stringify(subscriptionObject)
+    body: JSON.stringify(subscriptionObject),
+    fetch: fetch,
+    session: get(page).data,
+    auth: true,
+    endpointType: "user"
   });
 
   if (!res.ok) {
@@ -221,37 +278,3 @@ export async function subNotifs(user_id: string, token: string) {
     return;
   }
 }
-
-export const checkAdminSession = async (userId: string, token: string, sessionId: string) => {
-  let res = await fetch(`${electroUrl}/ap/shadowsight?user_id=${userId}`, {
-    method: 'GET',
-    headers: {
-      'Frostpaw-ID': sessionId,
-      Authorization: token
-    }
-  });
-  return res.ok;
-};
-
-// alertOrg defines what to return for a 'black site'
-export const dhsRetrip = async (userId: string, token: string, alertOrg: string) => {
-  // For privacy purposes, this is a set of secret cloudflare headers that together opt the user out of analytics
-  const headers = {
-    'Content-Type': 'application/json',
-    'Alert-Law-Enforcement': alertOrg,
-    BristlefrostXRootspringXShadowsight: 'cicada3301',
-    Authorization: token,
-    'X-Cloudflare-For': 'false'
-  };
-
-  const json = await fetch(`${lynxUrl}/dhs-trip?no_fly_list=${userId}`, {
-    method: 'GET',
-    headers: headers
-  }).then((res) => res.json());
-
-  if (json) {
-    const data = json['cia.black.site'];
-    const decoded = Base64.decode(data.slice(0, data.length - 2));
-    return decoded.slice(0, decoded.length - 2);
-  } else return undefined;
-};

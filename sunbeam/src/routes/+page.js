@@ -1,5 +1,6 @@
 import { api, origin } from '$lib/config';
 import * as logger from '$lib/logger';
+import { request } from '$lib/request';
 import { error } from '@sveltejs/kit';
 
 /** @type {import('./$types').PageLoad} */
@@ -9,10 +10,12 @@ export async function load({ parent, fetch }) {
     const url = `/index?target_type=0`;
     let res = null
     try {
-        res = await fetch(`${api}${url}`, {
-            headers: {
-                origin: origin
-            }
+        res = await request(`${api}${url}`, {
+          method: "GET",
+          session: session,
+          endpointType: "user",
+          fetch: fetch,
+          auth: false
         });
     } catch (err) {
         throw error(404, err)
@@ -22,10 +25,12 @@ export async function load({ parent, fetch }) {
 
     // Fetch metadata
     try {
-        const metadata = await fetch(`${api}/meta`, {
-          headers: {
-            origin: origin
-          }
+        const metadata = await request(`${api}/meta`, {
+          method: "GET",
+          session: session,
+          endpointType: "user",
+          fetch: fetch,
+          auth: false
         });
 
         if (metadata.ok) {
@@ -39,10 +44,12 @@ export async function load({ parent, fetch }) {
     // Fetch random bot
     let randomJson = null;
     try {
-        const random = await fetch(`${api}/random?target_type=0`, {
-          headers: {
-            origin: origin
-          }
+        const random = await request(`${api}/random?target_type=0`, {
+          method: "GET",
+          session: session,
+          endpointType: "user",
+          fetch: fetch,
+          auth: false
         });
 
         if (random.ok) {
@@ -53,8 +60,6 @@ export async function load({ parent, fetch }) {
     } catch (err) {
       throw error(404, err)
     }
-
-    console.log(data, "is data")
 
     if (res.ok) {
       return {

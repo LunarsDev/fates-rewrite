@@ -32,7 +32,7 @@
   import CardContainer from '$lib/cards/CardContainer.svelte';
   import Section from '$lib/base/Section.svelte';
   import BristlefrostMeta from '$lib/base/BristlefrostMeta.svelte';
-  import RandomBot from '$lib/base/RandomBot.svelte';
+  import RandomBot from '$lib/base/RandomCard.svelte';
   import Intl from '$lib/base/Intl.svelte';
   export let data: any;
   export let randomBot: any;

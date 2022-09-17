@@ -41,7 +41,7 @@
   export let context: any;
   if (failed) {
     if (browser) {
-      loginUser(false);
+      loginUser();
     }
   }
 </script>

@@ -21,7 +21,7 @@
   
     if (!$page.data.token) {
       if (browser) {
-        loginUser(false);
+        loginUser();
       }
     }
   </script>

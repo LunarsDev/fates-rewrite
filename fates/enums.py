@@ -1,11 +1,12 @@
 from enum import Enum, IntEnum
 
+
 class WidgetFormat(Enum):
     """Widget format"""
 
     json = "json"
     """Raw JSON format"""
-    
+
     html = "html"
     """HTML format"""
 
@@ -17,12 +18,13 @@ class WidgetFormat(Enum):
 
     # kitescratch-end
 
+
 class BotServerFlag(IntEnum):
     """Flags that apply to both bots and servers"""
 
     Unlocked = 0
     """Bot or server is unlocked and can be freely editted"""
-    
+
     EditLocked = 1
     """Bot or server is locked and cannot be editted but can be unlocked by the owner"""
 
@@ -31,7 +33,7 @@ class BotServerFlag(IntEnum):
 
     StatsLocked = 3
     """Bot or server stats are locked due to abuse"""
-    
+
     VoteLocked = 4
     """Bot or server is locked from voting due to abuse"""
 
@@ -52,6 +54,7 @@ class BotServerFlag(IntEnum):
 
     # kitescratch-end
 
+
 class UserFlag(IntEnum):
     """Flags that apply to users"""
 
@@ -69,6 +72,7 @@ class UserFlag(IntEnum):
 
     # kitescratch-end
 
+
 class UserState(IntEnum):
     """User states"""
 
@@ -82,6 +86,7 @@ class UserState(IntEnum):
     """User is banned from editing their profile due to abuse"""
 
     # kitescratch-end
+
 
 class BotServerState(IntEnum):
     Approved = 0

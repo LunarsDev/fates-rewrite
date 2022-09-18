@@ -1,6 +1,7 @@
 import enum
 from pydantic import BaseModel
 
+
 class Status(enum.IntEnum):
     online = 0
     idle = 1
@@ -19,8 +20,10 @@ class Status(enum.IntEnum):
             case "offline" | _:
                 return Status.offline
 
+
 class IDiscordUser(BaseModel):
     """Represents a internal silverpelt discord user response. Not safe to be returned in JS"""
+
     id: int
     username: str
     disc: str
@@ -30,9 +33,12 @@ class IDiscordUser(BaseModel):
     status: Status
     flags: int
 
+
 class DiscordUser(IDiscordUser):
     """Represents a discord user"""
+
     id: str
+
 
 def check_snow(id: int) -> bool:
     """Checks if a snowflake is valid"""

@@ -23,6 +23,7 @@ from decimal import Decimal
 import secrets
 from fates import enums
 
+
 class Bots(Table, tablename="bots"):
     bot_id = BigInt(
         default=0,

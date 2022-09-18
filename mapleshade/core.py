@@ -12,7 +12,9 @@ from maplecache import *
 
 class SilverException(Exception):
     """Base exception for Silverpelt"""
+
     ...
+
 
 class SilverRespError(SilverException):
     """Exception for when a response is not okay (200)"""
@@ -31,16 +33,28 @@ class SilverNoData(SilverException):
 
     ...
 
+
 class BackendDoc:
     def __init__(self, fn: str):
         try:
             with open(f"backend_assets/{fn}.kitescratch") as doc:
                 doc.read()
         except FileNotFoundError:
-            raise RuntimeError(f"BackendDoc {fn} not found. Have you run kitescratch/genassets?")
+            raise RuntimeError(
+                f"BackendDoc {fn} not found. Have you run kitescratch/genassets?"
+            )
+
 
 class Mapleshade:
-    __slots__ = ["yaml", "config", "sanitize_tags", "sanitize_attrs", "cache", "cmark_opts", "cmark_exts"]
+    __slots__ = [
+        "yaml",
+        "config",
+        "sanitize_tags",
+        "sanitize_attrs",
+        "cache",
+        "cmark_opts",
+        "cmark_exts",
+    ]
 
     def __init__(self):
         # In memory cache for bot data
@@ -50,17 +64,15 @@ class Mapleshade:
 
         with open("config.yaml") as doc:
             self.config = self.yaml.load(doc)
-        
+
         # CMark options
         self.cmark_opts = (
-            #cmarkgfmOptions.CMARK_OPT_LIBERAL_HTML_TAG |
-            cmarkgfmOptions.CMARK_OPT_UNSAFE |
-            cmarkgfmOptions.CMARK_OPT_SMART
+            # cmarkgfmOptions.CMARK_OPT_LIBERAL_HTML_TAG |
+            cmarkgfmOptions.CMARK_OPT_UNSAFE
+            | cmarkgfmOptions.CMARK_OPT_SMART
         )
 
-        self.cmark_exts = (
-            'table', 'autolink', 'strikethrough', 'tasklist'
-        )
+        self.cmark_exts = ("table", "autolink", "strikethrough", "tasklist")
 
         # Sanitize tags for bleach
         self.sanitize_tags = bleach.sanitizer.ALLOWED_TAGS + [
@@ -136,9 +148,7 @@ class Mapleshade:
         if long_description_type == models.LongDescriptionType.MarkdownServerSide:
             # First parse markdown
             s = cmarkgfm.markdown_to_html_with_extensions(
-                s,
-                options=self.cmark_opts,
-                extensions=self.cmark_exts
+                s, options=self.cmark_opts, extensions=self.cmark_exts
             )
         return bleach.clean(
             s,
@@ -221,7 +231,9 @@ class Mapleshade:
 
         bot["features"] = models.Feature.to_list(features)
 
-        bot["commands"] = await tables.BotCommands.select().where(tables.BotCommands.bot_id == bot_id)
+        bot["commands"] = await tables.BotCommands.select().where(
+            tables.BotCommands.bot_id == bot_id
+        )
 
         # Pydantic memes
         bot_m = models.Bot(**bot)
@@ -267,10 +279,12 @@ class Mapleshade:
             if entity.get("bot_id"):
                 # This is a bot
                 try:
-                    entity["user"] = await self.silverpelt_req(f"users/{entity['bot_id']}")
+                    entity["user"] = await self.silverpelt_req(
+                        f"users/{entity['bot_id']}"
+                    )
                 except:
                     print(f"Failed to get user for bot {entity['bot_id']}")
                     continue
             snippet.append(models.Snippet(**entity))
-        
+
         return snippet

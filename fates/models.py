@@ -37,15 +37,18 @@ BOT_SNIPPET_COLS = (
     Bots.state,
 )
 
+
 async def augment(c: Select, aug: str):
     """Augment a SQL select with custom SQL"""
-    return await tables.Bots.raw(str(c) + aug)    
+    return await tables.Bots.raw(str(c) + aug)
+
 
 class UserBotLog(UserBotLogsBase):  # type: ignore[valid-type, misc]
     bot_id: str
     user_id: str
 
     # kitescratch-end
+
 
 class BotCommands(BotCommandsBase):
     """Represents a command attached to a bot"""
@@ -54,6 +57,7 @@ class BotCommands(BotCommandsBase):
     """The commands bot ID"""
 
     # kitescratch-end
+
 
 class Entity:
     """Base class for all entities"""
@@ -189,17 +193,21 @@ class Bot(BotBase):  # type: ignore[misc, valid-type]
 
     # kitescratch-end
 
+
 class User(UserBase):  # type: ignore[valid-type, misc]
     """Represents a user"""
+
     pass
+
 
 class Snippet(BaseModel):
     """
-Represents a snippet which is essentially a miniature version of a bot/server where a full Bot is too expensive to return
+    Represents a snippet which is essentially a miniature version of a bot/server where a full Bot is too expensive to return
 
-- This applies to both ``Bot`` and ``Server`` entities
+    - This applies to both ``Bot`` and ``Server`` entities
 
     """
+
     user: silver_types.DiscordUser
     """The bot's/server's user object"""
 
@@ -223,6 +231,7 @@ Represents a snippet which is essentially a miniature version of a bot/server wh
 
     # kitescratch-end
 
+
 class Index(BaseModel):
     """Represents an index"""
 
@@ -237,6 +246,7 @@ class Index(BaseModel):
 
     # kitescratch-end
 
+
 class BotListMeta(BaseModel):
     """Core metadata about the bot list part of fates list"""
 
@@ -246,11 +256,13 @@ class BotListMeta(BaseModel):
     features: list[Feature]
     """All features for a bot"""
 
+
 class ServerListMeta(BaseModel):
     """Core metadata about the server list part of fates list"""
-    
+
     tags: list[Tag]
     """All tags for a server"""
+
 
 class ListMeta(BaseModel):
     """Core metadata (tags/features for servers and bots)"""

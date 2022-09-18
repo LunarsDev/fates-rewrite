@@ -84,20 +84,14 @@ async def get_user(id: int):
     if user:
         user_obj = msgpack.unpackb(user)
 
-        if not user_obj:
-            return None
-
-        return IDiscordUser(**user_obj)
-
+        return IDiscordUser(**user_obj) if user_obj else None
     print("Not in cache, fetching from discord")
     await bot.wait_until_ready()
 
     # Check if in dpy cache
     for guild in bot.guilds:
         print(guild)
-        user = guild.get_member(id)
-
-        if user:
+        if user := guild.get_member(id):
             return await cache(
                 IDiscordUser(
                     id=user.id,

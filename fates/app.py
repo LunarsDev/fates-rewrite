@@ -40,8 +40,9 @@ app = FastAPI(
     ],
     description="""
 For more documentation on our API, see https://github.com/LunarsDev/fates-rewrite#developer-docs
-    """
+    """,
 )
+
 
 @app.middleware("http")
 async def cors(request: Request, call_next):
@@ -49,13 +50,17 @@ async def cors(request: Request, call_next):
     response.headers["Access-Control-Allow-Origin"] = "*"
     response.headers["Access-Control-Allow-Methods"] = "GET, POST, PUT, DELETE, OPTIONS"
     response.headers["Access-Control-Allow-Credentials"] = "false"
-    response.headers["Access-Control-Allow-Headers"] = "Content-Type, Authorization, Accept, Frostpaw-Auth, Frostpaw-Vote-Page, Frostpaw-Invite, Frostpaw-Server"
-    
+    response.headers[
+        "Access-Control-Allow-Headers"
+    ] = "Content-Type, Authorization, Accept, Frostpaw-Auth, Frostpaw-Vote-Page, Frostpaw-Invite, Frostpaw-Server"
+
     if request.method == "OPTIONS":
         response.status_code = 200
     return response
 
+
 mapleshade = Mapleshade()
+
 
 @app.on_event("startup")
 async def open_database_connection_pool():
@@ -70,55 +75,68 @@ async def close_database_connection_pool():
     engine = engine_finder()
     await engine.close_connnection_pool()
 
+
 @app.get("/random", response_model=models.Snippet)
-async def random_snippet(target_type: models.TargetType = models.TargetType.Bot, reroll: bool = False):
+async def random_snippet(
+    target_type: models.TargetType = models.TargetType.Bot, reroll: bool = False
+):
     """
-- reroll: Whether to reroll and bypass cache
+    - reroll: Whether to reroll and bypass cache
     """
-    if target_type == models.TargetType.Bot:
-        if not reroll:
-            cached = mapleshade.cache.get("random-bot")
-            if cached:
-                return cached.value()
-        flag = 0
-        while flag < 10:
-            try:
-                v = (await mapleshade.to_snippet(
+    if target_type != models.TargetType.Bot:
+        return
+    if not reroll:
+        if cached := mapleshade.cache.get("random-bot"):
+            return cached.value()
+    flag = 0
+    while flag < 10:
+        try:
+            v = (
+                await mapleshade.to_snippet(
                     await models.augment(
-                        tables.Bots.select(*models.BOT_SNIPPET_COLS).where(tables.Bots.state == models.BotServerState.Certified),
-                        "ORDER BY RANDOM() LIMIT 1"
+                        tables.Bots.select(*models.BOT_SNIPPET_COLS).where(
+                            tables.Bots.state == models.BotServerState.Certified
+                        ),
+                        "ORDER BY RANDOM() LIMIT 1",
                     )
-                ))[0]
-                mapleshade.cache.set("random-bot", v, expiry=60 * 60 * 3)
-                return v
-            except Exception as exc:
-                print(exc)
-                flag += 1
+                )
+            )[0]
+            mapleshade.cache.set("random-bot", v, expiry=60 * 60 * 3)
+            return v
+        except Exception as exc:
+            print(exc)
+            flag += 1
 
 
 @app.get("/index", response_model=models.Index)
 async def index(target_type: models.TargetType):
-    if target_type == models.TargetType.Bot:
-
-        cached_index = mapleshade.cache.get("bot_index")
-
-        if cached_index:
-            return cached_index.value()
-        index = models.Index(
-            top_voted=await mapleshade.to_snippet(
-                await tables.Bots.select(*models.BOT_SNIPPET_COLS).where(tables.Bots.state == models.BotServerState.Approved).order_by(tables.Bots.votes, ascending=False).limit(12)
-            ),
-            new=await mapleshade.to_snippet(
-                await tables.Bots.select(*models.BOT_SNIPPET_COLS).where(tables.Bots.state == models.BotServerState.Approved).order_by(tables.Bots.created_at, ascending=False).limit(12)
-            ),
-            certified=await mapleshade.to_snippet(
-                await tables.Bots.select(*models.BOT_SNIPPET_COLS).where(tables.Bots.state == models.BotServerState.Certified).order_by(tables.Bots.votes, ascending=False).limit(12)
-            ),
-        )
-        mapleshade.cache.set("bot_index", index, expiry=30)
-        return index
-    else:
+    if target_type != models.TargetType.Bot:
         raise HTTPException(400, "Not yet implemented")
+    if cached_index := mapleshade.cache.get("bot_index"):
+        return cached_index.value()
+    index = models.Index(
+        top_voted=await mapleshade.to_snippet(
+            await tables.Bots.select(*models.BOT_SNIPPET_COLS)
+            .where(tables.Bots.state == models.BotServerState.Approved)
+            .order_by(tables.Bots.votes, ascending=False)
+            .limit(12)
+        ),
+        new=await mapleshade.to_snippet(
+            await tables.Bots.select(*models.BOT_SNIPPET_COLS)
+            .where(tables.Bots.state == models.BotServerState.Approved)
+            .order_by(tables.Bots.created_at, ascending=False)
+            .limit(12)
+        ),
+        certified=await mapleshade.to_snippet(
+            await tables.Bots.select(*models.BOT_SNIPPET_COLS)
+            .where(tables.Bots.state == models.BotServerState.Certified)
+            .order_by(tables.Bots.votes, ascending=False)
+            .limit(12)
+        ),
+    )
+    mapleshade.cache.set("bot_index", index, expiry=30)
+    return index
+
 
 @app.get("/bots/{bot_id}", tags=[tags.bot], response_model=models.Bot)
 async def get_bot(bot_id: int):
@@ -138,8 +156,8 @@ async def test_sv_resp():
 async def get_discord_user(id: int):
     try:
         req = await mapleshade.silverpelt_req(f"users/{id}")
-    except SilverNoData:
-        raise HTTPException(status_code=404, detail="Not Found")
+    except SilverNoData as e:
+        raise HTTPException(status_code=404, detail="Not Found") from e
     return req
 
 
@@ -147,23 +165,18 @@ async def get_discord_user(id: int):
 async def get_meta():
     return models.ListMeta(
         bot=models.BotListMeta(
-            tags=models.Tag.to_list(
-                await tables.BotListTags.select()
-            ),
-            features=models.Feature.to_list(
-                await tables.Features.select()
-            )
+            tags=models.Tag.to_list(await tables.BotListTags.select()),
+            features=models.Feature.to_list(await tables.Features.select()),
         ),
         server=models.ServerListMeta(
-            tags=models.Tag.to_list(
-                await tables.ServerTags.select()
-            ),
-        )
+            tags=models.Tag.to_list(await tables.ServerTags.select()),
+        ),
     )
+
 
 @app.get("/oauth2")
 async def oauth2(request: Request):
-    if not request.headers.get('Frostpaw-Server'):
+    if not request.headers.get("Frostpaw-Server"):
         raise HTTPException(400, "Missing Frostpaw-Server header")
     state = str(uuid.uuid4())
     return {

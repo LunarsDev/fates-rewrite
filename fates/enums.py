@@ -147,6 +147,7 @@ class CommandType(IntEnum):
 class TargetType(IntEnum):
     Bot = 0
     Server = 1
+    User = 2
 
 
 class PageStyle(IntEnum):

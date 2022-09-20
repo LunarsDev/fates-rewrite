@@ -47,16 +47,12 @@ class UserBotLog(UserBotLogsBase):  # type: ignore[valid-type, misc]
     bot_id: str
     user_id: str
 
-    # kitescratch-end
-
 
 class BotCommands(BotCommandsBase):
     """Represents a command attached to a bot"""
 
     bot_id: str
     """The commands bot ID"""
-
-    # kitescratch-end
 
 
 class Entity:
@@ -229,8 +225,6 @@ class Snippet(BaseModel):
     guild_count: int
     """The bot's/server's guild count"""
 
-    # kitescratch-end
-
 
 class Index(BaseModel):
     """Represents an index"""
@@ -243,8 +237,6 @@ class Index(BaseModel):
 
     certified: list[Snippet]
     """Certified bots/servers this week"""
-
-    # kitescratch-end
 
 
 class BotListMeta(BaseModel):
@@ -271,4 +263,24 @@ class ListMeta(BaseModel):
 
     server: ServerListMeta
 
-    # kitescratch-end
+
+class BotSecrets(BaseModel):
+    """Represents a bot's secrets"""
+
+    api_token: str
+    """The bot's API token"""
+
+    webhook: str
+    """The bot's webhook"""
+
+    webhook_secret: str
+    """The bot's webhook secret"""
+
+
+## Internal API
+
+class AuthData(BaseModel):
+    """INTERNAL Auth struct"""
+    auth_type: TargetType
+    target_id: int 
+    token: str

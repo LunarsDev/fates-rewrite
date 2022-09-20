@@ -1,10 +1,11 @@
 import uuid
 from fates import models
+from fates.auth import auth
 from . import tables
 from . import tags
 import inspect
 import piccolo
-from fastapi import FastAPI, HTTPException, Request
+from fastapi import FastAPI, HTTPException, Request, Depends
 from fastapi.responses import ORJSONResponse
 from fastapi.staticfiles import StaticFiles
 from starlette.routing import Mount
@@ -83,6 +84,8 @@ async def random_snippet(
     """
     - reroll: Whether to reroll and bypass cache
     """
+    if target_type == models.TargetType.User:
+        raise HTTPException(400, detail="User snippets are not supported *yet*")
     if target_type != models.TargetType.Bot:
         return
     if not reroll:
@@ -145,8 +148,18 @@ async def get_bot(bot_id: int):
         raise HTTPException(status_code=404, detail="Not Found")
     return bot
 
+@app.get("/bots/{bot_id}/secrets", tags=[tags.bot], response_model=models.BotSecrets)
+async def get_bot_secrets(bot_id: int, auth: models.AuthData = Depends(auth)):
+    bot_owners = await tables.BotOwner.select().where(tables.BotOwner.bot_id == bot_id)
 
-@app.get("/test/@me", response_model=silver_types.DiscordUser)
+    if not bot_owners:
+        raise HTTPException(status_code=404, detail="Not Found")
+    
+    for owner in bot_owners:
+        if owner["user_id"] != auth.target_id:
+            raise HTTPException(status_code=403, detail="Forbidden")
+
+@app.get("/@me", response_model=silver_types.DiscordUser)
 async def test_sv_resp():
     req = await mapleshade.silverpelt_req("@me")
     return req

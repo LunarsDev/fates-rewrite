@@ -8,7 +8,7 @@ export async function load({ params, fetch, parent }) {
   let inviteUrl = await request(`${api}/bots/${params.id}`, {
     method: 'GET',
     headers: {
-      'Frostpaw-Invite': '1'
+      'Frostpaw-Target': 'invite'
     },
     endpointType: 'user',
     session: session,

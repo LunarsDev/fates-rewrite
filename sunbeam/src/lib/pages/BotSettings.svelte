@@ -583,7 +583,7 @@
   async function sendTestWebhook() {
     $loadstore = 'Voting...';
     $navigationState = 'loading';
-    await voteHandler($page.data.user.id, $page.data.token, data.bot_id, true, 'bot');
+    await voteHandler(data.bot_id, true, 'bot');
     $navigationState = 'loaded';
     return;
   }

@@ -35,6 +35,7 @@ interface AuthOptions {
   entityAuth?: EntityAuth;
   /** Does this request need auth, defaults to true if unset */
   auth?: boolean;
+  errorOnFail?: boolean;
 }
 
 // Authenticated fetch (should always be preferred to fetch)
@@ -72,11 +73,23 @@ export async function request(url: string, options: AuthOptions): Promise<Respon
 
   options.headers["origin"] = origin;
 
-  return await options.fetch(url, {
-    method: options.method,
-    headers: options.headers,
-    body: options.body,
-  })
+  try {
+    let res: Response = await options.fetch(url, {
+      method: options.method,
+      headers: options.headers,
+      body: options.body,
+    });
+
+    if(options.errorOnFail && !res.ok) {
+      let err = await res.text();
+      throw new Error(err);
+    }
+
+    return res
+  } catch (err) {
+    logger.error(err);
+    throw new Error(`${err} (url: ${url})`);
+  }
 }
 
 // Parse review state from number

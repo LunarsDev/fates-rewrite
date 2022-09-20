@@ -221,15 +221,18 @@ class Mapleshade:
 
         # Features
         features = []
-        for feature in bot["features"]:
-            feature_data = (
-                await tables.Features.select()
-                .where(tables.Features.id == feature)
-                .first()
-            )
-            features.append(feature_data)
+        if bot["features"]:
+            for feature in bot["features"]:
+                feature_data = (
+                    await tables.Features.select()
+                    .where(tables.Features.id == feature)
+                    .first()
+                )
+                features.append(feature_data)
 
-        bot["features"] = models.Feature.to_list(features)
+            bot["features"] = models.Feature.to_list(features)
+        else:
+            bot["features"] = []
 
         bot["commands"] = await tables.BotCommands.select().where(
             tables.BotCommands.bot_id == bot_id

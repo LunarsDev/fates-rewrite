@@ -52,7 +52,7 @@ async def cors(request: Request, call_next):
     response.headers["Access-Control-Allow-Credentials"] = "false"
     response.headers[
         "Access-Control-Allow-Headers"
-    ] = "Content-Type, Authorization, Accept, Frostpaw-Auth, Frostpaw-Vote-Page, Frostpaw-Invite, Frostpaw-Server"
+    ] = "Content-Type, Authorization, Accept, Frostpaw-Cache, Frostpaw-Auth, Frostpaw-Target, Frostpaw-Server"
 
     if request.method == "OPTIONS":
         response.status_code = 200

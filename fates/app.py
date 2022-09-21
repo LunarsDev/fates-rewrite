@@ -155,9 +155,14 @@ async def get_bot_secrets(bot_id: int, auth: models.AuthData = Depends(auth)):
     if not bot_owners:
         raise HTTPException(status_code=404, detail="Not Found")
     
+    flag = False
     for owner in bot_owners:
-        if owner["user_id"] != auth.target_id:
-            raise HTTPException(status_code=403, detail="Forbidden")
+        if owner["user_id"] == auth.target_id:
+            flag = True
+            break
+    
+    if not flag:
+        raise HTTPException(status_code=403, detail="Forbidden")
 
 @app.get("/@me", response_model=silver_types.DiscordUser)
 async def test_sv_resp():

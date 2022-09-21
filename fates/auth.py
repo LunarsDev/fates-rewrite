@@ -5,6 +5,7 @@ from fates import tables
 from fates.enums import TargetType
 from .models import AuthData
 from fastapi.exceptions import HTTPException
+import secrets
 
 frostpaw_auth = APIKeyHeader(name="Frostpaw-Auth", description="**Format**: user/bot/server|ID|TOKEN", auto_error=False)
 
@@ -25,7 +26,7 @@ async def auth(header: str = Depends(frostpaw_auth)):
         if not auth_data:
             raise HTTPException(404, detail="User not found")
         
-        if auth_data["api_token"] != token:
+        if not secrets.compare_digest(auth_data["api_token"], token):
             raise HTTPException(401, detail="Invalid token")
         
         return AuthData(user_id=id, target_id=id, auth_type=TargetType.User)
@@ -35,7 +36,7 @@ async def auth(header: str = Depends(frostpaw_auth)):
         if not auth_data:
             raise HTTPException(404, detail="Bot not found")
         
-        if auth_data["api_token"] != token:
+        if not secrets.compare_digest(auth_data["api_token"], token):
             raise HTTPException(401, detail="Invalid token")
         
         return AuthData(user_id=id, target_id=id, auth_type=TargetType.Bot)
@@ -45,7 +46,7 @@ async def auth(header: str = Depends(frostpaw_auth)):
         if not auth_data:
             raise HTTPException(404, detail="Server not found")
         
-        if auth_data["api_token"] != token:
+        if not secrets.compare_digest(auth_data["api_token"], token):
             raise HTTPException(401, detail="Invalid token")
         
         return AuthData(user_id=id, target_id=id, auth_type=TargetType.Server)

@@ -163,6 +163,14 @@ async def get_bot_secrets(bot_id: int, auth: models.AuthData = Depends(auth)):
     
     if not flag:
         raise HTTPException(status_code=403, detail="Forbidden")
+    
+    bot_secrets = await tables.Bots.select(tables.Bots.webhook, tables.Bots.webhook_secret, tables.Bots.api_token).where(tables.Bots.id == bot_id).first()
+
+    return models.BotSecrets(
+        api_token=bot_secrets["api_token"],
+        webhook=bot_secrets["webhook"],
+        webhook_secret=bot_secrets["webhook_secret"]
+    )
 
 @app.get("/@me", response_model=silver_types.DiscordUser)
 async def test_sv_resp():

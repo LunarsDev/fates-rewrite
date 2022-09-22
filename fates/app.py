@@ -1,3 +1,4 @@
+from typing import Optional
 import uuid
 from fates import models
 from fates.auth import auth
@@ -172,8 +173,13 @@ async def get_bot_secrets(bot_id: int, auth: models.AuthData = Depends(auth)):
         webhook_secret=bot_secrets["webhook_secret"]
     )
 
-@app.get("/@me", response_model=silver_types.DiscordUser)
+@app.get("/@auth", tags=[tags.tests], response_model=models.AuthData)
+async def test_auth(auth: models.AuthData = Depends(auth)):
+    return auth
+
+@app.get("/@me", tags=[tags.tests], response_model=silver_types.DiscordUser)
 async def test_sv_resp():
+    """Returns the current Fates List user thats logged in on the API"""
     req = await mapleshade.silverpelt_req("@me")
     return req
 

@@ -8,8 +8,17 @@ from fastapi.exceptions import HTTPException
 import secrets
 
 frostpaw_auth = APIKeyHeader(name="Frostpaw-Auth", description="**Format**: user/bot/server|ID|TOKEN", auto_error=False)
+compat_header = APIKeyHeader(name="Authorization", description="**Format**: TOKEN (*for backwards compatibility only, only some bot endpoints supported*)", auto_error=False)
 
-async def auth(header: str = Depends(frostpaw_auth)):
+async def auth(header: str = Depends(frostpaw_auth), compat: str = Depends(compat_header)):
+    if compat:
+        auth_data = await tables.Bots.select(tables.Bots.bot_id).where(tables.Bots.api_token == compat).first()
+
+        if not auth_data:
+            raise HTTPException(404, detail="Bot not found")
+                
+        return AuthData(target_id=auth_data["bot_id"], auth_type=TargetType.Bot, token=compat, compat=True)
+
     try:
         auth_type, id, token = header.split("|")
     except:
@@ -29,7 +38,7 @@ async def auth(header: str = Depends(frostpaw_auth)):
         if not secrets.compare_digest(auth_data["api_token"], token):
             raise HTTPException(401, detail="Invalid token")
         
-        return AuthData(user_id=id, target_id=id, auth_type=TargetType.User, token=token)
+        return AuthData(target_id=id, auth_type=TargetType.User, token=token, compat=False)
     elif auth_type == "bot":
         auth_data = await tables.Bots.select(tables.Bots.api_token).where(tables.Bots.bot_id == id).first()
 
@@ -39,7 +48,7 @@ async def auth(header: str = Depends(frostpaw_auth)):
         if not secrets.compare_digest(auth_data["api_token"], token):
             raise HTTPException(401, detail="Invalid token")
         
-        return AuthData(user_id=id, target_id=id, auth_type=TargetType.Bot, token=token)
+        return AuthData(target_id=id, auth_type=TargetType.Bot, token=token, compat=False)
     elif auth_type == "server":
         auth_data = await tables.Servers.select(tables.Servers.api_token).where(tables.Servers.server_id == id).first()
 
@@ -49,4 +58,4 @@ async def auth(header: str = Depends(frostpaw_auth)):
         if not secrets.compare_digest(auth_data["api_token"], token):
             raise HTTPException(401, detail="Invalid token")
         
-        return AuthData(user_id=id, target_id=id, auth_type=TargetType.Server, token=token)
+        return AuthData(target_id=id, auth_type=TargetType.Server, token=token, compat=False)

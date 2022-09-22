@@ -284,6 +284,7 @@ class AuthData(BaseModel):
     auth_type: TargetType
     target_id: int 
     token: str
+    compat: bool
 
 class Vanity(BaseModel):
     """Represents a vanity"""

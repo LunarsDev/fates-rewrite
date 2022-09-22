@@ -7,7 +7,7 @@ import inspect
 import piccolo
 from fastapi import FastAPI, HTTPException, Request, Depends
 from fastapi.responses import ORJSONResponse
-from fastapi.staticfiles import StaticFiles
+from piccolo.columns.combination import WhereRaw
 from starlette.routing import Mount
 from piccolo_admin.endpoints import create_admin
 from piccolo.engine import engine_finder
@@ -157,7 +157,7 @@ async def get_bot_secrets(bot_id: int, auth: models.AuthData = Depends(auth)):
     
     flag = False
     for owner in bot_owners:
-        if owner["user_id"] == auth.target_id:
+        if owner["owner"] == auth.target_id:
             flag = True
             break
     
@@ -199,6 +199,27 @@ async def get_meta():
         ),
     )
 
+@app.get("/code/{vanity}", response_model=models.Vanity)
+async def get_code(vanity: str):
+    vanity = await tables.Vanity.select().where(WhereRaw("lower(vanity_url) = {}", vanity.lower())).first()
+
+    if not vanity:
+        raise HTTPException(status_code=404, detail="Not Found")
+
+    if vanity["type"] == 0:
+        vanity["type"] = models.TargetType.Server
+    elif vanity["type"] == 1:
+        vanity["type"] = models.TargetType.Bot
+    elif vanity["type"] == 2:
+        vanity["type"] = models.TargetType.User
+    else:
+        raise HTTPException(status_code=400, detail="Unknown Vanity Type")
+    
+    return models.Vanity(
+        target_type=vanity["type"],
+        code=vanity["vanity_url"],
+        target_id=vanity["redirect"]
+    )
 
 @app.get("/oauth2")
 async def oauth2(request: Request):

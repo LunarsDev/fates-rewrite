@@ -33,17 +33,17 @@ interface AuthOptions {
   session: LayoutData;
   endpointType: "bot" | "server" | "user";
   entityAuth?: EntityAuth;
-  /** Does this request need auth, defaults to true if unset */
+  /** Does this request need auth, defaults to false if unset */
   auth?: boolean;
   errorOnFail?: boolean;
 }
 
 // Authenticated fetch (should always be preferred to fetch)
 export async function request(url: string, options: AuthOptions): Promise<Response> {
-  if(options.auth === undefined) options.auth = true;
+  if(options.auth === undefined) options.auth = false;
 
   if(!options.headers) {
-    options.headers = new Map();
+    options.headers = {}
   }
 
   if(!options.fetch) {
@@ -65,13 +65,14 @@ export async function request(url: string, options: AuthOptions): Promise<Respon
     } else {
       if(options.session.token) {
         options.headers["Frostpaw-Auth"] = `${options.endpointType}|${options.session.user.id}|${options.session.token}`
+      } else {
+        throw new Error("No token found in session");
       }
     }
   }
-
+  
+  options.headers["Origin"] = origin;
   options.headers["Content-Type"] = "application/json";
-
-  options.headers["origin"] = origin;
 
   try {
     let res: Response = await options.fetch(url, {

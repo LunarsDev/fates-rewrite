@@ -843,8 +843,7 @@ class ServerTags(Table, tablename="server_tags"):
 
 
 class Vanity(Table, tablename="vanity"):
-    id = Integer(
-        default=0,
+    id = Serial(
         null=False,
         primary_key=True,
         unique=False,
@@ -998,7 +997,7 @@ class BotOwner(Table, tablename="bot_owner"):
     )
     main = Boolean(
         default=False,
-        null=True,
+        null=False,
         primary_key=False,
         unique=False,
         secret=False,

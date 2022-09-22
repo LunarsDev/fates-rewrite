@@ -284,3 +284,14 @@ class AuthData(BaseModel):
     auth_type: TargetType
     target_id: int 
     token: str
+
+class Vanity(BaseModel):
+    """Represents a vanity"""
+    target_id: str
+    """The vanity's target ID"""
+
+    target_type: TargetType
+    """The vanity's target type"""
+
+    code: str
+    """The vanity's code"""

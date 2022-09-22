@@ -37,7 +37,8 @@ Then, pen ``psql``, then run the following:
 
 **Sept 12th 2022** 
 
-- ``bot_library`` renamed to ``library``
+- ``bot_library`` renamed to ``library`` (``ALTER TABLE bots RENAME COLUMN bot_library TO library``)
+- Added vanity.id (``alter table vanity add column id SERIAL NOT NULL``)
 
 ## Developer Docs
 

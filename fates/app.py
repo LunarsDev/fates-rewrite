@@ -164,7 +164,7 @@ async def get_bot_secrets(bot_id: int, auth: models.AuthData = Depends(auth)):
     if not flag:
         raise HTTPException(status_code=403, detail="Forbidden")
     
-    bot_secrets = await tables.Bots.select(tables.Bots.webhook, tables.Bots.webhook_secret, tables.Bots.api_token).where(tables.Bots.id == bot_id).first()
+    bot_secrets = await tables.Bots.select(tables.Bots.webhook, tables.Bots.webhook_secret, tables.Bots.api_token).where(tables.Bots.bot_id == bot_id).first()
 
     return models.BotSecrets(
         api_token=bot_secrets["api_token"],

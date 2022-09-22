@@ -270,10 +270,10 @@ class BotSecrets(BaseModel):
     api_token: str
     """The bot's API token"""
 
-    webhook: str
+    webhook: Optional[str] = None
     """The bot's webhook"""
 
-    webhook_secret: str
+    webhook_secret: Optional[str] = None
     """The bot's webhook secret"""
 
 

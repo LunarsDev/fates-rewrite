@@ -12,7 +12,7 @@ compat_header = APIKeyHeader(name="Authorization", description="**Format**: TOKE
 
 async def auth(header: str = Depends(frostpaw_auth), compat: str = Depends(compat_header)):
     if compat:
-        auth_data = await tables.Bots.select(tables.Bots.bot_id).where(tables.Bots.api_token == compat).first()
+        auth_data = await tables.Bots.select(tables.Bots.bot_id).where(tables.Bots.api_token == compat.replace("Bot ", "")).first()
 
         if not auth_data:
             raise HTTPException(404, detail="Bot not found")

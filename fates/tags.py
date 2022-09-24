@@ -1,4 +1,5 @@
 # Doc tags
 
-bot = "bot"
-tests = "tests"
+bot = "Bot-related endpoints"
+tests = "Experimental test endpoints"
+internal = "Internal endpoints (classified)"

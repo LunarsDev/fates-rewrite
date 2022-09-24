@@ -4,3 +4,17 @@ secrets:
   client_secret:
 
 redis_url: "redis://127.0.0.1:5432" # Redis URL
+
+main_server: 789934742128558080
+
+perms:
+  sudo: 
+    roles: 
+      - 976891305336655903 # dev
+      - 836326299223195738 # overseer
+      - 999035725272068166 # owner
+    index: 10
+  head_admin:
+    roles:
+      - 836349482340843572 # head admin
+    index: 9

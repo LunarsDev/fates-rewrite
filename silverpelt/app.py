@@ -127,3 +127,13 @@ async def get_user(id: int):
         print(exc)
         await cache(None, key=f"user:{id}", expiry=60)
         return None
+
+@app.get("/roles/{gid}/{uid}")
+async def get_guild_member_roles(gid: int, uid: int): 
+    guild = bot.get_guild(gid)
+    if not guild:
+        return None
+    member = guild.get_member(uid)
+    if not member:
+        return None
+    return [role.id for role in member.roles]

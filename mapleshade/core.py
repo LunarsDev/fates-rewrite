@@ -1,4 +1,4 @@
-from typing import Any, Optional
+from typing import Any, Optional, Union
 from fates import tables, models
 from ruamel.yaml import YAML
 import orjson
@@ -30,20 +30,28 @@ class SilverRespError(SilverException):
 
 class SilverNoData(SilverException):
     """Exception for when there is no data"""
-
     ...
 
-
-class BackendDoc:
-    def __init__(self, fn: str):
-        try:
-            with open(f"backend_assets/{fn}.kitescratch") as doc:
-                doc.read()
-        except FileNotFoundError:
-            raise RuntimeError(
-                f"BackendDoc {fn} not found. Have you run kitescratch/genassets?"
-            )
-
+class Permission:
+    def __init__(self, index: int, roles: list[int], name: str):
+        self.index = index
+        self.roles = roles
+        self.name = name
+    
+    def __eq__(self, other: "Permission") -> bool:
+        if not isinstance(other, Permission):
+            return False
+        return self.index == other.index
+    
+    def __lt__(self, other: "Permission") -> bool:
+        if not isinstance(other, Permission):
+            return False
+        return self.index < other.index
+    
+    def __gt__(self, other: "Permission") -> bool:
+        if not isinstance(other, Permission):
+            return False
+        return self.index > other.index
 
 class Mapleshade:
     __slots__ = [
@@ -54,6 +62,7 @@ class Mapleshade:
         "cache",
         "cmark_opts",
         "cmark_exts",
+        "perms"
     ]
 
     def __init__(self):
@@ -64,6 +73,17 @@ class Mapleshade:
 
         with open("config.yaml") as doc:
             self.config = self.yaml.load(doc)
+        
+        self.perms = {
+            "default": Permission(0, [], "default"),
+        }
+
+        for name, perm in self.config["perms"].items():
+            self.perms[name] = Permission(
+                index=perm["index"],
+                roles=perm["roles"],
+                name=name
+            )
 
         # CMark options
         self.cmark_opts = (
@@ -122,6 +142,19 @@ class Mapleshade:
                 "srcset",
             ],
         }
+    
+    async def guppy(self, user_id: int) -> Permission:
+        """Guppy: (Get User Permissions Pretty Please You!"""
+        try:
+            user_roles: list[int] = await self.silverpelt_req(f"roles/{self.config['main_server']}/{user_id}")
+        except SilverNoData:
+            return self.perms["default"]
+        
+        for perm in self.perms.values():
+            if any(role in user_roles for role in perm.roles):
+                return perm
+        
+        return self.perms["default"]
 
     def parse_dict(self, d: dict | object) -> dict | object:
         """Parse dict for handling bigints in DDR's etc"""
@@ -138,7 +171,7 @@ class Mapleshade:
             return nd
         else:
             return d
-
+    
     def sanitize(
         self,
         s: str,

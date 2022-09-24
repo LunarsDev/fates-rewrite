@@ -1,4 +1,3 @@
-from typing import Optional
 import uuid
 from fates import models
 from fates.auth import auth
@@ -13,8 +12,11 @@ from starlette.routing import Mount
 from piccolo_admin.endpoints import create_admin
 from piccolo.engine import engine_finder
 
-from mapleshade import Mapleshade, SilverNoData
+from mapleshade import SilverNoData, Mapleshade
 import silverpelt.types.types as silver_types
+
+mapleshade = Mapleshade()
+
 
 _tables = []
 
@@ -45,7 +47,6 @@ For more documentation on our API, see https://github.com/LunarsDev/fates-rewrit
     """,
 )
 
-
 @app.middleware("http")
 async def cors(request: Request, call_next):
     response = await call_next(request)
@@ -59,9 +60,6 @@ async def cors(request: Request, call_next):
     if request.method == "OPTIONS":
         response.status_code = 200
     return response
-
-
-mapleshade = Mapleshade()
 
 
 @app.on_event("startup")
@@ -236,3 +234,7 @@ async def oauth2(request: Request):
         "state": state,
         "url": f"https://discord.com/oauth2/authorize?client_id={mapleshade.config['secrets']['client_id']}&redirect_uri={request.headers.get('Frostpaw-Server')}/frostpaw/login&scope=identify&response_type=code",
     }
+
+@app.get("/guppy", tags=[tags.internal])
+async def guppy_test(user_id: int):
+    return await mapleshade.guppy(user_id)

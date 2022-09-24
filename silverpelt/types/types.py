@@ -10,6 +10,7 @@ class Status(enum.IntEnum):
 
     @classmethod
     def new(cls, v):
+        # https://www.reddit.com/r/Python/comments/ur9t92/python_310_match_statements_are_86_faster_than_if/
         match v:
             case "online":
                 return Status.online
@@ -32,7 +33,7 @@ class IDiscordUser(BaseModel):
     system: bool
     status: Status
     flags: int
-
+    
 
 class DiscordUser(IDiscordUser):
     """Represents a discord user"""

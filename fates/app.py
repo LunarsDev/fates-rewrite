@@ -76,7 +76,7 @@ async def close_database_connection_pool():
     await engine.close_connnection_pool()
 
 
-@app.get("/random", response_model=models.Snippet)
+@app.get("/random", response_model=models.Snippet, tags=[tags.bot])
 async def random_snippet(
     target_type: models.TargetType = models.TargetType.Bot, reroll: bool = False
 ):
@@ -110,7 +110,7 @@ async def random_snippet(
             flag += 1
 
 
-@app.get("/index", response_model=models.Index)
+@app.get("/index", response_model=models.Index, tags=[tags.generic])
 async def index(target_type: models.TargetType):
     if target_type != models.TargetType.Bot:
         raise HTTPException(400, "Not yet implemented")
@@ -182,7 +182,7 @@ async def test_sv_resp():
     return req
 
 
-@app.get("/blazefire/{id}", response_model=silver_types.DiscordUser)
+@app.get("/blazefire/{id}", tags=[tags.generic], response_model=silver_types.DiscordUser)
 async def get_discord_user(id: int):
     try:
         req = await mapleshade.silverpelt_req(f"users/{id}")
@@ -191,7 +191,7 @@ async def get_discord_user(id: int):
     return req
 
 
-@app.get("/meta", response_model=models.ListMeta)
+@app.get("/meta", tags=[tags.generic], response_model=models.ListMeta)
 async def get_meta():
     return models.ListMeta(
         bot=models.BotListMeta(
@@ -203,7 +203,7 @@ async def get_meta():
         ),
     )
 
-@app.get("/code/{vanity}", response_model=models.Vanity)
+@app.get("/code/{vanity}", tags=[tags.generic], response_model=models.Vanity)
 async def get_code(vanity: str):
     vanity = await tables.Vanity.select().where(WhereRaw("lower(vanity_url) = {}", vanity.lower())).first()
 
@@ -225,7 +225,7 @@ async def get_code(vanity: str):
         target_id=vanity["redirect"]
     )
 
-@app.get("/oauth2")
+@app.get("/oauth2", tags=[tags.internal])
 async def oauth2(request: Request):
     if not request.headers.get("Frostpaw-Server"):
         raise HTTPException(400, "Missing Frostpaw-Server header")

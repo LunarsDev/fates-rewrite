@@ -6,6 +6,7 @@
 
 - ``Mapleshade`` - The core API implementations of fates list
 - ``Silverpelt`` - A IPC service to handle all discord API actions (using fastapi and msgpack)
+- ``Kitescratch`` - A simple CLI for Fates List (mostly for development, but may become full cli-only replacement for sunbeam (one day?))
 
 ### Frontend
 

@@ -61,8 +61,6 @@ class Entity:
     id: str
     """The entity's ID"""
 
-    # kitescratch-end
-
     @staticmethod
     def to(_: dict) -> "Entity":
         pass
@@ -91,8 +89,6 @@ class Tag(BaseModel, Entity):
 
     owner_guild: Optional[str]
     """The guild ID of the tags owner (server only)"""
-
-    # kitescratch-end
 
     @staticmethod
     def to(tag: dict) -> "Tag":

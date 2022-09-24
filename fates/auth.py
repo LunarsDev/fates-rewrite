@@ -7,8 +7,8 @@ from .models import AuthData
 from fastapi.exceptions import HTTPException
 import secrets
 
-frostpaw_auth = APIKeyHeader(name="Frostpaw-Auth", description="**Format**: user/bot/server|ID|TOKEN", auto_error=False)
-compat_header = APIKeyHeader(name="Authorization", description="**Format**: TOKEN (*for backwards compatibility only, only some bot endpoints supported*)", auto_error=False)
+frostpaw_auth = APIKeyHeader(name="Frostpaw-Auth", scheme_name="Frostpaw-Auth", description="**Format**: user/bot/server|ID|TOKEN", auto_error=False)
+compat_header = APIKeyHeader(name="Authorization", scheme_name="Bot (compat)", description="**Format**: TOKEN (*for backwards compatibility only, only some bot endpoints supported*)", auto_error=False)
 
 async def auth(header: str = Depends(frostpaw_auth), compat: str = Depends(compat_header)):
     if compat:

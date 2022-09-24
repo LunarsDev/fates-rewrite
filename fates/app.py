@@ -44,6 +44,10 @@ app = FastAPI(
     ],
     description="""
 For more documentation on our API, see https://github.com/LunarsDev/fates-rewrite#developer-docs
+
+## General Terms
+
+**Snippet:** A snippet is a basic core/common representation of any bot or server on the list.
     """,
 )
 
@@ -81,7 +85,11 @@ async def random_snippet(
     target_type: models.TargetType = models.TargetType.Bot, reroll: bool = False
 ):
     """
-    - reroll: Whether to reroll and bypass cache
+Fetches a random 'snippet' from the list.
+
+**Query Parameters**
+
+- reroll: Whether to reroll and bypass cache (default: false)
     """
     if target_type == models.TargetType.User:
         raise HTTPException(400, detail="User snippets are not supported *yet*")

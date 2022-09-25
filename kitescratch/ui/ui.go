@@ -14,11 +14,13 @@ import (
 var BoldText = color.New(color.Bold).PrintlnFunc()
 var BlueText = color.New(color.FgBlue).PrintlnFunc()
 var RedText = color.New(color.FgRed).PrintlnFunc()
+var YellowText = color.New(color.FgYellow).PrintlnFunc()
+var PurpleText = color.New(color.FgMagenta).PrintlnFunc()
+var GreenText = color.New(color.FgGreen).PrintlnFunc()
 
 type OptionHandler = func() error
 
 type Option struct {
-	ID      string        // The ID of the Option
 	Char    string        // The character to press to select this Option, leave empty to use numbers
 	Text    string        // The text to display
 	Handler OptionHandler // The function to call when this Option is selected
@@ -44,13 +46,11 @@ func YesNoPrompt(question string, f1 OptionHandler, f2 OptionHandler) *Prompt {
 		Question: question,
 		Choices: []*Option{
 			{
-				ID:      "yes",
 				Char:    "Y",
 				Text:    "Yes",
 				Handler: f1,
 			},
 			{
-				ID:      "no",
 				Char:    "N",
 				Text:    "No",
 				Handler: f2,

@@ -1,15 +1,9 @@
 package auth
 
-type AuthTargetType string
-
-const (
-	AuthTargetTypeUser   AuthTargetType = "user"
-	AuthTargetTypeBot    AuthTargetType = "bot"
-	AuthTargetTypeServer AuthTargetType = "server"
-)
+import "kitescratch/types"
 
 type Auth struct {
-	TargetType AuthTargetType
+	TargetType types.AuthTargetType
 	ID         string
 	Token      string
 }

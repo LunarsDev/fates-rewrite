@@ -5,13 +5,13 @@ import (
 	"kitescratch/types"
 )
 
-func GetMeta(reason string) types.ListMeta {
+func GetMeta() types.ListMeta {
 	var meta types.ListMeta
 
 	requests.RequestToStruct(requests.HTTPRequest{
 		Method: "GET",
 		Url:    "/meta",
-		Reason: reason,
+		Reason: Reason,
 	}, &meta)
 
 	return meta

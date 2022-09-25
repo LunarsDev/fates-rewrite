@@ -24,11 +24,15 @@ type HTTPRequest struct {
 	Reason      string
 }
 
+func (req HTTPRequest) String() string {
+	return fmt.Sprintf("%s %s (reason: \"%s\", errorOnFail: %t)", req.Method, req.Url, req.Reason, req.ErrorOnFail)
+}
+
 func Request(req HTTPRequest) ([]byte, error) {
 	if req.Reason == "" {
 		req.Reason = "unknown"
 	}
-	logrus.Info(req.Method, " ", req.Url, " (reason: ", req.Reason, ", errorOnFail: ", req.ErrorOnFail, ")")
+	logrus.Info(req.String())
 
 	cli := http.Client{
 		Timeout: 10 * time.Second,
@@ -89,4 +93,16 @@ func Request(req HTTPRequest) ([]byte, error) {
 	}
 
 	return []byte{}, nil
+}
+
+func RequestToStruct(req HTTPRequest, output any) {
+	data, err := Request(req)
+	if err != nil {
+		logrus.Fatal(err)
+	}
+
+	err = json.Unmarshal(data, output)
+	if err != nil {
+		logrus.Fatal(err)
+	}
 }

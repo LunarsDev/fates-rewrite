@@ -153,3 +153,27 @@ class TargetType(IntEnum):
 class PageStyle(IntEnum):
     tabs = 0
     single_scroll = 1
+
+class UserExperiment(IntEnum):
+    """User experiments"""
+
+    Unknown = 0
+    """Unknown experiment"""
+
+    GetRoleSelector = 1
+    """We switched to native roles"""
+
+    LynxExperimentRolloutView = 2
+    """The 'Experiment Rollout' view in lynx"""
+
+    BotReport = 3
+    """Bot Reports"""
+    
+    ServerAppealCertification = 4 
+    """Ability to use request type of Appeal or Certification in server appeal"""
+
+    UserVotePrivacy = 5
+    """The ability for users to hide their votes from Get Bot Votes and Get Server Votes API"""
+
+    DevPortal = 6
+    """The ability for users to access the dev portal. This needs explicit whitelisting and cannot be rolled out"""

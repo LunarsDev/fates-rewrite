@@ -75,3 +75,104 @@ type Vanity struct {
 	TargetType TargetType `json:"target_type"`
 	Code       string     `json:"code"`
 }
+
+type Oauth2 struct {
+	State string `json:"state"`
+	Url   string `json:"url"`
+}
+
+type UserStatus int
+
+const (
+	UserStatusOnline UserStatus = iota
+	UserStatusIdle
+	UserStatusDnd
+	UserStatusOffline
+)
+
+func (s UserStatus) String() string {
+	switch s {
+	case UserStatusOnline:
+		return "online"
+	case UserStatusIdle:
+		return "idle"
+	case UserStatusDnd:
+		return "dnd"
+	case UserStatusOffline:
+		return "offline"
+	}
+	return ""
+}
+
+type UserState int
+
+const (
+	UserStateNormal UserState = iota
+	UserStateGlobalBan
+	UserStateProfileEditBan
+)
+
+func (s UserState) String() string {
+	switch s {
+	case UserStateNormal:
+		return "normal"
+	case UserStateGlobalBan:
+		return "globalBan"
+	case UserStateProfileEditBan:
+		return "profileEditBan"
+	}
+	return ""
+}
+
+type UserExperiment int
+
+const (
+	UserExperimentUnknown UserExperiment = iota
+	UserExperimentGetRoleSelector
+	UserExperimentLynxExperimentRolloutView
+	UserExperimentBotReport
+	UserExperimentServerAppealCertification
+	UserExperimentUserVotePrivacy
+	UserExperimentDevPortal
+)
+
+func (e UserExperiment) String() string {
+	switch e {
+	case UserExperimentUnknown:
+		return "unknown"
+	case UserExperimentGetRoleSelector:
+		return "getRoleSelector"
+	case UserExperimentLynxExperimentRolloutView:
+		return "lynxExperimentRolloutView"
+	case UserExperimentBotReport:
+		return "botReport"
+	case UserExperimentServerAppealCertification:
+		return "serverAppealCertification"
+	case UserExperimentUserVotePrivacy:
+		return "userVotePrivacy"
+	case UserExperimentDevPortal:
+		return "devPortal"
+	}
+	return ""
+}
+
+type DiscordUser struct {
+	ID            string     `json:"id"`
+	Username      string     `json:"username"`
+	Discriminator string     `json:"disc"`
+	Avatar        string     `json:"avatar"`
+	Bot           bool       `json:"bot"`
+	System        bool       `json:"system"`
+	Status        UserStatus `json:"status"`
+	Flags         int        `json:"flags"`
+}
+
+type OauthUser struct {
+	State           UserState        `json:"state"`
+	Token           string           `json:"token"`
+	User            DiscordUser      `json:"user"`
+	RefreshToken    *string          `json:"refresh_token"`
+	SiteLang        string           `json:"site_lang"`
+	CSS             string           `json:"css"`
+	UserExperiments []UserExperiment `json:"user_experiments"`
+}

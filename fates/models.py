@@ -37,6 +37,12 @@ BOT_SNIPPET_COLS = (
     Bots.state,
 )
 
+DEFAULT_USER_EXPERIMENTS = [
+    UserExperiment.UserVotePrivacy,
+    UserExperiment.LynxExperimentRolloutView,
+    UserExperiment.BotReport,
+]
+
 
 async def augment(c: Select, aug: str):
     """Augment a SQL select with custom SQL"""
@@ -292,3 +298,98 @@ class Vanity(BaseModel):
 
     code: str
     """The vanity's code"""
+
+class Login(BaseModel):
+    """Represents a login"""
+    
+    code: str
+    """The Discord OAuth2 code"""
+
+    state: Optional[str] = None
+    """The Discord OAuth2 state"""
+
+    frostpaw: bool
+    """Whether the login is for a custom client or not"""
+
+    frostpaw_blood: Optional[str] = None
+    """The custom client's ID"""
+
+    frostpaw_claw: Optional[str] = None
+    """The custom client's hmac data"""
+
+    frostpaw_claw_unseathe_time: Optional[float | int] = None
+    """Custom client reported current time"""
+
+class OauthUser(BaseModel):
+    """OAuth2 login response"""
+
+    state: UserState
+    """The user's state"""
+
+    token: str
+    """The user's token"""
+
+    user: silver_types.DiscordUser
+    """The user's user object"""
+
+    refresh_token: Optional[str] = None
+    """The user's refresh token"""
+
+    site_lang: str
+    """The user's site language"""
+
+    css: Optional[str] = None
+    """The user's CSS"""
+
+    user_experiments: list[UserExperiment]
+    """The user's experiments"""
+
+class OAuth2Login(BaseModel):
+    """OAuth2 login response"""
+
+    state: str
+    """The user's state"""
+
+    url: str
+    """The url to redirect to"""
+
+
+# id, name, domain, verified, privacy_policy, secret,, owner_id
+class FrostpawClient(BaseModel):
+    """Represents a Frostpaw client"""
+
+    id: str
+    """The Frostpaw client's ID"""
+
+    name: str
+    """The Frostpaw client's name"""
+
+    domain: str
+    """The Frostpaw client's domain"""
+
+    verified: bool
+    """Whether the Frostpaw client is verified or not"""
+
+    privacy_policy: str
+    """The Frostpaw client's privacy policy"""
+
+    owner: silver_types.DiscordUser
+    """The Frostpaw client's owner"""
+
+class SecretFrostpawClient(FrostpawClient):
+    """Represents a Frostpaw client with secrets"""
+
+    secret: Optional[str] = None
+    """The Frostpaw client's secret"""
+
+class FrostpawLogin(BaseModel):
+    """Internal: Login data for a custom client"""
+
+    client_id: str
+    """The Frostpaw client's ID"""
+
+    user_id: str
+    """The Frostpaw client's user ID"""
+
+    token: str
+    """The users token"""

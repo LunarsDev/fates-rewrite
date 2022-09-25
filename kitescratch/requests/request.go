@@ -16,7 +16,7 @@ import (
 type HTTPRequest struct {
 	Method      string
 	Url         string
-	Data        map[string]any // A struct to send as JSON
+	Data        any // A struct to send as JSON
 	Body        []byte
 	Headers     http.Header // Any custom headers
 	Auth        *auth.Auth
@@ -89,6 +89,14 @@ func Request(req HTTPRequest) ([]byte, error) {
 		if err != nil {
 			return nil, err
 		}
+
+		if resp.StatusCode >= 400 {
+			logrus.WithFields(logrus.Fields{
+				"status": resp.StatusCode,
+				"body":   string(output),
+			}).Warn("Request failed")
+		}
+
 		return output, nil
 	}
 

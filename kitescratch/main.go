@@ -1,21 +1,46 @@
 package main
 
 import (
+	"context"
 	"fmt"
 	"kitescratch/api"
 	"kitescratch/state"
 	"kitescratch/ui"
+	"log"
+	"net/http"
 	"strconv"
+	"time"
 
 	"github.com/sirupsen/logrus"
 )
 
-var backupCfg state.State
+var (
+	backupCfg state.State
+	loginCh   = make(chan iLogin)
+)
+
+type iLogin struct {
+	code  string
+	state string
+}
 
 func init() {
 	// Load initial config
 	state.StateInit()
 	backupCfg = state.GlobalState
+
+	// Load login webserver
+	http.HandleFunc("/frostpaw/login", func(w http.ResponseWriter, r *http.Request) {
+		code := r.URL.Query().Get("code")
+		state := r.URL.Query().Get("state")
+
+		w.Write([]byte("You can now close this window"))
+
+		loginCh <- iLogin{
+			code:  code,
+			state: state,
+		}
+	})
 }
 
 func cfgSetup() {
@@ -114,6 +139,46 @@ func vanityView() {
 	}
 }
 
+func loginView() {
+	// Get oauth2 url
+	api.SetReason("Fetching login URL for loginView")
+	oauth2 := api.GetOauth2("http://localhost:5001")
+
+	// Open a http server on port 5001
+	srv := &http.Server{Addr: ":5001"}
+
+	go func() {
+		err := srv.ListenAndServe()
+		if err != http.ErrServerClosed {
+			log.Fatal(err)
+		}
+	}()
+
+	fmt.Println("Please open the following URL in your browser:\n\n", oauth2.Url+"&state="+oauth2.State)
+
+	// Wait for login
+	login := <-loginCh
+
+	fmt.Println("Got login code", login.code, "with state", login.state)
+
+	ctx, cancel := context.WithTimeout(context.Background(), 1*time.Second)
+
+	srv.Shutdown(ctx)
+
+	cancel()
+
+	// Exchange code for token via fates api endpoint
+
+	// RN, only do a normal auth, frostpaw auth is *NOT* needed
+	api.SetReason("Exchanging login code for token")
+	token := api.LoginUser("http://localhost:5001", api.LoginUserData{
+		Code:  login.code,
+		State: login.state,
+	})
+
+	fmt.Println("Got user token", token.Token)
+}
+
 func mainMenu() {
 	for {
 		var exit bool
@@ -141,6 +206,14 @@ func mainMenu() {
 					Char: "C",
 					Handler: func() error {
 						cmdView()
+						return nil
+					},
+				},
+				{
+					Text: "Login",
+					Char: "L",
+					Handler: func() error {
+						loginView()
 						return nil
 					},
 				},

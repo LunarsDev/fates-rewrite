@@ -652,6 +652,11 @@ class FrostpawClient(Table, tablename="frostpaw_clients"):
         null=False,
     )
 
+    verified = Boolean(
+        default=False,
+        null=False,
+    )
+
 
 class UserConnection(Table, tablename="user_connections"):
     user_id = ForeignKey(

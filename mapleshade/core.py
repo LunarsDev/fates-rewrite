@@ -1,3 +1,5 @@
+import random
+import string
 from typing import Any, Optional, Union
 from fates import tables, models
 from ruamel.yaml import YAML
@@ -324,3 +326,105 @@ class Mapleshade:
             snippet.append(models.Snippet(**entity))
 
         return snippet
+    
+    def gen_secret(self, n: int = 32) -> str:
+        """Generates a secret"""
+        bytes(random.choices(string.ascii_uppercase.encode('ascii'),k=n)).decode('ascii')
+
+
+    async def login(self, code: str, redirect_url: str) -> models.OauthUser:
+        """Logs a user in"""
+        async with aiohttp.ClientSession() as session:
+            async with session.post(
+                "https://discord.com/api/v10/oauth2/token",
+                data={
+                    "client_id": self.config["secrets"]["client_id"],
+                    "client_secret": self.config["secrets"]["client_secret"],
+                    "grant_type": "authorization_code",
+                    "code": code,
+                    "redirect_uri": redirect_url,
+                },
+            ) as resp:
+                data = await resp.json()
+                if not resp.ok:
+                    raise Exception(f"Failed to get token with status code: {resp.status} [err of {data}]")
+
+            async with session.get(
+                "https://discord.com/api/v10/users/@me",
+                headers={"Authorization": f"Bearer {data['access_token']}"},
+            ) as resp:
+                duser = await resp.json()
+                if not resp.ok:
+                    raise Exception(f"Failed to get user with status code: {resp.status} [err of {duser}]")
+
+        user = await self.silverpelt_req(
+            f"users/{duser['id']}",
+        )
+
+        duser["id"] = int(duser["id"])
+
+        list_data = await tables.Users.select(
+            tables.Users.state,
+            tables.Users.api_token,
+            tables.Users.user_css,
+            tables.Users.username,
+            tables.Users.site_lang,
+            tables.Users.experiments
+        ).where(
+            tables.Users.user_id == duser["id"]
+        ).first()
+
+        if not list_data:
+            await tables.Users.insert(
+                tables.Users(
+                    id=duser["id"],
+                    user_id=duser["id"],
+                    username=duser["username"],
+                    user_css="",
+                    site_lang="en",
+                    api_token=self.gen_secret(128)
+                )
+            )
+
+            list_data = await tables.Users.select(
+                tables.Users.state,
+                tables.Users.api_token,
+                tables.Users.user_css,
+                tables.Users.username,
+                tables.Users.site_lang,
+                tables.Users.experiments
+            ).where(
+                tables.Users.user_id == duser["id"]
+            ).first()
+
+
+        return models.OauthUser(
+            state=list_data["state"],
+            token=list_data["api_token"],
+            user=user,
+            refresh_token=None,
+            site_lang=list_data["site_lang"],
+            css=list_data["user_css"],
+            user_experiments=models.DEFAULT_USER_EXPERIMENTS + list_data["experiments"],
+        )
+    
+    async def get_frostpaw_client(self, client_id: str) -> models.SecretFrostpawClient:
+        """Gets a frostpaw client"""
+
+        client = await tables.FrostpawClient.select(
+            tables.FrostpawClient.id,
+            tables.FrostpawClient.name,
+            tables.FrostpawClient.domain,
+            tables.FrostpawClient.verified,
+            tables.FrostpawClient.privacy_policy,
+            tables.FrostpawClient.secret,
+            tables.FrostpawClient.owner_id
+        ).where(
+            tables.FrostpawClient.id == client_id
+        ).first()
+        if not client:
+            raise Exception("Client not found")
+
+        client["owner"] = await self.silverpelt_req(f"users/{client['owner_id']}")
+        
+        return models.SecretFrostpawClient(**client)

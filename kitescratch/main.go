@@ -4,14 +4,15 @@ import (
 	"context"
 	"fmt"
 	"kitescratch/api"
+	"kitescratch/auth"
 	"kitescratch/state"
+	"kitescratch/types"
 	"kitescratch/ui"
 	"log"
 	"net/http"
 	"strconv"
+	"strings"
 	"time"
-
-	"github.com/sirupsen/logrus"
 )
 
 var (
@@ -68,6 +69,74 @@ func cfgSetup() {
 							return nil
 						},
 					},
+					{
+						Text: "Auth",
+						Handler: func() error {
+							ui.AskOption(ui.YesNoPrompt(
+								"Do you have a auth header value already?",
+								func() error {
+									// Yes, ask for auth header
+									authHeader := ui.AskInput("Enter the auth header value")
+
+									authSplit := strings.Split(authHeader, "|")
+
+									if len(authSplit) != 3 {
+										return fmt.Errorf("invalid auth header format")
+									}
+
+									var tgtType types.AuthTargetType
+									switch authSplit[0] {
+									case "user":
+										tgtType = types.AuthTargetTypeUser
+									case "bot":
+										tgtType = types.AuthTargetTypeBot
+									case "server":
+										tgtType = types.AuthTargetTypeServer
+									default:
+										ui.RedText("invalid auth target type")
+										return nil
+									}
+
+									state.GlobalState.Auth = &auth.Auth{
+										TargetType: tgtType,
+										ID:         authSplit[1],
+										Token:      authSplit[2],
+									}
+									return nil
+								},
+								func() error {
+									targetType := ui.AskInput("Enter the auth target type (user, bot, server)")
+
+									var tgtType types.AuthTargetType
+									switch targetType {
+									case "user":
+										tgtType = types.AuthTargetTypeUser
+									case "bot":
+										tgtType = types.AuthTargetTypeBot
+									case "server":
+										tgtType = types.AuthTargetTypeServer
+									default:
+										ui.RedText("invalid auth target type")
+										return nil
+									}
+
+									targetId := ui.AskInput("Enter the auth target ID")
+
+									token := ui.AskInput("Enter the auth token")
+
+									state.GlobalState.Auth = &auth.Auth{
+										TargetType: tgtType,
+										ID:         targetId,
+										Token:      token,
+									}
+
+									return nil
+								},
+							))
+
+							return nil
+						},
+					},
 
 					// Default choice to restore default config
 					{
@@ -95,7 +164,7 @@ func cfgSetup() {
 		},
 		func() error {
 			// No
-			logrus.Info("Loading kitescratch...")
+			ui.NormalText("Loading kitescratch...")
 			return nil
 		},
 	))
@@ -109,21 +178,24 @@ func indexView() {
 	api.SetReason("Loading index metadata")
 	meta := api.GetMeta()
 
-	logrus.Info("Loaded ", len(meta.Bot.Tags), " bot tags, ", len(meta.Bot.Features), " bot features and ", len(meta.Server.Tags), " server tags")
+	ui.OrangeText("Loaded ", len(meta.Bot.Tags), " bot tags, ", len(meta.Bot.Features), " bot features and ", len(meta.Server.Tags), " server tags")
 
 	ui.BoldText("Bot Tags")
+	color := ui.RandomColorFunc()
 	for i, tag := range meta.Bot.Tags {
-		ui.YellowText(strconv.Itoa(i+1)+".", tag.String())
+		color(strconv.Itoa(i+1)+".", tag.String())
 	}
 
 	ui.BoldText("Bot Features")
+	color = ui.RandomColorFunc()
 	for i, feature := range meta.Bot.Features {
-		ui.PurpleText(strconv.Itoa(i+1)+".", feature.String())
+		color(strconv.Itoa(i+1)+".", feature.String())
 	}
 
 	ui.BoldText("Server Tags")
+	color = ui.RandomColorFunc()
 	for i, tag := range meta.Server.Tags {
-		ui.BlueText(strconv.Itoa(i+1)+".", tag.String())
+		color(strconv.Itoa(i+1)+".", tag.String())
 	}
 }
 
@@ -154,7 +226,8 @@ func loginView() {
 		}
 	}()
 
-	fmt.Println("Please open the following URL in your browser:\n\n", oauth2.Url+"&state="+oauth2.State)
+	ui.GreenText("Please open the following URL in your browser:\n")
+	ui.BoldText(oauth2.String())
 
 	// Wait for login
 	login := <-loginCh
@@ -176,56 +249,104 @@ func loginView() {
 		State: login.state,
 	})
 
-	fmt.Println("Got user token", token.Token)
+	ui.GreenText("\nAuth Done!")
+	ui.PurpleText("User ID:", token.User.ID, "\nUsername:", token.User.Username, "\nUser Token:", token.Token)
+
+	state.GlobalState.Auth = &auth.Auth{
+		Token:      token.Token,
+		ID:         token.User.ID,
+		TargetType: types.AuthTargetTypeUser,
+	}
+}
+
+func _prepend[T any](s []T, v ...T) []T {
+	// Prepend v to start of s
+	return append(v, s...)
 }
 
 func mainMenu() {
 	for {
 		var exit bool
-		ui.AskOption(&ui.Prompt{
-			Question: "What would you like to do?",
-			Choices: []*ui.Option{
+
+		var authOpts []*ui.Option
+		if state.GlobalState.Auth == nil {
+			authOpts = []*ui.Option{
 				{
-					Text: "View index",
-					Char: "I",
-					Handler: func() error {
-						indexView()
-						return nil
-					},
-				},
-				{
-					Text: "Resolve a vanity",
-					Char: "RV",
-					Handler: func() error {
-						vanityView()
-						return nil
-					},
-				},
-				{
-					Text: "CMD View",
-					Char: "C",
-					Handler: func() error {
-						cmdView()
-						return nil
-					},
-				},
-				{
-					Text: "Login",
 					Char: "L",
+					Text: "Login",
 					Handler: func() error {
 						loginView()
 						return nil
 					},
 				},
+			}
+		} else {
+			authOpts = []*ui.Option{
 				{
-					Text: "Exit",
-					Char: "E",
+					Char: "L",
+					Text: "Logout",
 					Handler: func() error {
-						exit = true
+						state.GlobalState.Auth = nil
+						ui.GreenText("Logged out")
 						return nil
 					},
 				},
+			}
+		}
+
+		choices := []*ui.Option{
+			// Spanner for the actual choices
+			{
+				Spanner:     true,
+				SpannerShow: true,
 			},
+			{
+				Text: "View index",
+				Char: "I",
+				Handler: func() error {
+					indexView()
+					return nil
+				},
+			},
+			{
+				Text: "Resolve a vanity",
+				Char: "RV",
+				Handler: func() error {
+					vanityView()
+					return nil
+				},
+			},
+			{
+				Text: "CMD View",
+				Char: "CMD",
+				Handler: func() error {
+					cmdView()
+					return nil
+				},
+			},
+			{
+				Text: "Check config",
+				Char: "C",
+				Handler: func() error {
+					cfgSetup()
+					return nil
+				},
+			},
+			{
+				Text: "Exit",
+				Char: "E",
+				Handler: func() error {
+					exit = true
+					return nil
+				},
+			},
+		}
+
+		choices = _prepend(choices, authOpts...)
+
+		ui.AskOption(&ui.Prompt{
+			Question: "What would you like to do?",
+			Choices:  choices,
 		})
 
 		if exit {
@@ -241,8 +362,6 @@ func main() {
 	if state.GlobalFlags.ShowConfig {
 		cfgSetup()
 	}
-
-	logrus.SetLevel(logrus.DebugLevel)
 
 	mainMenu()
 }

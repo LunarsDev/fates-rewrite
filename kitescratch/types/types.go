@@ -81,6 +81,10 @@ type Oauth2 struct {
 	Url   string `json:"url"`
 }
 
+func (o Oauth2) String() string {
+	return o.Url + "&state=" + o.State
+}
+
 type UserStatus int
 
 const (

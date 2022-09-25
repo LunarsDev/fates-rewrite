@@ -7,10 +7,9 @@ import (
 	"io"
 	"kitescratch/auth"
 	"kitescratch/state"
+	"kitescratch/ui"
 	"net/http"
 	"time"
-
-	"github.com/sirupsen/logrus"
 )
 
 type HTTPRequest struct {
@@ -32,7 +31,7 @@ func Request(req HTTPRequest) ([]byte, error) {
 	if req.Reason == "" {
 		req.Reason = "unknown"
 	}
-	logrus.Info(req.String())
+	ui.YellowText(req.String())
 
 	cli := http.Client{
 		Timeout: 10 * time.Second,
@@ -51,14 +50,14 @@ func Request(req HTTPRequest) ([]byte, error) {
 		req.Body = dataBytes
 
 		if v, ok := req.Headers["Content-Type"]; ok {
-			logrus.Debug("Not changing Content-Type from ", v, " to application/json")
+			ui.RedText("Not changing Content-Type from ", v, " to application/json")
 		} else {
 			req.Headers["Content-Type"] = []string{"application/json"}
 		}
 	}
 
 	if req.Auth != nil {
-		req.Headers["Frostpaw-Auth"] = []string{string(req.Auth.TargetType) + "|" + req.Auth.ID + "|" + req.Auth.Token}
+		req.Headers["Frostpaw-Auth"] = []string{req.Auth.String()}
 	}
 
 	r, err := http.NewRequest(req.Method, state.GlobalState.BaseURL+req.Url, bytes.NewBuffer(req.Body))
@@ -91,10 +90,7 @@ func Request(req HTTPRequest) ([]byte, error) {
 		}
 
 		if resp.StatusCode >= 400 {
-			logrus.WithFields(logrus.Fields{
-				"status": resp.StatusCode,
-				"body":   string(output),
-			}).Warn("Request failed")
+			ui.YellowText("Request failed!\nStatus code:", resp.StatusCode, "\nBody:", string(output))
 		}
 
 		return output, nil
@@ -106,11 +102,11 @@ func Request(req HTTPRequest) ([]byte, error) {
 func RequestToStruct(req HTTPRequest, output any) {
 	data, err := Request(req)
 	if err != nil {
-		logrus.Fatal(err)
+		ui.FatalText(err)
 	}
 
 	err = json.Unmarshal(data, output)
 	if err != nil {
-		logrus.Fatal(err)
+		ui.FatalText(err)
 	}
 }

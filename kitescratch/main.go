@@ -101,6 +101,12 @@ func cfgSetup() {
 										TargetType: tgtType,
 										ID:         authSplit[1],
 										Token:      authSplit[2],
+										AuthExt: types.OauthUser{
+											User: types.DiscordUser{
+												ID:       authSplit[1],
+												Username: authSplit[1] + " (unknown user)",
+											},
+										},
 									}
 									return nil
 								},
@@ -128,6 +134,12 @@ func cfgSetup() {
 										TargetType: tgtType,
 										ID:         targetId,
 										Token:      token,
+										AuthExt: types.OauthUser{
+											User: types.DiscordUser{
+												ID:       targetId,
+												Username: targetId + " (unknown user)",
+											},
+										},
 									}
 
 									return nil
@@ -257,6 +269,7 @@ func loginView() {
 		Token:      token.Token,
 		ID:         token.User.ID,
 		TargetType: types.AuthTargetTypeUser,
+		AuthExt:    token,
 	}
 }
 
@@ -285,7 +298,7 @@ func mainMenu() {
 			authOpts = []*ui.Option{
 				{
 					Char: "L",
-					Text: "Logout",
+					Text: "Logout [Logged in as " + state.GlobalState.Auth.AuthExt.User.Username + "]",
 					Handler: func() error {
 						state.GlobalState.Auth = nil
 						ui.GreenText("Logged out")
@@ -314,14 +327,6 @@ func mainMenu() {
 				Char: "RV",
 				Handler: func() error {
 					vanityView()
-					return nil
-				},
-			},
-			{
-				Text: "CMD View",
-				Char: "CMD",
-				Handler: func() error {
-					cmdView()
 					return nil
 				},
 			},

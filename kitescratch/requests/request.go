@@ -90,7 +90,7 @@ func Request(req HTTPRequest) ([]byte, error) {
 		}
 
 		if resp.StatusCode >= 400 {
-			ui.YellowText("Request failed!\nStatus code:", resp.StatusCode, "\nBody:", string(output))
+			ui.RedText("Request failed!\nStatus code:", resp.StatusCode, "\nBody:", string(output))
 		}
 
 		return output, nil

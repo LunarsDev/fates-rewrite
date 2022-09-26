@@ -180,3 +180,69 @@ type OauthUser struct {
 	CSS             string           `json:"css"`
 	UserExperiments []UserExperiment `json:"user_experiments"`
 }
+
+type BotServerFlag int
+
+const (
+	BotServerFlagUnlocked BotServerFlag = iota
+	BotServerFlagEditLocked
+	BotServerFlagStaffLocked
+	BotServerFlagStatsLocked
+	BotServerFlagVoteLocked
+	BotServerFlagSystem
+	BotServerFlagWhitelistOnly
+	BotServerFlagKeepBannerDecor
+	BotServerFlagNSFW
+	BotServerFlagLoginRequired
+)
+
+func (f BotServerFlag) String() string {
+	switch f {
+	case BotServerFlagUnlocked:
+		return "unlocked"
+	case BotServerFlagEditLocked:
+		return "editLocked"
+	case BotServerFlagStaffLocked:
+		return "staffLocked"
+	case BotServerFlagStatsLocked:
+		return "statsLocked"
+	case BotServerFlagVoteLocked:
+		return "voteLocked"
+	case BotServerFlagSystem:
+		return "system"
+	case BotServerFlagWhitelistOnly:
+		return "whitelistOnly"
+	case BotServerFlagKeepBannerDecor:
+		return "keepBannerDecor"
+	case BotServerFlagNSFW:
+		return "nsfw"
+	case BotServerFlagLoginRequired:
+		return "loginRequired"
+	}
+	return ""
+}
+
+type BotServerState int
+
+const (
+	BotServerStateApproved BotServerState = iota
+	BotServerStatePending
+	BotServerStateDenied
+	BotServerStateHidden
+	BotServerStateBanned
+	BotServerStateUnderReview
+	BotServerStateCertified
+	BotServerStateArchived
+	BotServerStatePrivateViewable
+	BotServerStatePrivateStaffOnly
+)
+
+type Snippet struct {
+	User        DiscordUser     `json:"user"`
+	Votes       int             `json:"votes"`
+	Description string          `json:"description"`
+	Flags       []BotServerFlag `json:"flags"`
+	BannerCard  string          `json:"banner_card"`
+	State       BotServerState  `json:"state"`
+	GuildCount  int             `json:"guild_count"`
+}

@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"kitescratch/api"
 	"kitescratch/auth"
+	"kitescratch/renderers"
 	"kitescratch/state"
 	"kitescratch/types"
 	"kitescratch/ui"
@@ -190,9 +191,16 @@ func indexMetaView() {
 	api.SetReason("Loading index metadata")
 	meta := api.GetMeta()
 
+	api.SetReason("Fetching random bot snippet")
+	snippet := api.RandomSnippet(types.TargetTypeBot, false)
+
 	var outputStr string
 
 	ui.OrangeText("Loaded ", len(meta.Bot.Tags), " bot tags, ", len(meta.Bot.Features), " bot features and ", len(meta.Server.Tags), " server tags")
+
+	outputStr += ui.BoldTextS("Random Bot")
+
+	outputStr += renderers.Snippet(snippet)
 
 	outputStr += ui.BoldTextS("Bot Tags")
 	for i, tag := range meta.Bot.Tags {

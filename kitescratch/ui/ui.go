@@ -25,16 +25,18 @@ var (
 		color.New(color.FgRed, color.Bold).PrintlnFunc()(a...)
 		os.Exit(1)
 	}
+	BoldBlueText = color.New(color.FgBlue, color.Bold).PrintlnFunc()
 
 	// Sprint version of the above
-	BoldTextS   = color.New(color.Bold).SprintlnFunc()
-	BlueTextS   = color.New(color.FgBlue).SprintlnFunc()
-	RedTextS    = color.New(color.FgRed).SprintlnFunc()
-	YellowTextS = color.New(color.FgYellow).SprintlnFunc()
-	PurpleTextS = color.New(color.FgMagenta).SprintlnFunc()
-	GreenTextS  = color.New(color.FgGreen).SprintlnFunc()
-	NormalTextS = color.New(color.FgWhite).SprintlnFunc()
-	OrangeTextS = color.New(color.FgHiRed).SprintlnFunc()
+	BoldTextS     = color.New(color.Bold).SprintlnFunc()
+	BlueTextS     = color.New(color.FgBlue).SprintlnFunc()
+	RedTextS      = color.New(color.FgRed).SprintlnFunc()
+	YellowTextS   = color.New(color.FgYellow).SprintlnFunc()
+	PurpleTextS   = color.New(color.FgMagenta).SprintlnFunc()
+	GreenTextS    = color.New(color.FgGreen).SprintlnFunc()
+	NormalTextS   = color.New(color.FgWhite).SprintlnFunc()
+	OrangeTextS   = color.New(color.FgHiRed).SprintlnFunc()
+	BoldBlueTextS = color.New(color.Bold, color.FgBlue).SprintlnFunc()
 )
 
 func RandomColorFunc() func(a ...any) {

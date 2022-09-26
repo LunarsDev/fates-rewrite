@@ -196,7 +196,7 @@ func indexMetaView() {
 
 	var outputStr string
 
-	ui.OrangeText("Loaded ", len(meta.Bot.Tags), " bot tags, ", len(meta.Bot.Features), " bot features and ", len(meta.Server.Tags), " server tags")
+	ui.OrangeText("Loaded", len(meta.Bot.Tags), "bot tags,", len(meta.Bot.Features), "bot features and", len(meta.Server.Tags), "server tags")
 
 	outputStr += ui.BoldTextS("Random Bot")
 

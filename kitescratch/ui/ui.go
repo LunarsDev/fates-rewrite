@@ -4,6 +4,7 @@ import (
 	"bufio"
 	"fmt"
 	"os"
+	"os/exec"
 	"strconv"
 	"strings"
 	"time"
@@ -24,6 +25,16 @@ var (
 		color.New(color.FgRed, color.Bold).PrintlnFunc()(a...)
 		os.Exit(1)
 	}
+
+	// Sprint version of the above
+	BoldTextS   = color.New(color.Bold).SprintlnFunc()
+	BlueTextS   = color.New(color.FgBlue).SprintlnFunc()
+	RedTextS    = color.New(color.FgRed).SprintlnFunc()
+	YellowTextS = color.New(color.FgYellow).SprintlnFunc()
+	PurpleTextS = color.New(color.FgMagenta).SprintlnFunc()
+	GreenTextS  = color.New(color.FgGreen).SprintlnFunc()
+	NormalTextS = color.New(color.FgWhite).SprintlnFunc()
+	OrangeTextS = color.New(color.FgHiRed).SprintlnFunc()
 )
 
 func RandomColorFunc() func(a ...any) {
@@ -138,6 +149,12 @@ func AskOption(p *Prompt) {
 
 	for _, option := range p.Choices {
 		if option.Char == opt {
+			if option.Handler == nil {
+				RedText("No handler for option", opt)
+				fmt.Println("")
+				return
+			}
+
 			err := option.Handler()
 
 			if err != nil {
@@ -166,4 +183,14 @@ func AskInput(question string) string {
 	}
 
 	return opt
+}
+
+func PageOutput(text string) {
+	// Custom pager using less -r
+	text = BoldTextS("") + text
+
+	cmd := exec.Command("less", "-r")
+	cmd.Stdin = strings.NewReader(text)
+	cmd.Stdout = os.Stdout
+	cmd.Run()
 }

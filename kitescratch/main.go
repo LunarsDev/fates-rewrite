@@ -174,29 +174,30 @@ func cfgSetup() {
 	}
 }
 
-func indexView() {
+func indexMetaView() {
 	api.SetReason("Loading index metadata")
 	meta := api.GetMeta()
 
+	var outputStr string
+
 	ui.OrangeText("Loaded ", len(meta.Bot.Tags), " bot tags, ", len(meta.Bot.Features), " bot features and ", len(meta.Server.Tags), " server tags")
 
-	ui.BoldText("Bot Tags")
-	color := ui.RandomColorFunc()
+	outputStr += ui.BoldTextS("Bot Tags")
 	for i, tag := range meta.Bot.Tags {
-		color(strconv.Itoa(i+1)+".", tag.String())
+		outputStr += ui.BlueTextS(strconv.Itoa(i+1)+".", tag.String())
 	}
 
-	ui.BoldText("Bot Features")
-	color = ui.RandomColorFunc()
+	outputStr += ui.BoldTextS("Bot Features")
 	for i, feature := range meta.Bot.Features {
-		color(strconv.Itoa(i+1)+".", feature.String())
+		outputStr += ui.GreenTextS(strconv.Itoa(i+1)+".", feature.String())
 	}
 
-	ui.BoldText("Server Tags")
-	color = ui.RandomColorFunc()
+	outputStr += ui.BoldTextS("Server Tags")
 	for i, tag := range meta.Server.Tags {
-		color(strconv.Itoa(i+1)+".", tag.String())
+		outputStr += ui.PurpleTextS(strconv.Itoa(i+1)+".", tag.String())
 	}
+
+	ui.PageOutput(outputStr)
 }
 
 func vanityView() {
@@ -304,7 +305,7 @@ func mainMenu() {
 				Text: "View index",
 				Char: "I",
 				Handler: func() error {
-					indexView()
+					indexMetaView()
 					return nil
 				},
 			},

@@ -281,6 +281,18 @@ func loginView() {
 	}
 }
 
+func checkUserPermsView() {
+	// Get user ID
+	userId := ui.AskInput("Enter the user ID to check")
+
+	// Get user perms
+	api.SetReason("Fetching user perms")
+	perms := api.GuppyTest(userId)
+
+	// Output perms
+	ui.GreenText("User", userId, "has the following permission:\nName:", perms.Name, "\nRoles:", perms.Roles, "\nIndex (value):", perms.Index)
+}
+
 func _prepend[T any](s []T, v ...T) []T {
 	// Prepend v to start of s
 	return append(v, s...)
@@ -339,6 +351,14 @@ func mainMenu() {
 				},
 			},
 			{
+				Text: "Check user permissions",
+				Char: "CUP",
+				Handler: func() error {
+					checkUserPermsView()
+					return nil
+				},
+			},
+			{
 				Text: "Check config",
 				Char: "C",
 				Handler: func() error {
@@ -366,6 +386,8 @@ func mainMenu() {
 		if exit {
 			return
 		}
+
+		time.Sleep(1 * time.Second)
 	}
 }
 

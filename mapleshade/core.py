@@ -10,6 +10,7 @@ import msgpack
 import aiohttp
 from cmarkgfm.cmark import Options as cmarkgfmOptions
 from maplecache import *
+from pydantic import BaseModel
 
 
 class SilverException(Exception):
@@ -34,12 +35,11 @@ class SilverNoData(SilverException):
     """Exception for when there is no data"""
     ...
 
-class Permission:
-    def __init__(self, index: int, roles: list[int], name: str):
-        self.index = index
-        self.roles = roles
-        self.name = name
-    
+class Permission(BaseModel):
+    index: int
+    roles: list[int]
+    name: str
+
     def __eq__(self, other: "Permission") -> bool:
         if not isinstance(other, Permission):
             return False
@@ -77,7 +77,7 @@ class Mapleshade:
             self.config = self.yaml.load(doc)
         
         self.perms = {
-            "default": Permission(0, [], "default"),
+            "default": Permission(index=0, roles=[], name="default"),
         }
 
         for name, perm in self.config["perms"].items():

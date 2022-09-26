@@ -246,3 +246,9 @@ type Snippet struct {
 	State       BotServerState  `json:"state"`
 	GuildCount  int             `json:"guild_count"`
 }
+
+type Permission struct {
+	Index int    `json:"index"`
+	Roles []int  `json:"roles"`
+	Name  string `json:"name"`
+}

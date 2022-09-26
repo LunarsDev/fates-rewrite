@@ -29,7 +29,7 @@ func Snippet(snip types.Snippet) string {
 			continue
 		}
 
-		snipStr += "=> "
+		snipStr += ui.PurpleTextSL("=> ")
 		snipStr += ui.PurpleTextS(fieldName+":", field.Interface())
 	}
 

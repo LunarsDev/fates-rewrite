@@ -15,7 +15,7 @@ from starlette.routing import Mount
 from piccolo_admin.endpoints import create_admin
 from piccolo.engine import engine_finder
 
-from mapleshade import SilverNoData, Mapleshade
+from mapleshade import SilverNoData, Mapleshade, Permission
 import silverpelt.types.types as silver_types
 
 mapleshade = Mapleshade()
@@ -310,6 +310,6 @@ async def login_user(request: Request, login: models.Login):
     
     return oauth
 
-@app.get("/guppy", tags=[tags.internal])
+@app.get("/guppy", tags=[tags.internal], response_model=Permission)
 async def guppy_test(user_id: int):
     return await mapleshade.guppy(user_id)

@@ -37,6 +37,9 @@ var (
 	NormalTextS   = color.New(color.FgWhite).SprintlnFunc()
 	OrangeTextS   = color.New(color.FgHiRed).SprintlnFunc()
 	BoldBlueTextS = color.New(color.Bold, color.FgBlue).SprintlnFunc()
+
+	// Same line purple text
+	PurpleTextSL = color.New(color.FgMagenta).SprintFunc()
 )
 
 func RandomColorFunc() func(a ...any) {

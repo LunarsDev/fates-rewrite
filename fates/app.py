@@ -17,6 +17,7 @@ from piccolo.engine import engine_finder
 
 from mapleshade import SilverNoData, Mapleshade, Permission
 import silverpelt.types.types as silver_types
+import orjson
 
 mapleshade = Mapleshade()
 
@@ -30,6 +31,15 @@ for obj in tables_dict.values():
         continue
     if inspect.isclass(obj) and isinstance(obj, piccolo.table.TableMetaclass):
         _tables.append(obj)
+
+# Load all docs
+docs = []
+with open("docs/meta.json") as meta_f:
+    meta: list[str] = orjson.loads(meta_f.read())
+
+for file_name in meta:
+    with open(f"docs/{file_name}") as doc:
+        docs.append(doc.read())
 
 app = FastAPI(
     default_response_class=ORJSONResponse,
@@ -45,13 +55,8 @@ app = FastAPI(
             ),
         ),
     ],
-    description="""
-For more documentation on our API, see https://github.com/LunarsDev/fates-rewrite#developer-docs
-
-## General Terms
-
-**Snippet:** A snippet is a basic core/common representation of any bot or server on the list.
-    """,
+    docs_url=None,
+    description="\n\n".join(docs),
 )
 
 @app.middleware("http")
@@ -278,14 +283,6 @@ async def get_oauth2(request: Request):
         "url": f"https://discord.com/oauth2/authorize?client_id={mapleshade.config['secrets']['client_id']}&redirect_uri={request.headers.get('Frostpaw-Server')}/frostpaw/login&scope=identify&response_type=code",
     }
 
-@app.get("/oauth2/clients/{id}", response_model=models.FrostpawClient)
-async def get_oauth2_client(id: str):
-    # Returns a SecretFrostpawClient which is then downgraded to a FrostpawClient
-    try:
-        return await mapleshade.get_frostpaw_client(id)
-    except:
-        raise HTTPException(404, "Client Not Found")
-
 @app.post("/oauth2", tags=[tags.internal], response_model=models.OauthUser)
 async def login_user(request: Request, login: models.Login):
     redirect_url_d = request.headers.get("Frostpaw-Server")
@@ -303,50 +300,6 @@ async def login_user(request: Request, login: models.Login):
     except Exception as e:
         print("Error logging in user", type(e), e)
         raise HTTPException(status_code=400, detail=str(e))
-    
-    if login.frostpaw:
-        if request.headers.get("Origin") not in ["fateslist.xyz", "sunbeam.fateslist.xyz", "localhost:5001"]:
-            raise HTTPException(status_code=400, detail="Invalid Origin")
-        
-        if not login.frostpaw_blood or not login.frostpaw_claw or not login.frostpaw_claw_unseathe_time:
-            raise HTTPException(status_code=400, detail="Missing Frostpaw Data")
-        
-        time_elapsed = time.time() - login.frostpaw_claw_unseathe_time
-
-        if time_elapsed > 75 or time_elapsed < 3:
-            raise HTTPException(status_code=400, detail="Elapsed time is too old (or too new)")
-
-        try:
-            fc = await mapleshade.get_frostpaw_client(login.frostpaw_blood)
-        except Exception as e:
-            raise HTTPException(status_code=400, detail=str(e))
-        
-        # Check key using HMAC_SHA512
-        decoded_claw = bytes.fromhex(login.frostpaw_claw).decode("ascii")
-        key = hmac.new(fc.secret.encode(), login.frostpaw_claw_unseathe_time.to_bytes(), hashlib.sha512)
-        if key.hexdigest() != decoded_claw:
-            raise HTTPException(status_code=400, detail="Invalid Frostpaw HMAC data")
-
-        access_token = "Frostpaw." + mapleshade.gen_secret(144)
-
-        mapleshade.cache.set(access_token, models.FrostpawLogin(
-            client_id=fc.id,
-            user_id=oauth.user.id,
-            token=oauth.token,
-        ), 15)
-
-        refresh_token = mapleshade.gen_secret(128)
-
-        await tables.UserConnection.insert(
-            tables.UserConnection(
-                user_id=oauth.user.id,
-                client_id=fc.id,
-                refresh_token=refresh_token,
-            )
-        )
-
-        oauth.token = access_token
-        oauth.refresh_token = refresh_token
     
     return oauth
 

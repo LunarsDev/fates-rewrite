@@ -5,16 +5,8 @@
 import { info } from '$lib/logger';
 import { api } from '$lib/config';
 
-  export const prerender = false;
+export const prerender = false;
 
-  interface CustomClients {
-    clientId?: string;
-    currentTime?: number;
-    hmacTime?: string;
-    cliInfo?: any;
-    code: string;
-    state: string;
-  }
 
 /** @type {import('./$types').PageLoad} */
 export async function load({ parent, fetch }) {
@@ -41,52 +33,6 @@ export async function load({ parent, fetch }) {
     }
 
     let stateSplit = state.split('.');
-    let customClientInfo: CustomClients = { code: code, state: stateSplit[3] };
-
-    if (state.startsWith('Bayshine.')) {
-      // Bayshine custom client login
-      customClientInfo.clientId = stateSplit[1];
-      customClientInfo.currentTime = parseInt(stateSplit[2]);
-      customClientInfo.hmacTime = stateSplit[3];
-      if (
-        !customClientInfo.clientId ||
-        !customClientInfo.currentTime ||
-        !customClientInfo.hmacTime
-      ) {
-        return {
-          error: 'Invalid custom client information'
-        };
-      }
-      if (
-        new Date().getTime() / 1000 - customClientInfo.currentTime > 60 ||
-        customClientInfo.currentTime > new Date().getTime() / 1000 ||
-        customClientInfo.currentTime <= 0
-      ) {
-        return {
-          error: `Current time nonce is too old! (${new Date().getTime() / 1000})`
-        };
-      }
-
-      // Fetch baypaw client info
-      let res = await request(`/oauth2/clients/${customClientInfo.clientId}`, {
-        method: 'GET',
-        fetch: fetch,
-        session: session,
-        endpointType: "user"
-      });
-
-      if (!res.ok) {
-        return {
-          error: `Could not fetch custom client information: ${res.statusText}`
-        };
-      }
-
-      customClientInfo.cliInfo = await res.json();
-
-      return {
-        customClient: customClientInfo
-      };
-    }
 
     if (stateSplit.length != 2) {
       return {
@@ -129,8 +75,6 @@ export async function load({ parent, fetch }) {
       json: {
         code: code,
         state: nonce,
-        // We are not a custom client
-        frostpaw: false
       },
       session: session,
       fetch: fetch,

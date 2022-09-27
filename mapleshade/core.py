@@ -407,24 +407,3 @@ class Mapleshade:
             css=list_data["user_css"],
             user_experiments=models.DEFAULT_USER_EXPERIMENTS + list_data["experiments"],
         )
-    
-    async def get_frostpaw_client(self, client_id: str) -> models.SecretFrostpawClient:
-        """Gets a frostpaw client"""
-
-        client = await tables.FrostpawClient.select(
-            tables.FrostpawClient.id,
-            tables.FrostpawClient.name,
-            tables.FrostpawClient.domain,
-            tables.FrostpawClient.verified,
-            tables.FrostpawClient.privacy_policy,
-            tables.FrostpawClient.secret,
-            tables.FrostpawClient.owner_id
-        ).where(
-            tables.FrostpawClient.id == client_id
-        ).first()
-        if not client:
-            raise Exception("Client not found")
-
-        client["owner"] = await self.silverpelt_req(f"users/{client['owner_id']}")
-        
-        return models.SecretFrostpawClient(**client)

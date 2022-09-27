@@ -249,7 +249,10 @@ async def get_oauth2(request: Request):
 @app.get("/oauth2/clients/{id}", response_model=models.FrostpawClient)
 async def get_oauth2_client(id: str):
     # Returns a SecretFrostpawClient which is then downgraded to a FrostpawClient
-    return await mapleshade.get_frostpaw_client(id)
+    try:
+        return await mapleshade.get_frostpaw_client(id)
+    except:
+        raise HTTPException(404, "Client Not Found")
 
 @app.post("/oauth2", tags=[tags.internal], response_model=models.OauthUser)
 async def login_user(request: Request, login: models.Login):

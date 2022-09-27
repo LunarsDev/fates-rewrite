@@ -2,6 +2,7 @@ from fastapi import Depends
 from fastapi.security.api_key import APIKeyHeader
 
 from fates import tables
+from fates import enums
 from fates.enums import TargetType
 from .models import AuthData
 from fastapi.exceptions import HTTPException
@@ -30,7 +31,7 @@ async def auth(header: str = Depends(frostpaw_auth), compat: str = Depends(compa
         raise HTTPException(400, detail="Invalid Frostpaw-Auth header set [id is not int]")
     
     if auth_type == "user":
-        auth_data = await tables.Users.select(tables.Users.api_token).where(tables.Users.user_id == id).first()
+        auth_data = await tables.Users.select(tables.Users.api_token).where(tables.Users.user_id == id, tables.Users.state != enums.UserState.GlobalBan.value).first()
 
         if not auth_data:
             raise HTTPException(404, detail="User not found")

@@ -248,14 +248,16 @@ async def get_code(vanity: str):
     if not vanity:
         raise HTTPException(status_code=404, detail="Not Found")
 
-    if vanity["type"] == 0:
-        vanity["type"] = models.TargetType.Server
-    elif vanity["type"] == 1:
-        vanity["type"] = models.TargetType.Bot
-    elif vanity["type"] == 2:
-        vanity["type"] = models.TargetType.User
-    else:
-        raise HTTPException(status_code=400, detail="Unknown Vanity Type")
+    vanity_map = {
+        0: models.TargetType.Server,
+        1: models.TargetType.Bot,
+        2: models.TargetType.User,
+    }
+
+    try:
+        vanity["type"] = vanity_map[vanity["type"]]
+    except KeyError:
+        raise HTTPException(status_code=500, detail="Unknown Vanity Type")
     
     return models.Vanity(
         target_type=vanity["type"],

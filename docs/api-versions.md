@@ -4,4 +4,5 @@
 | :--- | :--- | :--- | :--- |
 | v1 | No | Deprecated | No |
 | v2 | No | Deprecated | No |
-| v3 | Yes | Working Well :) | Yes |
+| v3 | No | Deprecated | No |
+| v4 | No | Working Better Than Ever :) | No |

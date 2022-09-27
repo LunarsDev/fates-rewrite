@@ -2,7 +2,7 @@ import { api } from '$lib/config';
 import * as logger from '$lib/logger';
   import { request } from '$lib/request';
 
-/** @type {import('../../../$types').PageLoad} */
+/** @type {import('./$types').PageLoad} */
 export async function load({ params, fetch, parent }) {
   let session = await parent();
   let inviteUrl = await request(`${api}/bots/${params.id}`, {

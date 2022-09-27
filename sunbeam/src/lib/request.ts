@@ -29,6 +29,7 @@ interface AuthOptions {
   method: string;
   headers?: Headers;
   body?: any;
+  json?: any;
   fetch: any;
   session: LayoutData;
   endpointType: "bot" | "server" | "user";
@@ -73,6 +74,14 @@ export async function request(url: string, options: AuthOptions): Promise<Respon
   
   options.headers["Origin"] = origin;
   options.headers["Content-Type"] = "application/json";
+
+  if(options.json) {
+    if(options.body) {
+      throw new Error("Cannot specify both body and json");
+    }
+
+    options.body = JSON.stringify(options.json);
+  }
 
   try {
     let res: Response = await options.fetch(url, {

@@ -9,6 +9,7 @@ interface UserInterface {
   avatar: string;
 }
 
+
 interface PageData {
   user: UserInterface;
   token: string;
@@ -41,6 +42,10 @@ declare global {
       admin_ticket: string;
       url: string
     };
+
+    interface Error {
+      message: string;
+    } 
 
     interface Stuff {}
   }

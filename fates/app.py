@@ -246,6 +246,11 @@ async def get_oauth2(request: Request):
         "url": f"https://discord.com/oauth2/authorize?client_id={mapleshade.config['secrets']['client_id']}&redirect_uri={request.headers.get('Frostpaw-Server')}/frostpaw/login&scope=identify&response_type=code",
     }
 
+@app.get("/oauth2/clients/{id}", response_model=models.FrostpawClient)
+async def get_oauth2_client(id: str):
+    # Returns a SecretFrostpawClient which is then downgraded to a FrostpawClient
+    return await mapleshade.get_frostpaw_client(id)
+
 @app.post("/oauth2", tags=[tags.internal], response_model=models.OauthUser)
 async def login_user(request: Request, login: models.Login):
     redirect_url_d = request.headers.get("Frostpaw-Server")

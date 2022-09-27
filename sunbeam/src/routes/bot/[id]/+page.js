@@ -3,7 +3,7 @@ import { request } from '$lib/request';
 import { error } from '@sveltejs/kit';
 export const prerender = false;
 
-/** @type {import('../../$types').PageLoad} */
+/** @type {import('./$types').PageLoad} */
 export async function load({ parent, params, fetch }) {
   const url = `/bots/${params.id}`;
 
@@ -12,18 +12,14 @@ export async function load({ parent, params, fetch }) {
   let session = null
   let res = null
 
-  try {
-    session = await parent();
+  session = await parent();
 
-    res = await request(`${api}${url}`, {
-      method: "GET",
-      session: session,
-      endpointType: "user",
-      fetch: fetch,
-    })
-  } catch (err) {
-    throw error(404, err)
-  }
+  res = await request(`${api}${url}`, {
+    method: "GET",
+    session: session,
+    endpointType: "user",
+    fetch: fetch,
+  })
 
   if (res.ok) {
     let data = await res.json();

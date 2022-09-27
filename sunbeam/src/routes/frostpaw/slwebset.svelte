@@ -29,10 +29,10 @@
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
-        Authorization: `${token}`
       },
       body: JSON.stringify({
-        value: (document.querySelector('#value') as HTMLInputElement).value
+        value: (document.querySelector('#value') as HTMLInputElement).value,
+        token: token
       })
     });
 

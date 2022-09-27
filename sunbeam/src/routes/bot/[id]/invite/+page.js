@@ -1,6 +1,7 @@
 import { api } from '$lib/config';
 import * as logger from '$lib/logger';
   import { request } from '$lib/request';
+import { redirect } from '@sveltejs/kit';
 
 /** @type {import('./$types').PageLoad} */
 export async function load({ params, fetch, parent }) {
@@ -31,8 +32,5 @@ export async function load({ params, fetch, parent }) {
     inviteJson,
     decodeURIComponent(inviteJson.invite_link)
   );
-  return {
-    status: 307,
-    redirect: decodeURIComponent(inviteJson.invite_link)
-  };
+  throw redirect(307, decodeURIComponent(inviteJson.invite_link))
 }

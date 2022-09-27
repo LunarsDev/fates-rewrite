@@ -104,6 +104,13 @@ export enum AlertInputType {
   Pre = 8 // Implements a metadata html element that can be put before another input
 }
 
+export enum TargetType {
+  Bot = 0,
+  Server = 1,
+  User = 2,
+}
+
+
 export const enums = {
   BotState: BotState,
   UserState: UserState,
@@ -120,6 +127,7 @@ export const enums = {
     html: 0,
     markdown_server: 1
   },
+  TargetType: TargetType,
   helpers: {
     flagCheck: function (flags: number[] | number, allFlags: number[]) {
       // Function start

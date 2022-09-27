@@ -178,7 +178,7 @@ async def get_bot_invite(request: Request, bot_id: int):
             invite=f"https://discord.com/api/oauth2/authorize?client_id={bot_id}&permissions=0&scope=bot%20applications.commands"
         )
     elif invite_url["invite"].startswith("P:"):
-        perm_num = int(invite_url["invite"][2:])
+        perm_num = invite_url["invite"][2:]
         return models.Invite(
             invite=f"https://discord.com/api/oauth2/authorize?client_id={bot_id}&permissions={perm_num}&scope=bot%20applications.commands"
         )

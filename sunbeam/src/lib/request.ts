@@ -57,19 +57,19 @@ export async function request(url: string, options: AuthOptions): Promise<Respon
     throw new Error("Session is undefined");
   }
 
-  if (options.auth) {
-    if(options.endpointType == "bot" || options.endpointType == "server") {
-      if(!options.entityAuth) {
-        throw new Error(`entityAuth must be included for bot endpoint ${url}`);
-      }
-      options.headers["Frostpaw-Auth"] = `${options.endpointType}|${options.entityAuth.id}|${options.entityAuth.apiToken}`;
-    } else {
-      if(options.session.token) {
-        options.headers["Frostpaw-Auth"] = `${options.endpointType}|${options.session.user.id}|${options.session.token}`
-      } else {
-        throw new Error("No token found in session");
-      }
+  if(options.endpointType == "bot" || options.endpointType == "server") {
+    if(!options.entityAuth && options.auth) {
+      throw new Error(`entityAuth must be included for bot endpoint ${url}`);
     }
+    options.headers["Frostpaw-Auth"] = `${options.endpointType}|${options.entityAuth.id}|${options.entityAuth.apiToken}`;
+  } else {
+    if(options.session.token) {
+      options.headers["Frostpaw-Auth"] = `${options.endpointType}|${options.session.user.id}|${options.session.token}`
+    }
+  }
+
+  if(options.auth && !options.headers["Frostpaw-Auth"]) {
+    throw new Error("Could not set required authentication?");
   }
   
   options.headers["Origin"] = origin;

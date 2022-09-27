@@ -393,3 +393,8 @@ class FrostpawLogin(BaseModel):
 
     token: str
     """The users token"""
+
+class Invite(BaseModel):
+    """A invite for a bot/server"""
+
+    invite: str

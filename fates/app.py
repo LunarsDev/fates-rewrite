@@ -158,6 +158,33 @@ async def get_bot(bot_id: int):
         raise HTTPException(status_code=404, detail="Not Found")
     return bot
 
+@app.get("/bots/{bot_id}/invite", tags=[tags.bot], response_model=models.Invite)
+async def get_bot_invite(request: Request, bot_id: int):
+    """
+    Gets the invite for a bot.
+
+    If ``Frostpaw-Target`` is set to ``invite``, then this also updates invite_amount
+    """
+    invite_url = await tables.Bots.select(tables.Bots.invite).where(tables.Bots.bot_id == bot_id).first()
+
+    if not invite_url:
+        raise HTTPException(status_code=404, detail="Not Found")
+    
+    if request.headers.get("Frostpaw-Target") == "invite":
+        await tables.Bots.update(invite_amount = tables.Bots.invite_amount + 1).where(tables.Bots.bot_id == bot_id)
+
+    if not invite_url["invite"]:
+        return models.Invite(
+            invite=f"https://discord.com/api/oauth2/authorize?client_id={bot_id}&permissions=0&scope=bot%20applications.commands"
+        )
+    elif invite_url["invite"].startswith("P:"):
+        perm_num = int(invite_url["invite"][2:])
+        return models.Invite(
+            invite=f"https://discord.com/api/oauth2/authorize?client_id={bot_id}&permissions={perm_num}&scope=bot%20applications.commands"
+        )
+    else:
+        return models.Invite(invite=invite_url["invite"])
+
 @app.get("/bots/{bot_id}/secrets", tags=[tags.bot], response_model=models.BotSecrets)
 async def get_bot_secrets(bot_id: int, auth: models.AuthData = Depends(auth)):
     bot_owners = await tables.BotOwner.select().where(tables.BotOwner.bot_id == bot_id)

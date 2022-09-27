@@ -1,12 +1,12 @@
 import { api } from '$lib/config';
 import * as logger from '$lib/logger';
   import { request } from '$lib/request';
-import { redirect } from '@sveltejs/kit';
+import { redirect, error } from '@sveltejs/kit';
 
 /** @type {import('./$types').PageLoad} */
 export async function load({ params, fetch, parent }) {
   let session = await parent();
-  let inviteUrl = await request(`${api}/bots/${params.id}`, {
+  let inviteUrl = await request(`${api}/bots/${params.id}/invite`, {
     method: 'GET',
     headers: {
       'Frostpaw-Target': 'invite'
@@ -14,15 +14,11 @@ export async function load({ params, fetch, parent }) {
     endpointType: 'user',
     session: session,
     fetch: fetch,
-    auth: true
   });
   let inviteJson = await inviteUrl.json();
 
   if (!inviteUrl.ok) {
-    return {
-      status: 400,
-      error: new Error(`${inviteJson.reason}`)
-    };
+    throw error(500, 'Could not fetch invite');
   }
 
   // JS and URLS do not go well together
@@ -30,7 +26,7 @@ export async function load({ params, fetch, parent }) {
     'BotInvite',
     'Parsed invite info',
     inviteJson,
-    decodeURIComponent(inviteJson.invite_link)
+    decodeURIComponent(inviteJson.invite)
   );
-  throw redirect(307, decodeURIComponent(inviteJson.invite_link))
+  throw redirect(307, decodeURIComponent(inviteJson.invite))
 }

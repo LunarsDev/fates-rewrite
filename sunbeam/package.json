@@ -46,7 +46,6 @@
     "@constemi/itsdangerjs": "github:constemi/itsdangerjs",
     "@fontsource/fira-mono": "^4.5.7",
     "@lukeed/uuid": "^2.0.0",
-    "@supabase/supabase-js": "^1.35.3",
     "@sveltejs/adapter-node": "^1.0.0-next.73",
     "@tiptap/extension-placeholder": "^2.0.0-beta.48",
     "cookie": "^0.5.0",

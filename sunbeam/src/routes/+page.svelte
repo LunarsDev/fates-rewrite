@@ -9,6 +9,8 @@
   import Intl from '$lib/base/Intl.svelte';
     import RandomCard from '$lib/base/RandomCard.svelte';
   export let data: { index: any, random: any };
+
+  let searchData: any = null;
 </script>
 
 <BristlefrostMeta
@@ -23,36 +25,39 @@
   <h2 class="best-bots"><Intl key="index.best_bots" /></h2>
 </section>
 
-<SearchBar type="bot" query="" />
-<Tag targetType="bot" tags={data.index.tags} />
+<SearchBar bind:data={searchData}/>
 
-{#if data.random}
-  <RandomCard type="bot" randomBot={data.random} />
+{#if !searchData}
+  <Tag targetType="bot" tags={data.index.tags} />
+
+  {#if data.random}
+    <RandomCard type="bot" randomBot={data.random} />
+  {/if}
+
+  <Section icon="fa-solid:certificate" title="Certified" id="certified-index">
+    <CardContainer>
+      {#each data.index.certified as bot}
+        <BotCard data={bot} type="bot" rand={false} />
+      {/each}
+    </CardContainer>
+  </Section>
+
+  <Section icon="fa-solid:sort-amount-up" title="Top Voted" id="top-voted-index">
+    <CardContainer>
+      {#each data.index.top_voted as bot}
+        <BotCard data={bot} type="bot" rand={false} />
+      {/each}
+    </CardContainer>
+  </Section>
+
+  <Section icon="fa-solid:plus" title="New Bots" id="new-bots">
+    <CardContainer>
+      {#each data.index.new as bot}
+        <BotCard data={bot} type="bot" rand={false} />
+      {/each}
+    </CardContainer>
+  </Section>
 {/if}
-
-<Section icon="fa-solid:certificate" title="Certified" id="certified-index">
-  <CardContainer>
-    {#each data.index.certified as bot}
-      <BotCard data={bot} type="bot" rand={false} />
-    {/each}
-  </CardContainer>
-</Section>
-
-<Section icon="fa-solid:sort-amount-up" title="Top Voted" id="top-voted-index">
-  <CardContainer>
-    {#each data.index.top_voted as bot}
-      <BotCard data={bot} type="bot" rand={false} />
-    {/each}
-  </CardContainer>
-</Section>
-
-<Section icon="fa-solid:plus" title="New Bots" id="new-bots">
-  <CardContainer>
-    {#each data.index.new as bot}
-      <BotCard data={bot} type="bot" rand={false} />
-    {/each}
-  </CardContainer>
-</Section>
 
 <style>
   h1 {

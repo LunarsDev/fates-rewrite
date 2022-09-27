@@ -247,6 +247,12 @@ type Snippet struct {
 	GuildCount  int             `json:"guild_count"`
 }
 
+type Index struct {
+	New       []Snippet `json:"new"`
+	TopVoted  []Snippet `json:"top_voted"`
+	Certified []Snippet `json:"certified"`
+}
+
 type Permission struct {
 	Index int    `json:"index"`
 	Roles []int  `json:"roles"`

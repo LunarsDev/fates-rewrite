@@ -194,6 +194,10 @@ func indexMetaView() {
 	api.SetReason("Fetching random bot snippet")
 	snippet := api.RandomSnippet(types.TargetTypeBot, false)
 
+	index := api.GetIndex(types.TargetTypeBot)
+
+	// TODO: Add servers once thats implemented
+
 	var outputStr string
 
 	ui.OrangeText("Loaded", len(meta.Bot.Tags), "bot tags,", len(meta.Bot.Features), "bot features and", len(meta.Server.Tags), "server tags")
@@ -215,6 +219,24 @@ func indexMetaView() {
 	outputStr += ui.BoldTextS("Server Tags")
 	for i, tag := range meta.Server.Tags {
 		outputStr += ui.PurpleTextS(strconv.Itoa(i+1)+".", tag.String())
+	}
+
+	outputStr += ui.BoldTextS("Bot Index [New]")
+
+	for _, bot := range index.New {
+		outputStr += renderers.Snippet(bot)
+	}
+
+	outputStr += ui.BoldTextS("Bot Index [Top Voted]")
+
+	for _, bot := range index.TopVoted {
+		outputStr += renderers.Snippet(bot)
+	}
+
+	outputStr += ui.BoldTextS("Bot Index [Certified]")
+
+	for _, bot := range index.Certified {
+		outputStr += renderers.Snippet(bot)
 	}
 
 	ui.PageOutput(outputStr)

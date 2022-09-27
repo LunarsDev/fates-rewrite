@@ -127,7 +127,7 @@ Fetches a random 'snippet' from the list.
 
 
 @app.get("/index", response_model=models.Index, tags=[tags.generic])
-async def index(target_type: models.TargetType):
+async def get_index(target_type: models.TargetType):
     if target_type != models.TargetType.Bot:
         raise HTTPException(400, "Not yet implemented")
     if cached_index := mapleshade.cache.get("bot_index"):

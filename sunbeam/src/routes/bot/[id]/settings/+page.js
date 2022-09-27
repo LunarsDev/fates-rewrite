@@ -3,7 +3,7 @@ import * as logger from '$lib/logger';
   import { request } from '$lib/request';
 import { error } from '@sveltejs/kit';
 
-/** @type {import('../../../$types').PageLoad} */
+/** @type {import('./$types').PageLoad} */
 export async function load({ params, fetch, parent }) {
   let session = await parent();
 

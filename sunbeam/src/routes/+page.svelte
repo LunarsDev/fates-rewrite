@@ -27,7 +27,7 @@
 
 <SearchBar bind:data={searchData}/>
 
-{#if !searchData}
+<span id="index">
   <Tag targetType="bot" tags={data.index.tags} />
 
   {#if data.random}
@@ -57,6 +57,14 @@
       {/each}
     </CardContainer>
   </Section>
+</span>
+
+{#if searchData}
+  <style>
+    #index {
+      display: none;
+    }
+  </style>
 {/if}
 
 <style>

@@ -39,7 +39,6 @@ declare global {
       refresh_token: string?;
       user_experiments: number[];
       site_lang: string;
-      admin_ticket: string;
       url: string
     };
 

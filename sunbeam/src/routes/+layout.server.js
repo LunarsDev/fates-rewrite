@@ -22,22 +22,14 @@ export async function load({ request, setHeaders }) {
       refresh_token: '',
       user_experiments: [2, 5, 6],
       site_lang: 'en',
-      admin_ticket: "",
       url: request.url
     };
-  
-    let adminData = '';
-  
-    if (cookies['_adminsession']) {
-      adminData = cookies['_adminsession'];
-    }
-  
+      
     if (cookies['sunbeam-session']) {
       const newJwt = cookies['sunbeam-session'];
   
       try {
         sessionData = JSON.parse(Base64.decode(newJwt));
-        sessionData.admin_ticket = adminData;
         sessionData.url = request.url
       } catch (e) {
         logger.error('Auth', e);

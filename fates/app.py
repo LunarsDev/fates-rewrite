@@ -187,6 +187,9 @@ async def get_bot_invite(request: Request, bot_id: int):
 
 @app.get("/bots/{bot_id}/secrets", tags=[tags.bot], response_model=models.BotSecrets)
 async def get_bot_secrets(bot_id: int, auth: models.AuthData = Depends(auth)):
+    if auth.auth_type != models.TargetType.User:
+        raise HTTPException(401, "User-only endpoint")
+
     bot_owners = await tables.BotOwner.select().where(tables.BotOwner.bot_id == bot_id)
 
     if not bot_owners:

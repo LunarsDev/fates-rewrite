@@ -20,6 +20,7 @@
 
 1. Run ``uvicorn silverpelt.app:app --port 3030`` to start silverpelt
 2. Then run ``uvicorn fates.app:app`` to start main API
+3. **Either use nginx to serve the ``static`` folder (for all static assets) *or* (for local development ONLY) edit ``static`` in config.yaml to point to http://localhost:3030 and run ``python3 -m http.server 3030`` in the ``static`` folder**
 
 ## Database Seeding
 
@@ -42,7 +43,35 @@ Then, pen ``psql``, then run the following:
 
 ## Developer Docs
 
-### Authorization
+### Routes
+
+A simple route on Fates List would look like this:
+
+```py
+@route(
+    Route(  
+        app=app,
+        mapleshade=mapleshade,
+        url="/@bot",
+        response_model=some_response_model_here,
+        method=Method.get, # Route method
+        tags=[tags.tests], # The tags of the route
+        ratelimit=SharedRatelimit.new("core") # Or use a manual Ratelimit
+    )
+)
+# NOTE that the request: Request bit is mandatory and @route will error if you don't give request as first parameter
+async def route_name(request: Request, foo: int, bar: str):
+    """FOO BAR"""
+    # The below line for frostpaw-cache is in the case you dont have anything to do with a request
+    if request.headers.get("Frostpaw-Cache"):
+        raise HTTPException(400, detail="Caching via Frostpaw-Cache is not implemented")
+
+    # Do something
+```
+
+Note that the ``route`` decorator checks all parameters passed to it and also enforces a basic structure for all routes.
+
+## Authorization
 
 Due to several issues (including extremely long URLs), the ``Frostpaw-Auth`` header is now the preferred way for authorization although ``/bots/{ID}/stats`` will still support ``Authorization`` as well as the new header.
 

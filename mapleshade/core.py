@@ -74,7 +74,7 @@ class Mapleshade:
         self.yaml = YAML()
 
         with open("config.yaml") as doc:
-            self.config = self.yaml.load(doc)
+            self.config: dict[str, Any] = self.yaml.load(doc)
         
         self.perms = {
             "default": Permission(index=0, roles=[], name="default"),

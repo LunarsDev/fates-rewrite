@@ -1,14 +1,13 @@
-import hashlib
-import hmac
-import time
 import uuid
 from fates import models
 from fates.auth import auth
+from fates.decorators import Ratelimit, SharedRatelimit, route, Route, Method, nop
 from . import tables
 from . import tags
 import inspect
 import piccolo
 from fastapi import FastAPI, HTTPException, Request, Depends
+from fastapi.staticfiles import StaticFiles
 from fastapi.responses import ORJSONResponse
 from piccolo.columns.combination import WhereRaw
 from starlette.routing import Mount
@@ -88,8 +87,19 @@ async def close_database_connection_pool():
     await engine.close_connnection_pool()
 
 
-@app.get("/random", response_model=models.Snippet, tags=[tags.bot])
+@route(
+    Route(  
+        app=app,
+        mapleshade=mapleshade,
+        url="/random",
+        response_model=models.Snippet,
+        method=Method.get,
+        tags=[tags.generic],
+        ratelimit=SharedRatelimit.new("core")
+    )
+)
 async def random_snippet(
+    request: Request,
     target_type: models.TargetType = models.TargetType.Bot, reroll: bool = False
 ):
     """
@@ -99,10 +109,15 @@ Fetches a random 'snippet' from the list.
 
 - reroll: Whether to reroll and bypass cache (default: false)
     """
+
+    nop(request)
+
+    if target_type != models.TargetType.Bot:
+        raise HTTPException(400, "Not yet implemented")
+
     if target_type == models.TargetType.User:
         raise HTTPException(400, detail="User snippets are not supported *yet*")
-    if target_type != models.TargetType.Bot:
-        return
+
     if not reroll:
         if cached := mapleshade.cache.get("random-bot"):
             return cached.value()
@@ -126,12 +141,35 @@ Fetches a random 'snippet' from the list.
             flag += 1
 
 
-@app.get("/index", response_model=models.Index, tags=[tags.generic])
-async def get_index(target_type: models.TargetType):
+@route(
+    Route(  
+        app=app,
+        mapleshade=mapleshade,
+        url="/index",
+        response_model=models.Index,
+        method=Method.get,
+        tags=[tags.generic],
+        ratelimit=SharedRatelimit.new("core")
+    )
+)
+async def get_index(
+    request: Request,
+    target_type: models.TargetType
+):
+    """
+Fetches the index for a bot/server.
+
+*An index is made of `Snippets`*
+    """
+
+    nop(request)
+
     if target_type != models.TargetType.Bot:
         raise HTTPException(400, "Not yet implemented")
+
     if cached_index := mapleshade.cache.get("bot_index"):
         return cached_index.value()
+
     index = models.Index(
         top_voted=await mapleshade.to_snippet(
             await tables.Bots.select(*models.BOT_SNIPPET_COLS)
@@ -156,20 +194,59 @@ async def get_index(target_type: models.TargetType):
     return index
 
 
-@app.get("/bots/{bot_id}", tags=[tags.bot], response_model=models.Bot)
-async def get_bot(bot_id: int):
+@route(
+    Route(  
+        app=app,
+        mapleshade=mapleshade,
+        url="/bots/{bot_id}",
+        response_model=models.Bot,
+        method=Method.get,
+        tags=[tags.bot],
+        ratelimit=Ratelimit(
+            num=10,
+            interval=1,
+            name="get_bot"
+        )
+    )
+)
+async def get_bot(
+    request: Request,
+    bot_id: int
+):
+    """
+Gets a bot based on its ``bot_id``
+    """
+    nop(request)
+
     bot = await mapleshade.bot(bot_id)
     if not bot:
         raise HTTPException(status_code=404, detail="Not Found")
     return bot
 
-@app.get("/bots/{bot_id}/invite", tags=[tags.bot], response_model=models.Invite)
+@route(
+    Route(  
+        app=app,
+        mapleshade=mapleshade,
+        url="/bots/{bot_id}/invite",
+        response_model=models.Invite,
+        method=Method.get,
+        tags=[tags.bot],
+        ratelimit=Ratelimit(
+            num=3,
+            interval=1.5,
+            name="get_bot_invite"
+        )
+    )
+)
 async def get_bot_invite(request: Request, bot_id: int):
     """
     Gets the invite for a bot.
 
     If ``Frostpaw-Target`` is set to ``invite``, then this also updates invite_amount
     """
+
+    nop(request)
+
     invite_url = await tables.Bots.select(tables.Bots.invite).where(tables.Bots.bot_id == bot_id).first()
 
     if not invite_url:
@@ -190,10 +267,29 @@ async def get_bot_invite(request: Request, bot_id: int):
     else:
         return models.Invite(invite=invite_url["invite"])
 
-@app.get("/bots/{bot_id}/secrets", tags=[tags.bot], response_model=models.BotSecrets)
-async def get_bot_secrets(bot_id: int, auth: models.AuthData = Depends(auth)):
+@route(
+    Route(  
+        app=app,
+        mapleshade=mapleshade,
+        url="/bots/{bot_id}/secrets",
+        response_model=models.BotSecrets,
+        method=Method.get,
+        tags=[tags.bot],
+        ratelimit=Ratelimit(
+            num=3,
+            interval=2,
+            name="get_bot_secrets"
+        )
+    )
+)
+async def get_bot_secrets(request: Request, bot_id: int, auth: models.AuthData = Depends(auth)):
+    """
+Returns the secrets of a bot (``api_token``, ``webhook`` and ``webhook_secret`` as of now)
+    """
     if auth.auth_type != models.TargetType.User:
         raise HTTPException(401, "User-only endpoint")
+    
+    nop(request)
 
     bot_owners = await tables.BotOwner.select().where(tables.BotOwner.bot_id == bot_id)
 
@@ -217,28 +313,88 @@ async def get_bot_secrets(bot_id: int, auth: models.AuthData = Depends(auth)):
         webhook_secret=bot_secrets["webhook_secret"]
     )
 
-@app.get("/@auth", tags=[tags.tests], response_model=models.AuthData)
-async def test_auth(auth: models.AuthData = Depends(auth)):
+@route(
+    Route(  
+        app=app,
+        mapleshade=mapleshade,
+        url="/@auth",
+        response_model=models.AuthData,
+        method=Method.get,
+        tags=[tags.generic],
+        ratelimit=SharedRatelimit.new("core")
+    )
+)
+async def check_auth_header(request: Request, auth: models.AuthData = Depends(auth)):
+    """
+Tests an ``Frostpaw-Auth`` or an ``Authorization`` header
+
+**Libraries are free (and encouraged) to use this to verify their auth code**
+    """
+
+    nop(request)
+
     return auth
 
-@app.get("/@me", tags=[tags.tests], response_model=silver_types.DiscordUser)
-async def test_sv_resp():
+@route(
+    Route(  
+        app=app,
+        mapleshade=mapleshade,
+        url="/@bot",
+        response_model=silver_types.DiscordUser,
+        method=Method.get,
+        tags=[tags.tests],
+        ratelimit=SharedRatelimit.new("core")
+    )
+)
+async def test_sv_resp(request: Request):
     """Returns the current Fates List user thats logged in on the API"""
+
+    nop(request)
+
     req = await mapleshade.silverpelt_req("@me")
     return req
 
 
-@app.get("/blazefire/{id}", tags=[tags.generic], response_model=silver_types.DiscordUser)
-async def get_discord_user(id: int):
+@route(
+    Route(  
+        app=app,
+        mapleshade=mapleshade,
+        url="/blazefire/{user_id}",
+        response_model=silver_types.DiscordUser,
+        method=Method.get,
+        tags=[tags.generic],
+        ratelimit=SharedRatelimit.new("core")
+    )
+)
+async def get_discord_user(request: Request, user_id: int):
+    """
+Internally used for extra owners etc, this fetches a user from the Discord API handling caching as well
+    """
+
+    nop(request)
+
     try:
-        req = await mapleshade.silverpelt_req(f"users/{id}")
+        req = await mapleshade.silverpelt_req(f"users/{user_id}")
     except SilverNoData as e:
         raise HTTPException(status_code=404, detail="Not Found") from e
     return req
 
+@route(
+    Route(  
+        app=app,
+        mapleshade=mapleshade,
+        url="/meta",
+        response_model=models.ListMeta,
+        method=Method.get,
+        tags=[tags.generic],
+        ratelimit=SharedRatelimit.new("core")
+    )
+)
+async def get_meta(request: Request):
+    """Returns the metadata of the list (tags, features etc)"""
 
-@app.get("/meta", tags=[tags.generic], response_model=models.ListMeta)
-async def get_meta():
+    nop(request)
+
     return models.ListMeta(
         bot=models.BotListMeta(
             tags=models.Tag.to_list(await tables.BotListTags.select()),
@@ -249,8 +405,21 @@ async def get_meta():
         ),
     )
 
-@app.get("/code/{vanity}", tags=[tags.generic], response_model=models.Vanity)
-async def get_code(vanity: str):
+@route(
+    Route(  
+        app=app,
+        mapleshade=mapleshade,
+        url="/code/{vanity}",
+        response_model=models.Vanity,
+        method=Method.get,
+        tags=[tags.generic],
+        ratelimit=SharedRatelimit.new("core")
+    )
+)
+async def get_code(request: Request, vanity: str):
+    """Resolves a vanity based on the code"""
+
+    nop(request)
     vanity = await tables.Vanity.select().where(WhereRaw("lower(vanity_url) = {}", vanity.lower())).first()
 
     if not vanity:
@@ -273,8 +442,19 @@ async def get_code(vanity: str):
         target_id=vanity["redirect"]
     )
 
-@app.get("/oauth2", tags=[tags.internal], response_model=models.OAuth2Login)
+@route(
+    Route(  
+        app=app,
+        mapleshade=mapleshade,
+        url="/oauth2",
+        response_model=models.OAuth2Login,
+        method=Method.get,
+        tags=[tags.internal],
+        ratelimit=SharedRatelimit.new("core")
+    )
+)
 async def get_oauth2(request: Request):
+    """Returns the OAuth2 login URL to redirect to"""
     if not request.headers.get("Frostpaw-Server"):
         raise HTTPException(400, "Missing Frostpaw-Server header")
     state = str(uuid.uuid4())
@@ -283,8 +463,19 @@ async def get_oauth2(request: Request):
         "url": f"https://discord.com/oauth2/authorize?client_id={mapleshade.config['secrets']['client_id']}&redirect_uri={request.headers.get('Frostpaw-Server')}/frostpaw/login&scope=identify&response_type=code",
     }
 
-@app.post("/oauth2", tags=[tags.internal], response_model=models.OauthUser)
+@route(
+    Route(  
+        app=app,
+        mapleshade=mapleshade,
+        url="/oauth2",
+        response_model=models.OauthUser,
+        method=Method.post,
+        tags=[tags.internal],
+        ratelimit=SharedRatelimit.new("core")
+    )
+)
 async def login_user(request: Request, login: models.Login):
+    """Logs in a user and returns a OauthUser including their User ID and Token among other things"""
     redirect_url_d = request.headers.get("Frostpaw-Server")
 
     if not redirect_url_d:
@@ -303,6 +494,20 @@ async def login_user(request: Request, login: models.Login):
     
     return oauth
 
-@app.get("/guppy", tags=[tags.internal], response_model=Permission)
-async def guppy_test(user_id: int):
+@route(
+    Route(  
+        app=app,
+        mapleshade=mapleshade,
+        url="/guppy",
+        response_model=Permission,
+        method=Method.get,
+        tags=[tags.tests],
+        ratelimit=SharedRatelimit.new("core")
+    )
+)
+async def guppy_test(request: Request, user_id: int):
+    """Returns a users permissions on the list"""
+
+    nop(request)
+
     return await mapleshade.guppy(user_id)

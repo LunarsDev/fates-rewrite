@@ -27,7 +27,7 @@
 
 <SearchBar bind:data={searchData}/>
 
-{#if searchData}
+{#if !searchData}
   <Tag targetType="bot" tags={data.index.tags} />
 
   {#if data.random}

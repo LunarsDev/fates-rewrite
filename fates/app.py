@@ -17,6 +17,7 @@ from piccolo.engine import engine_finder
 from mapleshade import SilverNoData, Mapleshade, Permission
 import silverpelt.types.types as silver_types
 import orjson
+from pydantic import BaseModel
 
 mapleshade = Mapleshade()
 
@@ -278,8 +279,9 @@ async def get_bot_invite(request: Request, bot_id: int):
         ratelimit=Ratelimit(
             num=3,
             interval=2,
-            name="get_bot_secrets"
-        )
+            name="get_bot_secrets",
+        ),
+        auth=models.TargetType.User
     )
 )
 async def get_bot_secrets(request: Request, bot_id: int, auth: models.AuthData = Depends(auth)):
@@ -321,7 +323,8 @@ Returns the secrets of a bot (``api_token``, ``webhook`` and ``webhook_secret`` 
         response_model=models.AuthData,
         method=Method.get,
         tags=[tags.generic],
-        ratelimit=SharedRatelimit.new("core")
+        ratelimit=SharedRatelimit.new("core"),
+        auth=True
     )
 )
 async def check_auth_header(request: Request, auth: models.AuthData = Depends(auth)):
@@ -506,6 +509,30 @@ async def login_user(request: Request, login: models.Login):
     )
 )
 async def guppy_test(request: Request, user_id: int):
+    """Returns a users permissions on the list"""
+
+    nop(request)
+
+    return await mapleshade.guppy(user_id)
+
+# Test model
+
+class NestedModel(BaseModel):
+    test: str
+    perms: Permission
+
+@route(
+    Route(  
+        app=app,
+        mapleshade=mapleshade,
+        url="/@test-tryitout/{user_id}/{a:path}",
+        response_model=Permission,
+        method=Method.put,
+        tags=[tags.tests],
+        ratelimit=SharedRatelimit.new("core")
+    )
+)
+async def test_tio(request: Request, user_id: int, b: int, permission: NestedModel):
     """Returns a users permissions on the list"""
 
     nop(request)

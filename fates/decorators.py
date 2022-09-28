@@ -1,10 +1,15 @@
+import datetime
 from functools import wraps
-from typing import Awaitable, Any
+from typing import Awaitable, Any, Optional, Protocol, Type, TypeVar
 from fastapi import FastAPI, Request
+from fastapi.params import Depends as DependsType
 from enum import IntEnum
 from pydantic import BaseModel
 from inspect import signature
+from fates import models
 from mapleshade import Mapleshade
+import base64
+import orjson
 
 class Method(IntEnum):
     get = 0
@@ -45,20 +50,103 @@ class Route(BaseModel):
     method: Method
     tags: list[str]
     ratelimit: Ratelimit # We don't actually ratelimit yet, this is for forwards-compat
+    auth: Optional[models.TargetType | bool] = None # Either None, a target type or true (for all)
 
     class Config:
         arbitrary_types_allowed = True
 
 
-
 class __RouteData:
     """Internal class for handling routes"""
 
-    def __init__(self, func: Awaitable):
+    def __init__(self, func: Awaitable, route: Route):
         self.func: Awaitable = func
+        self.route: Route = route
+    
+    def get_tio_type(self, v: Any) -> str:
+        tio_types = {
+            str: "text",
+            int: "number",
+            bool: "bool",
+            datetime.datetime: "datetime-local",
+        }
+
+        return tio_types.get(v) or "str"
+
+    def extract_bm(self, bm: BaseModel) -> dict[str, Any]:
+        """Extracts the fields from a BaseModel"""
+        fields = {}
+
+        tio_types = {
+            str: "text",
+            int: "number",
+            bool: "bool",
+            datetime.datetime: "datetime-local",
+        }
+
+        for field in bm.__fields__.values():
+            if issubclass(field.type_, BaseModel):
+                fields[field.name] = {"nested": True} | self.extract_bm(field.type_)
+                continue
+            fields[field.name] = self.get_tio_type(field.type_)
+
+        return fields
+        
+    def extract_tryitout(self) -> dict[str, Any]:
+        """Extracts the tryitout data (query params, path params, body, headers) from the function"""
+        tryitout = {
+            "query": {},
+            "path": {},
+            "body": {},
+            "auth": [v.name for v in models.TargetType] if self.route.auth == True else [self.route.auth.name] if self.route.auth else [],
+        }
+
+        sig = signature(self.func)
+
+        # Get all the path params for route.url
+        path_params = [v[1:-1].split(":")[0] for v in self.route.url.split("/") if v.startswith("{") and v.endswith("}")]
+
+        # Handle path params
+        for param in path_params:
+            if param in sig.parameters:
+                tryitout["path"][param] = self.get_tio_type(sig.parameters[param].annotation)
+
+        # First find the body param
+        for key, param in sig.parameters.items():
+
+            # Body param
+            if issubclass(param.annotation, BaseModel):
+                # Check that it is not a dependency
+                if issubclass(type(param.default), DependsType):
+                    continue
+
+                # Loop over all fields of the base model
+                tryitout["body"] = self.extract_bm(param.annotation)
+            
+            else:
+                # Query param or path param
+                if key in path_params or key == "request":
+                    continue
+
+                tryitout["query"][key] = self.get_tio_type(param.annotation)
+        
+        return tryitout
+
+T = TypeVar("T", covariant=True)
+class __RouteProtocol(Protocol[T]):
+    """Type hints for a route"""
+    def __init__(
+        self, 
+        path: str, 
+        response_model: Any = None, 
+        tags: list[str] = None, 
+        operation_id: str = None
+    ) -> None:
+        ...
 
 
 routes = {}
+
 
 def route(route: Route):
     def rw(func: Awaitable):
@@ -67,15 +155,19 @@ def route(route: Route):
 
         if func.__name__ in routes:
             raise ValueError("Function name must be unique")
+
+        route_data = __RouteData(func, route)
         
-        routes[func.__name__] = __RouteData(func)
+        routes[func.__name__] = route_data
+
+        try_data = orjson.dumps(route_data.extract_tryitout())
 
         func.__doc__ += f"""
 
-<iframe style="width: 100%!important;" frameborder="0" src="{route.mapleshade.config['static']}/tryitout.html?name={func.__name__}"></iframe>
+<iframe style="width: 100%!important;" frameborder="0" src="{route.mapleshade.config['static']}/tryitout.html?name={func.__name__}&data={base64.urlsafe_b64encode(try_data).decode()}"></iframe>
     """
 
-        rmap = {
+        rmap: dict[Method, Type[__RouteProtocol]] = {
             Method.get: route.app.get,
             Method.post: route.app.post,
             Method.put: route.app.put,
@@ -94,7 +186,12 @@ def route(route: Route):
         async def custom_route(request: Request, *args, **kwargs):
             return await func(request, *args, **kwargs)
 
-        rmap[route.method](route.url, response_model=route.response_model, tags=route.tags)(custom_route)
+        rmap[route.method](
+            route.url, 
+            response_model=route.response_model, 
+            tags=route.tags,
+            operation_id=func.__name__,
+        )(custom_route)
 
     return rw
 

@@ -12,7 +12,7 @@
   import loadstore from '$lib/loadstore';
   import alertstore from '$lib/alertstore';
   import { errorStore } from '$lib/alertstore';
-  import { apiUrl, lynxUrl } from '$lib/config';
+  import { api } from '$lib/config';
   import * as logger from '$lib/logger';
   import menustore from '$lib/menustore';
 
@@ -88,7 +88,7 @@
     }
 
     docReady(llhandler);
-	window.llhandler = llhandler
+	  window.llhandler = llhandler
   }
 
   $: {
@@ -119,8 +119,7 @@
         return {
           id: $page.data.user.id,
           token: $page.data.token,
-          apiUrl: apiUrl,
-          lynxUrl: lynxUrl
+          apiUrl: api,
         };
       } else {
         return null;

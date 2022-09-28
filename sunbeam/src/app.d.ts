@@ -23,7 +23,6 @@ interface UserFnInterface {
   id: string;
   token: string;
   apiUrl: string;
-  lynxUrl: string;
 }
 
 declare global {

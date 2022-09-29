@@ -167,9 +167,8 @@ This section includes the *additional* requirements for certification. This list
 13. **By using server listing, you agree for your server to be publicly listed on our stats page and API for easier moderation. You can opt out by setting state to private_viewable**
 14. This list is non-exhaustive and malicious violations/loopholes of the rules will be counted as breaking them.
 15. **When you as a user last voted for a server is *public* to otther users**
-
-- We rely on reports in most cases to perform actions. This is because it is unfeasible to go through every single server. We require servers to be community servers to aid in moderation.
-- Feel free to DM Rootspring#6701 if you have any questions.
+16. We rely on reports in most cases to perform actions. This is because it is unfeasible to go through every single server. We require servers to be community servers to aid in moderation.
+17. Feel free to DM Rootspring#6701 if you have any questions.
 
 </blockquote>
 
@@ -239,9 +238,7 @@ We log all admin actions taken on Lynx for anti-nuke and debugging purposes. We 
 3. We may also use IPs for access logs. Due to technical reasons, these cannot be easily deleted from our servers so please use a VPN if you do not want your IP to be exposed to us.
 4. We also store timestamps of when you vote for a bot and these timestamps are exposed to bot owners via our API which they may then use for their own purposes such as determining whether you can vote for a bot or not.
 5. We may release user data to law enforcement if requested by law. We will also try our best to notify affected parties however this may not be possible in all cases. By using Fates List, you agree to this.
-6. By using the Fates List API, you agree that all requests made to the site will be logged by ``Actix Web`` (api-v3), ``uvicorn`` (widgets, lynx) and ``nginx``. Apart from ``nginx``, these logs are not stored persistently 
-and are merely logged to console as of this time. This can change without notice however. These logs include request method, URL and the ``Cloudflare IP`` that connected to the site. While cloudflare does share all IP addresses with us, 
-we do not use this whatsoever for privacy purposes. We do not use IP addresses for any purposes beyond preventing Distributed Denial Of Services (and the IP address logged cannot anyways be correlated back as it is not your real IP but rather a Cloudflare-anonymized one)
+6. By using the Fates List API, you agree that all requests made to the site will be logged by ``Actix Web`` (api-v3), ``uvicorn`` (widgets, lynx) and ``nginx``. Apart from ``nginx``, these logs are not stored persistently and are merely logged to console as of this time. This can change without notice however. These logs include request method, URL and the ``Cloudflare IP`` that connected to the site. While cloudflare does share all IP addresses with us, we do not use this whatsoever for privacy purposes. We do not use IP addresses for any purposes beyond preventing Distributed Denial Of Services (and the IP address logged cannot anyways be correlated back as it is not your real IP but rather a Cloudflare-anonymized one)
 
 </blockquote>
 

@@ -44,6 +44,7 @@ for file_name in meta:
         )
 
 app = FastAPI(
+    title="Fates List",
     default_response_class=ORJSONResponse,
     routes=[
         Mount(

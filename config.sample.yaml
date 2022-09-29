@@ -8,6 +8,7 @@ redis_url: "redis://127.0.0.1:6379" # Redis URL
 main_server: 789934742128558080
 
 static: http://localhost:3030 # Change this in prod
+sunbeam: http://localhost:5001 # Change this in prod
 
 perms:
   sudo: 

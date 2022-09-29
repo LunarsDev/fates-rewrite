@@ -97,6 +97,7 @@ class __RouteData:
     def extract_tryitout(self) -> dict[str, Any]:
         """Extracts the tryitout data (query params, path params, body, headers) from the function"""
         tryitout = {
+            "name": self.func.__name__,
             "query": {},
             "path": {},
             "body": {},
@@ -167,7 +168,7 @@ def route(route: Route):
 
         func.__doc__ += f"""
 
-<iframe style="width: 100%!important;" frameborder="0" src="{route.mapleshade.config['static']}/tryitout.html?name={func.__name__}&data={base64.urlsafe_b64encode(try_data).decode()}"></iframe>
+<iframe style="width: 100%!important; height: 300px !important;" frameborder="0" src="{route.mapleshade.config['static']}/tryitout.html#{base64.urlsafe_b64encode(try_data).decode()}"></iframe>
     """
 
         rmap: dict[Method, Type[__RouteProtocol]] = {

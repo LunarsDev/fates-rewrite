@@ -38,7 +38,7 @@ with open("docs/meta.yaml") as meta_f:
 
 for file_name in meta:
     with open(f"docs/{file_name}") as doc:
-        docs.append(doc.read())
+        docs.append(doc.read().replace("{%static%}", mapleshade.config["static"]).replace("{%sunbeam%}", mapleshade.config["sunbeam"]))
 
 app = FastAPI(
     default_response_class=ORJSONResponse,

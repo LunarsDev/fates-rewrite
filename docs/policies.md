@@ -300,31 +300,13 @@ We are not affiliated with Discord Inc. or any of its partners or affiliates.
 
 We believe your data belongs to *you*
 
-::: info
-
-**These actions can only be done for your *own* user id for security purposes unless you are a Overseer (which is our version of a owner)**
-
-:::
-
-::: action-gdpr-request
+**These actions can only be done for your *own* user id for security purposes unless you are sudo on the list (which is our version of an owner)**
 
 ### Request Data
 
-<div class="form-group">
-    <label for='user-id'>User ID</label>
-    <input 
-        class="form-control"
-        name='user-id' 
-        id='user-id'
-        type="number"
-        placeholder="User ID. See note above"
-    />
-    <button id="request-btn" onclick="dataRequest()">Request</button>
-</div>
+Click "Request My Data" if you wish to request a copy of your data.
 
-:::
-
-::: action-gdpr-delete
+<a href="{%sunbeam%}/frostpaw/data?act=request"><button class="doc-button">Request My Data</button></a>
 
 ### Data Deletion Request
 
@@ -333,18 +315,6 @@ We believe your data belongs to *you*
 - There is no way to readd deleted bots unless you manually fill out all bot information again
 - **All votes you have ever made will be wiped. In the future, this *may* also trigger a 'data deletion webhook' to all voted bots**. This may lead to chargebacks or revoking of vote rewards from such bots.
 - Actual servers in server listing are not removed by a Data Deletion Request as we do not store such information regarding server owners/managers etc. due to privacy concerns (servers are *not* associated with their owners/admins/moderators on our database whatsoever and we do not store such information). Instead, server owners should use /delserver instead which permanently deletes the server from server listing.
+- This does not delete vote epoch which is temporary anyways which is removed after 8 hours automatically. This is to prevent abuse
 
-
-<div class="form-group">
-    <label for='user-id-del'>User ID</label>
-    <input 
-        class="form-control"
-        name='user-id-del' 
-        id='user-id-del'
-        type="number"
-        placeholder="User ID. See note above"
-    />
-    <button id="delete-btn" onclick="dataDelete()">Delete</button>
-</div>
-
-:::
+<a href="{%sunbeam%}/frostpaw/data?act=delete"><button class="doc-button">Delete My Data</button></a>

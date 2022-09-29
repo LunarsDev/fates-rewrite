@@ -4,6 +4,9 @@
         <div id="tio">
             Loading tryitout, if you have JS disabled, this feature may not work...
         </div>
+        <div id="body">
+
+        </div>
     </div>
 </html>
 
@@ -31,4 +34,46 @@
         margin-inline-start: 0px;
         margin-inline-end: 0px;
     }
+
+    input {
+        font-family: Roboto, sans-serif;
+        font-weight: 400;
+        font-size: 14px;
+        line-height: 1.5em;
+        color: rgb(51, 51, 51);
+        -webkit-font-smoothing: antialiased;
+        text-size-adjust: 100%;
+        text-rendering: optimizespeed !important;
+    }
 </style>
+
+<script>
+    String.prototype.toTitle = function() {
+        return this.replaceAll("_", "").replace(/(^|\s)\S/g, function(t) { return t.toUpperCase() });
+    };
+
+    var tidDat = JSON.parse(atob(window.location.hash.substring(1)));
+
+    console.log("Got TryItOut data: ", tidDat)
+
+    if(Object.keys(tidDat.body).length > 0) {
+        console.warn("Got body: ", tidDat.body)
+
+        inputEl = "<h2>Body</h2>"
+
+        // Loop over body and add to body as inputs
+        for(var key in tidDat.body) {
+            console.log(key)
+            var val = tidDat.body[key];
+
+            inputEl += `
+<div class="input">
+    <label for="input-${key}">${key.toTitle()}</label>
+    <input type="${val}" id="input-${key}" name="input-${key}" placeholder=${key.toTitle()}>
+</div>
+            `
+        }
+
+        document.getElementById("body").innerHTML += inputEl;
+    }
+</script>

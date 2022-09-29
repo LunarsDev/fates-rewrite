@@ -16,7 +16,6 @@ from piccolo.engine import engine_finder
 
 from mapleshade import SilverNoData, Mapleshade
 import silverpelt.types.types as silver_types
-import orjson
 
 mapleshade = Mapleshade()
 

@@ -126,7 +126,7 @@ class Mapleshade:
     async def guppy(self, user_id: int) -> models.Permission:
         """Guppy: (Get User Permissions Pretty Please You!"""
         try:
-            user_roles: list[int] = await self.silverpelt_req(f"roles/{self.config['main_server']}/{user_id}")
+            user_roles: list[str] = [str(v) for v in await self.silverpelt_req(f"roles/{self.config['main_server']}/{user_id}")]
         except SilverNoData:
             return self.perms["default"]
         

@@ -71,26 +71,23 @@ class __RouteData:
             int: "number",
             bool: "bool",
             datetime.datetime: "datetime-local",
+            list[str]: "list:number",
+            list[int]: "list:text",
         }
 
-        return tio_types.get(v) or "str"
+        print(v)
+
+        return tio_types.get(v) or "text"
 
     def extract_bm(self, bm: BaseModel) -> dict[str, Any]:
         """Extracts the fields from a BaseModel"""
         fields = {}
 
-        tio_types = {
-            str: "text",
-            int: "number",
-            bool: "bool",
-            datetime.datetime: "datetime-local",
-        }
-
         for field in bm.__fields__.values():
             if issubclass(field.type_, BaseModel):
-                fields[field.name] = {"nested": True} | self.extract_bm(field.type_)
+                fields[field.name] = {"_nested": True} | self.extract_bm(field.annotation)
                 continue
-            fields[field.name] = self.get_tio_type(field.type_)
+            fields[field.name] = self.get_tio_type(field.annotation)
 
         return fields
         

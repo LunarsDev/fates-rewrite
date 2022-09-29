@@ -388,7 +388,7 @@ class ResponseRaise(Exception):
 class Permission(BaseModel):
     """A permission for a staff member on the list"""
     index: int
-    roles: list[int]
+    roles: list[str]
     name: str
 
     def __eq__(self, other: "Permission") -> bool:

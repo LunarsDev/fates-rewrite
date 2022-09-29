@@ -71,6 +71,23 @@ async def route_name(request: Request, foo: int, bar: str):
 
 Note that the ``route`` decorator checks all parameters passed to it and also enforces a basic structure for all routes.
 
+### Errors
+
+To handle a error, use a ``models.Response.error()``
+
+**Example:**
+
+```py
+      if not auth_data:
+            Response(
+                done=False,
+                reason="The specified server could not be found",
+                code=ResponseCode.NOT_FOUND
+            ).error(404)
+```
+
+For the case a ``HTTPException`` (etc) is raised instead, the ``route`` decorator automatically converts it into a ``Response`` and returns it however this leads to a broken ``code`` in the JSON and as such is discouraged.
+
 ## Authorization
 
 Due to several issues (including extremely long URLs), the ``Frostpaw-Auth`` header is now the preferred way for authorization although ``/bots/{ID}/stats`` will still support ``Authorization`` as well as the new header.

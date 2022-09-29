@@ -1,15 +1,18 @@
 import datetime
 from functools import wraps
+import traceback
 from typing import Awaitable, Any, Optional, Protocol, Type, TypeVar
-from fastapi import FastAPI, Request
+from fastapi import FastAPI, Request, HTTPException
+from fastapi.responses import ORJSONResponse
 from fastapi.params import Depends as DependsType
 from enum import IntEnum
 from pydantic import BaseModel
 from inspect import signature
-from fates import models
+from fates import models, consts
 from mapleshade import Mapleshade
 import base64
 import orjson
+import asyncpg
 
 class Method(IntEnum):
     get = 0
@@ -54,7 +57,6 @@ class Route(BaseModel):
 
     class Config:
         arbitrary_types_allowed = True
-
 
 class __RouteData:
     """Internal class for handling routes"""
@@ -138,9 +140,10 @@ class __RouteProtocol(Protocol[T]):
     def __init__(
         self, 
         path: str, 
+        responses: dict[int, Any],
         response_model: Any = None, 
         tags: list[str] = None, 
-        operation_id: str = None
+        operation_id: str = None,
     ) -> None:
         ...
 
@@ -184,13 +187,60 @@ def route(route: Route):
 
         @wraps(func)
         async def custom_route(request: Request, *args, **kwargs):
-            return await func(request, *args, **kwargs)
+            try:
+                res = await func(request, *args, **kwargs)
+            except HTTPException as e:
+                return ORJSONResponse(
+                    models.Response(
+                        done=False,
+                        reason=e.detail,
+                        code=consts.DEFAULT_EXC.get(e.status_code, models.ResponseCode.UNKNOWN),
+                    ).dict(),
+                    status_code=e.status_code
+                )
+            except models.ResponseRaise as e:
+                return ORJSONResponse(e.response.dict(), status_code=e.status_code)
+            except asyncpg.exceptions.DataError as e:
+                return ORJSONResponse(
+                    models.Response(
+                        done=False,
+                        reason=str(e),
+                        code=models.ResponseCode.INVALID_DATA,
+                    ).dict(),
+                    status_code=400
+                )
+            except Exception as e:
+                traceback.print_exc()
+                return ORJSONResponse(
+                    models.Response(
+                        done=False,
+                        reason=repr(e),
+                        code=models.ResponseCode.UNKNOWN,
+                    ).dict(),
+                    status_code=500
+                )
+
+            return res
 
         rmap[route.method](
             route.url, 
             response_model=route.response_model, 
             tags=route.tags,
             operation_id=func.__name__,
+            responses={
+                404: {
+                    "model": models.Response(
+                        done=False,
+                        reason="Not found (or some other reason)"
+                    )
+                },
+                400: {
+                    "model": models.Response(
+                        done=False,
+                        reason="Some reason why the request was bad"
+                    )
+                },
+            }
         )(custom_route)
 
     return rw

@@ -4,6 +4,7 @@ from .tables import BotCommands, Bots, Users, UserBotLogs
 from piccolo.utils.pydantic import create_pydantic_model
 from piccolo.query import Select
 from pydantic import BaseModel
+from fastapi import HTTPException
 import silverpelt.types.types as silver_types
 from fates.enums import *
 
@@ -345,3 +346,67 @@ class Invite(BaseModel):
     """A invite for a bot/server"""
 
     invite: str
+
+class ResponseCode(Enum):
+    """A API response code (can be used for programatic error handling)"""
+    OK = "ok"
+    AUTH_FAIL = "auth_fail"
+    NOT_FOUND = "not_found"
+    UNKNOWN = "unknown"
+    INVALID_DATA = "invalid_data"
+    FORBIDDEN = "forbidden"
+
+class Response(BaseModel):
+    """A API Response"""
+
+    done: bool
+    """Whether or not the request was successful"""
+
+    code: Optional[ResponseCode] = ResponseCode.OK
+    """The response code (can be used for programatic error handling)"""
+
+    reason: Optional[str] = None
+    """The reason for the request failing (if any)"""
+
+    def error(self, status_code: int):
+        raise ResponseRaise(status_code, self) 
+
+    @staticmethod
+    def not_implemented():
+        Response(
+            done=False,
+            code=ResponseCode.UNKNOWN,
+            reason="This feature/endpoint is not implemented yet"
+        ).error(409) # Conflict
+
+class ResponseRaise(Exception):
+    """Raised via ``Response.error``"""
+    def __init__(self, status_code: int, response: Response):
+        self.status_code = status_code
+        self.response = response 
+
+class Permission(BaseModel):
+    """A permission for a staff member on the list"""
+    index: int
+    roles: list[int]
+    name: str
+
+    def __eq__(self, other: "Permission") -> bool:
+        if not isinstance(other, Permission):
+            return False
+        return self.index == other.index
+    
+    def __lt__(self, other: "Permission") -> bool:
+        if not isinstance(other, Permission):
+            return False
+        return self.index < other.index
+    
+    def __gt__(self, other: "Permission") -> bool:
+        if not isinstance(other, Permission):
+            return False
+        return self.index > other.index
+
+# Test model
+class NestedModel(BaseModel):
+    test: str
+    perms: Permission

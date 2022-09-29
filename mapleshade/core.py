@@ -10,8 +10,6 @@ import msgpack
 import aiohttp
 from cmarkgfm.cmark import Options as cmarkgfmOptions
 from maplecache import *
-from pydantic import BaseModel
-
 
 class SilverException(Exception):
     """Base exception for Silverpelt"""
@@ -35,26 +33,6 @@ class SilverNoData(SilverException):
     """Exception for when there is no data"""
     ...
 
-class Permission(BaseModel):
-    index: int
-    roles: list[int]
-    name: str
-
-    def __eq__(self, other: "Permission") -> bool:
-        if not isinstance(other, Permission):
-            return False
-        return self.index == other.index
-    
-    def __lt__(self, other: "Permission") -> bool:
-        if not isinstance(other, Permission):
-            return False
-        return self.index < other.index
-    
-    def __gt__(self, other: "Permission") -> bool:
-        if not isinstance(other, Permission):
-            return False
-        return self.index > other.index
-
 class Mapleshade:
     __slots__ = [
         "yaml",
@@ -77,11 +55,11 @@ class Mapleshade:
             self.config: dict[str, Any] = self.yaml.load(doc)
         
         self.perms = {
-            "default": Permission(index=0, roles=[], name="default"),
+            "default": models.Permission(index=0, roles=[], name="default"),
         }
 
         for name, perm in self.config["perms"].items():
-            self.perms[name] = Permission(
+            self.perms[name] = models.Permission(
                 index=perm["index"],
                 roles=perm["roles"],
                 name=name
@@ -145,7 +123,7 @@ class Mapleshade:
             ],
         }
     
-    async def guppy(self, user_id: int) -> Permission:
+    async def guppy(self, user_id: int) -> models.Permission:
         """Guppy: (Get User Permissions Pretty Please You!"""
         try:
             user_roles: list[int] = await self.silverpelt_req(f"roles/{self.config['main_server']}/{user_id}")

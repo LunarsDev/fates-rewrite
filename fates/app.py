@@ -1,5 +1,5 @@
 import uuid
-from fates import models
+from fates import models, consts
 from fates.auth import auth
 from fates.decorators import Ratelimit, SharedRatelimit, route, Route, Method, nop
 from . import tables
@@ -14,10 +14,9 @@ from starlette.routing import Mount
 from piccolo_admin.endpoints import create_admin
 from piccolo.engine import engine_finder
 
-from mapleshade import SilverNoData, Mapleshade, Permission
+from mapleshade import SilverNoData, Mapleshade
 import silverpelt.types.types as silver_types
 import orjson
-from pydantic import BaseModel
 
 mapleshade = Mapleshade()
 
@@ -58,6 +57,25 @@ app = FastAPI(
     docs_url=None,
     description="\n\n".join(docs),
 )
+
+@app.exception_handler(404)
+async def not_found(_: Request, exc: HTTPException):
+    return ORJSONResponse(
+        models.Response(
+            done=False,
+            reason=exc.detail,
+            code=consts.DEFAULT_EXC.get(exc.status_code, models.ResponseCode.UNKNOWN)
+        ).dict(),
+        status_code=exc.status_code,
+    )
+
+
+@app.exception_handler(models.ResponseRaise)
+async def unicorn_exception_handler(_: Request, exc: models.ResponseRaise):
+    return ORJSONResponse(
+        status_code=exc.status_code,
+        content=exc.response.dict(),
+    )
 
 @app.middleware("http")
 async def cors(request: Request, call_next):
@@ -111,35 +129,32 @@ Fetches a random 'snippet' from the list.
 - reroll: Whether to reroll and bypass cache (default: false)
     """
 
-    nop(request)
+    nop(request)        
 
-    if target_type != models.TargetType.Bot:
-        raise HTTPException(400, "Not yet implemented")
-
-    if target_type == models.TargetType.User:
-        raise HTTPException(400, detail="User snippets are not supported *yet*")
-
-    if not reroll:
-        if cached := mapleshade.cache.get("random-bot"):
-            return cached.value()
-    flag = 0
-    while flag < 10:
-        try:
-            v = (
-                await mapleshade.to_snippet(
-                    await models.augment(
-                        tables.Bots.select(*models.BOT_SNIPPET_COLS).where(
-                            tables.Bots.state == models.BotServerState.Certified
-                        ),
-                        "ORDER BY RANDOM() LIMIT 1",
+    if target_type == models.TargetType.Bot:
+        if not reroll:
+            if cached := mapleshade.cache.get("random-bot"):
+                return cached.value()
+        flag = 0
+        while flag < 10:
+            try:
+                v = (
+                    await mapleshade.to_snippet(
+                        await models.augment(
+                            tables.Bots.select(*models.BOT_SNIPPET_COLS).where(
+                                tables.Bots.state == models.BotServerState.Certified
+                            ),
+                            "ORDER BY RANDOM() LIMIT 1",
+                        )
                     )
-                )
-            )[0]
-            mapleshade.cache.set("random-bot", v, expiry=60 * 60 * 3)
-            return v
-        except Exception as exc:
-            print(exc)
-            flag += 1
+                )[0]
+                mapleshade.cache.set("random-bot", v, expiry=60 * 60 * 3)
+                return v
+            except Exception as exc:
+                print(exc)
+                flag += 1
+    else:
+        models.Response.not_implemented() # TODO: Implement this
 
 
 @route(
@@ -165,34 +180,34 @@ Fetches the index for a bot/server.
 
     nop(request)
 
-    if target_type != models.TargetType.Bot:
-        raise HTTPException(400, "Not yet implemented")
+    if target_type == models.TargetType.Bot:
+        if cached_index := mapleshade.cache.get("bot_index"):
+            return cached_index.value()
 
-    if cached_index := mapleshade.cache.get("bot_index"):
-        return cached_index.value()
-
-    index = models.Index(
-        top_voted=await mapleshade.to_snippet(
-            await tables.Bots.select(*models.BOT_SNIPPET_COLS)
-            .where(tables.Bots.state == models.BotServerState.Approved)
-            .order_by(tables.Bots.votes, ascending=False)
-            .limit(12)
-        ),
-        new=await mapleshade.to_snippet(
-            await tables.Bots.select(*models.BOT_SNIPPET_COLS)
-            .where(tables.Bots.state == models.BotServerState.Approved)
-            .order_by(tables.Bots.created_at, ascending=False)
-            .limit(12)
-        ),
-        certified=await mapleshade.to_snippet(
-            await tables.Bots.select(*models.BOT_SNIPPET_COLS)
-            .where(tables.Bots.state == models.BotServerState.Certified)
-            .order_by(tables.Bots.votes, ascending=False)
-            .limit(12)
-        ),
-    )
-    mapleshade.cache.set("bot_index", index, expiry=30)
-    return index
+        index = models.Index(
+            top_voted=await mapleshade.to_snippet(
+                await tables.Bots.select(*models.BOT_SNIPPET_COLS)
+                .where(tables.Bots.state == models.BotServerState.Approved)
+                .order_by(tables.Bots.votes, ascending=False)
+                .limit(12)
+            ),
+            new=await mapleshade.to_snippet(
+                await tables.Bots.select(*models.BOT_SNIPPET_COLS)
+                .where(tables.Bots.state == models.BotServerState.Approved)
+                .order_by(tables.Bots.created_at, ascending=False)
+                .limit(12)
+            ),
+            certified=await mapleshade.to_snippet(
+                await tables.Bots.select(*models.BOT_SNIPPET_COLS)
+                .where(tables.Bots.state == models.BotServerState.Certified)
+                .order_by(tables.Bots.votes, ascending=False)
+                .limit(12)
+            ),
+        )
+        mapleshade.cache.set("bot_index", index, expiry=30)
+        return index
+    else:
+        models.Response.not_implemented() # TODO: Implement this
 
 
 @route(
@@ -221,7 +236,11 @@ Gets a bot based on its ``bot_id``
 
     bot = await mapleshade.bot(bot_id)
     if not bot:
-        raise HTTPException(status_code=404, detail="Not Found")
+        models.Response(
+            done=False,
+            reason="The specified bot could not be found",
+            code=models.ResponseCode.NOT_FOUND
+        ).error(404)
     return bot
 
 @route(
@@ -251,7 +270,11 @@ async def get_bot_invite(request: Request, bot_id: int):
     invite_url = await tables.Bots.select(tables.Bots.invite).where(tables.Bots.bot_id == bot_id).first()
 
     if not invite_url:
-        raise HTTPException(status_code=404, detail="Not Found")
+        models.Response(
+            done=False,
+            reason="The specified bot could not be found",
+            code=models.ResponseCode.NOT_FOUND
+        ).error(404)
     
     if request.headers.get("Frostpaw-Target") == "invite":
         await tables.Bots.update(invite_amount = tables.Bots.invite_amount + 1).where(tables.Bots.bot_id == bot_id)
@@ -289,6 +312,11 @@ async def get_bot_secrets(request: Request, bot_id: int, auth: models.AuthData =
 Returns the secrets of a bot (``api_token``, ``webhook`` and ``webhook_secret`` as of now)
     """
     if auth.auth_type != models.TargetType.User:
+        models.Response(
+            done=False,
+            reason="User-only endpoint",
+            code=models.ResponseCode.FORBIDDEN
+        ).error(401)
         raise HTTPException(401, "User-only endpoint")
     
     nop(request)
@@ -296,7 +324,11 @@ Returns the secrets of a bot (``api_token``, ``webhook`` and ``webhook_secret`` 
     bot_owners = await tables.BotOwner.select().where(tables.BotOwner.bot_id == bot_id)
 
     if not bot_owners:
-        raise HTTPException(status_code=404, detail="Not Found")
+        models.Response(
+            done=False,
+            reason="The specified bot could not be found",
+            code=models.ResponseCode.NOT_FOUND
+        ).error(404)
     
     flag = False
     for owner in bot_owners:
@@ -305,7 +337,11 @@ Returns the secrets of a bot (``api_token``, ``webhook`` and ``webhook_secret`` 
             break
     
     if not flag:
-        raise HTTPException(status_code=403, detail="Forbidden")
+        models.Response(
+            done=False,
+            reason="You are not an owner of this bot",
+            code=models.ResponseCode.FORBIDDEN
+        ).error(403)
     
     bot_secrets = await tables.Bots.select(tables.Bots.webhook, tables.Bots.webhook_secret, tables.Bots.api_token).where(tables.Bots.bot_id == bot_id).first()
 
@@ -379,7 +415,11 @@ Internally used for extra owners etc, this fetches a user from the Discord API h
     try:
         req = await mapleshade.silverpelt_req(f"users/{user_id}")
     except SilverNoData as e:
-        raise HTTPException(status_code=404, detail="Not Found") from e
+        models.Response(
+            done=False,
+            reason="The specified user could not be found on the Discord API",
+            code=models.ResponseCode.NOT_FOUND
+        ).error(404)
     return req
 
 @route(
@@ -426,7 +466,11 @@ async def get_code(request: Request, vanity: str):
     vanity = await tables.Vanity.select().where(WhereRaw("lower(vanity_url) = {}", vanity.lower())).first()
 
     if not vanity:
-        raise HTTPException(status_code=404, detail="Not Found")
+        models.Response(
+            done=False,
+            reason="The specified vanity could not be found",
+            code=models.ResponseCode.NOT_FOUND
+        ).error(404)
 
     vanity_map = {
         0: models.TargetType.Server,
@@ -437,7 +481,11 @@ async def get_code(request: Request, vanity: str):
     try:
         vanity["type"] = vanity_map[vanity["type"]]
     except KeyError:
-        raise HTTPException(status_code=500, detail="Unknown Vanity Type")
+        models.Response(
+            done=False,
+            reason="The specified vanity could not be resolved",
+            code=models.ResponseCode.INVALID_DATA
+        ).error(500)
     
     return models.Vanity(
         target_type=vanity["type"],
@@ -459,7 +507,11 @@ async def get_code(request: Request, vanity: str):
 async def get_oauth2(request: Request):
     """Returns the OAuth2 login URL to redirect to"""
     if not request.headers.get("Frostpaw-Server"):
-        raise HTTPException(400, "Missing Frostpaw-Server header")
+        models.Response(
+            done=False,
+            reason="This endpoint needs the Frostpaw-Server header to be set",
+            code=models.ResponseCode.INVALID_DATA
+        ).error(400)
     state = str(uuid.uuid4())
     return {
         "state": state,
@@ -493,7 +545,11 @@ async def login_user(request: Request, login: models.Login):
         oauth = await mapleshade.login(login.code, redirect_url)
     except Exception as e:
         print("Error logging in user", type(e), e)
-        raise HTTPException(status_code=400, detail=str(e))
+        models.Response(
+            done=False,
+            reason=f"An error occurred while logging in the user: {e}",
+            code=models.ResponseCode.INVALID_DATA
+        ).error(400)
     
     return oauth
 
@@ -502,7 +558,7 @@ async def login_user(request: Request, login: models.Login):
         app=app,
         mapleshade=mapleshade,
         url="/guppy",
-        response_model=Permission,
+        response_model=models.Permission,
         method=Method.get,
         tags=[tags.tests],
         ratelimit=SharedRatelimit.new("core")
@@ -515,24 +571,18 @@ async def guppy_test(request: Request, user_id: int):
 
     return await mapleshade.guppy(user_id)
 
-# Test model
-
-class NestedModel(BaseModel):
-    test: str
-    perms: Permission
-
 @route(
     Route(  
         app=app,
         mapleshade=mapleshade,
         url="/@test-tryitout/{user_id}/{a:path}",
-        response_model=Permission,
+        response_model=models.Permission,
         method=Method.put,
         tags=[tags.tests],
         ratelimit=SharedRatelimit.new("core")
     )
 )
-async def test_tio(request: Request, user_id: int, b: int, permission: NestedModel):
+async def test_tio(request: Request, user_id: int, b: int, permission:models.NestedModel):
     """Returns a users permissions on the list"""
 
     nop(request)

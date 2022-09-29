@@ -75,8 +75,6 @@ class __RouteData:
             list[int]: "list:text",
         }
 
-        print(v)
-
         return tio_types.get(v) or "text"
 
     def extract_bm(self, bm: BaseModel) -> dict[str, Any]:

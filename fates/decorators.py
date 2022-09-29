@@ -229,17 +229,15 @@ def route(route: Route):
             operation_id=func.__name__,
             responses={
                 404: {
-                    "model": models.Response(
-                        done=False,
-                        reason="Not found (or some other reason)"
-                    )
+                    "model": models.Response
                 },
                 400: {
-                    "model": models.Response(
-                        done=False,
-                        reason="Some reason why the request was bad"
-                    )
+                    "model": models.Response
                 },
+                409: {
+                    "description": "Not Implemented",
+                    "model": models.Response
+                }
             }
         )(custom_route)
 

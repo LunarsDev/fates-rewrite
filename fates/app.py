@@ -33,8 +33,8 @@ for obj in tables_dict.values():
 
 # Load all docs
 docs = []
-with open("docs/meta.json") as meta_f:
-    meta: list[str] = orjson.loads(meta_f.read())
+with open("docs/meta.yaml") as meta_f:
+    meta: list[str] = mapleshade.yaml.load(meta_f)
 
 for file_name in meta:
     with open(f"docs/{file_name}") as doc:

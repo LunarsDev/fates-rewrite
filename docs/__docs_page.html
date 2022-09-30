@@ -25,7 +25,14 @@
             }
         }    
 
-        handled = []
+        handled = new Map()
+
+        class TryItOut {
+            constructor(el) {
+                this.el = el
+                console.log("TryItOut", el)
+            }
+        }
 
         function handleTryItOut(el) {
             if(el.id in handled) {
@@ -33,8 +40,8 @@
             }
 
             console.log(el.id)
-            
-            handled.push(el.id)
+
+            handled.set(el.id, new TryItOut(el))
         }
 
 

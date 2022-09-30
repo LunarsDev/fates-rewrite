@@ -163,7 +163,7 @@ def route(route: Route):
 
         func.__doc__ += f"""
 
-<iframe style="width: 100%!important; height: 300px !important;" frameborder="0" src="{route.mapleshade.config['static']}/tryitout.html#{base64.urlsafe_b64encode(try_data).decode()}"></iframe>
+<div id="{func.__name__}" class="try-it-out" data-tryitout="{base64.urlsafe_b64encode(try_data).decode()}">
     """
 
         rmap: dict[Method, Type[__RouteProtocol]] = {

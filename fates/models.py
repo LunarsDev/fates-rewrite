@@ -369,7 +369,7 @@ class Response(BaseModel):
     """The reason for the request failing (if any)"""
 
     def error(self, status_code: int):
-        raise ResponseRaise(status_code, self) 
+        raise ResponseRaise(self, status_code) 
 
     @staticmethod
     def not_implemented():
@@ -381,7 +381,7 @@ class Response(BaseModel):
 
 class ResponseRaise(Exception):
     """Raised via ``Response.error``"""
-    def __init__(self, status_code: int, response: Response):
+    def __init__(self, response: Response, status_code: int):
         self.status_code = status_code
         self.response = response 
 

@@ -1,4 +1,5 @@
 - styles.html # Styles for the docs, must be top
 - policies.md
+- api-intro.md
 - api-versions.md
 - general-terms.md

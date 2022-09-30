@@ -20,7 +20,7 @@
 
 1. Run ``uvicorn silverpelt.app:app --port 3030`` to start silverpelt
 2. Then run ``uvicorn fates.app:app`` to start main API
-3. **Either use nginx to serve the ``static`` folder (for all static assets) *or* (for local development ONLY) edit ``static`` in config.yaml to point to http://localhost:3030 and run ``python3 -m http.server 3030`` in the ``static`` folder**
+3. **Either use nginx to serve the ``static`` folder (for all static assets) *or* (for local development ONLY) edit ``static`` in config.yaml to point to http://localhost:3030 and run ``python3 -m http.server 3030`` in the ``static`` folder**. This folder is not currently used.
 
 ## Database Seeding
 

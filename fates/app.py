@@ -1,4 +1,5 @@
 from fates import models, consts
+from fates import tags
 from fates.decorators import nop
 from . import tables
 import inspect
@@ -43,6 +44,7 @@ with open("docs/__docs_page.html") as dp:
 app = FastAPI(
     title="Fates List",
     default_response_class=ORJSONResponse,
+    openapi_tags=tags.tags_metadata,
     routes=[
         Mount(
             "/admin/",

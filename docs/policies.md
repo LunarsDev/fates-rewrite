@@ -66,8 +66,6 @@ These are some requirements we test for and require. Note that this list is **no
 
 </blockquote>
 
-<hr/>
-
 ## Certification Requirements
 
 This section includes the *additional* requirements for certification. This list builds *on top of* the above basic Bot Requirements
@@ -120,8 +118,6 @@ This section includes the *additional* requirements for certification. This list
 
 </blockquote>
 
-<hr/>
-
 ## Privacy Policies
 
 <blockquote class="quote">
@@ -171,8 +167,6 @@ This section includes the *additional* requirements for certification. This list
 17. Feel free to DM Rootspring#6701 if you have any questions.
 
 </blockquote>
-
-<hr/>
 
 ## Data Collection And Security
 
@@ -291,13 +285,21 @@ We are not affiliated with Discord Inc. or any of its partners or affiliates.
 
 </blockquote>
 
-<hr/>
-
 ## Data Actions
 
-We believe your data belongs to *you*
+We believe your data belongs to *you*.
 
-**These actions can only be done for your *own* user id for security purposes unless you are sudo on the list (which is our version of an owner)**
+Thats why we provide you with the ability to immediately request+recieve your data as well as delete it. We didn't do this just because of the GDPR. We promise!
+
+<blockquote class="quote info">
+
+### For your security...
+
+Actions related to your data can only be executed against your *own* user ID unless you are sudo on the list (which is our version of an owner) *and* have been explicitly requested for said action by the user.
+
+We use Discord Oauth2 to verify your identity.
+
+</blockquote>
 
 ### Request Data
 

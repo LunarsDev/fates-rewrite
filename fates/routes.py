@@ -405,7 +405,7 @@ async def get_code(request: Request, vanity: str):
         url="/oauth2",
         response_model=models.OAuth2Login,
         method=Method.get,
-        tags=[tags.internal],
+        tags=[tags.login],
         ratelimit=SharedRatelimit.new("core")
     )
 )
@@ -430,7 +430,7 @@ async def get_oauth2(request: Request):
         url="/oauth2",
         response_model=models.OauthUser,
         method=Method.post,
-        tags=[tags.internal],
+        tags=[tags.login],
         ratelimit=SharedRatelimit.new("core")
     )
 )

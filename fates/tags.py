@@ -4,6 +4,7 @@ bot = "Bot-related endpoints"
 tests = "Experimental test endpoints"
 login = "Login"
 generic = "Generic endpoints"
+user = "User-related endpoints"
 
 tags_metadata = [
     {
@@ -22,4 +23,8 @@ tags_metadata = [
         "name": generic,
         "description": "Generic endpoints that don't fit into any other category",
     },
+    {
+        "name": user,
+        "description": "Operations related to users",
+    }
 ]

@@ -285,7 +285,7 @@ func checkUserPermsView() {
 
 	// Get user perms
 	api.SetReason("Fetching user perms")
-	perms := api.GuppyTest(userId)
+	perms := api.CheckUserPermissions(userId)
 
 	// Output perms
 	ui.GreenText("User", userId, "has the following permission:\nName:", perms.Name, "\nRoles:", perms.Roles, "\nIndex (value):", perms.Index)

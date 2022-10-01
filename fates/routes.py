@@ -462,14 +462,14 @@ async def login_user(request: Request, login: models.Login):
     Route(  
         app=app,
         mapleshade=mapleshade,
-        url="/guppy",
+        url="/users/{user_id}/permissions",
         response_model=models.Permission,
         method=Method.get,
-        tags=[tags.tests],
+        tags=[tags.user],
         ratelimit=SharedRatelimit.new("core")
     )
 )
-async def guppy_test(request: Request, user_id: int):
+async def check_user_permissions(request: Request, user_id: int):
     """Returns a users permissions on the list"""
 
     nop(request)

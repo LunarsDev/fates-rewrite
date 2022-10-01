@@ -5,12 +5,12 @@ import (
 	"kitescratch/types"
 )
 
-func GuppyTest(userId string) types.Permission {
+func CheckUserPermissions(userId string) types.Permission {
 	var perm types.Permission
 
 	requests.RequestToStruct(requests.HTTPRequest{
 		Method: "GET",
-		Url:    "/guppy?user_id=" + userId,
+		Url:    "/users/" + userId + "/permissions",
 		Reason: Reason,
 	}, &perm)
 

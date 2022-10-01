@@ -13,7 +13,11 @@ tags_metadata = [
     },
     {
         "name": tests,
-        "description": "Experimental test endpoints",
+        "description": """Experimental test endpoints. 
+        
+These endpoints are not guaranteed to be stable and do not have to be implemented in any library/frontend 
+(eg: ``Kitescratch`` and ``Sunbeam`` (the website))
+""",
     },
     {
         "name": login,

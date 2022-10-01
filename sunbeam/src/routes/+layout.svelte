@@ -1,6 +1,6 @@
 <script lang="ts">
   export const prerender = true;
-  
+
   import Header from '$lib/header/Header.svelte';
 
   import navigationState from '$lib/navigationState';
@@ -88,7 +88,7 @@
     }
 
     docReady(llhandler);
-	  window.llhandler = llhandler
+    window.llhandler = llhandler;
   }
 
   $: {
@@ -119,7 +119,7 @@
         return {
           id: $page.data.user.id,
           token: $page.data.token,
-          apiUrl: api,
+          apiUrl: api
         };
       } else {
         return null;

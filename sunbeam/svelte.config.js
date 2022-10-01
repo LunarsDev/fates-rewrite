@@ -23,7 +23,7 @@ const config = {
     prerender: {
       enabled: false
     }
-  }, 
+  }
 };
 
 export default config;

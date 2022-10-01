@@ -22,7 +22,6 @@ func GetOauth2(frostpawServer string) types.Oauth2 {
 
 type LoginUserData struct {
 	Code                     string `json:"code"`
-	State                    string `json:"state"`
 	Frostpaw                 bool   `json:"frostpaw"`                    // Custom client or not
 	FrostpawBlood            string `json:"frostpaw_blood"`              // The custom client's ID
 	FrostpawClaw             string `json:"frostpaw_claw"`               // The custom client's secret

@@ -14,10 +14,10 @@ export async function load({ params, fetch, parent }) {
   let session = await parent();
 
   const res = await request(`${api}/code/${params.vanity}`, {
-    method: "GET",
+    method: 'GET',
     fetch: fetch,
     session: session,
-    endpointType: "user"
+    endpointType: 'user'
   });
 
   if (res.ok) {
@@ -25,9 +25,8 @@ export async function load({ params, fetch, parent }) {
     let id = data.target_id;
     let type = enums.TargetType[data.target_type];
 
-
     throw redirect(307, `/${type}/${id}/invite`);
   }
 
-  throw error(404, "Invalid Vanity")
+  throw error(404, 'Invalid Vanity');
 }

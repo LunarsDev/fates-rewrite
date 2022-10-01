@@ -297,7 +297,7 @@ Thats why we provide you with the ability to immediately request+recieve your da
 
 Actions related to your data can only be executed against your *own* user ID unless you are sudo on the list (which is our version of an owner) *and* have been explicitly requested for said action by the user.
 
-We use Discord Oauth2 to verify your identity.
+We use Discord Oauth2 to verify your identity. This internally creates a ``ticket`` which is then used to maintain progress updates on the request and to allow its usage even if you have been banned from the service.
 
 </blockquote>
 
@@ -305,7 +305,7 @@ We use Discord Oauth2 to verify your identity.
 
 Click "Request My Data" if you wish to request a copy of your data.
 
-<a href="{%sunbeam%}/frostpaw/data?act=request"><button class="doc-button">Request My Data</button></a>
+<button class="doc-button" onclick="dataAction(this, 'req')">Request My Data</button>
 
 ### Data Deletion Request
 
@@ -315,5 +315,6 @@ Click "Request My Data" if you wish to request a copy of your data.
 - **All votes you have ever made will be wiped. In the future, this *may* also trigger a 'data deletion webhook' to all voted bots**. This may lead to chargebacks or revoking of vote rewards from such bots.
 - Actual servers in server listing are not removed by a Data Deletion Request as we do not store such information regarding server owners/managers etc. due to privacy concerns (servers are *not* associated with their owners/admins/moderators on our database whatsoever and we do not store such information). Instead, server owners should use /delserver instead which permanently deletes the server from server listing.
 - This does not delete vote epoch which is temporary anyways which is removed after 8 hours automatically. This is to prevent abuse
+- If you are **global banned**, your data will be deleted, *but* a stub user entry (with default DB values only) will be created with the global ban set to prevent abuse
 
-<a href="{%sunbeam%}/frostpaw/data?act=delete"><button class="doc-button">Delete My Data</button></a>
+<button class="doc-button" onclick="dataAction(this, 'del')">Delete My Data</button>

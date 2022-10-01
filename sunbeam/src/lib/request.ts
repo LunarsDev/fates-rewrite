@@ -2,7 +2,7 @@ import { browser } from '$app/environment';
 import { api, origin } from './config';
 import { genError } from './strings';
 import * as logger from './logger';
-import Base64 from "./b64"
+import Base64 from './b64';
 import type { LayoutData } from '.svelte-kit/types/src/routes/$types';
 import { page } from '$app/stores';
 import { get } from 'svelte/store';
@@ -23,7 +23,7 @@ interface EntityAuth {
 
 type Headers = {
   [key: string]: any;
-}
+};
 
 interface AuthOptions {
   method: string;
@@ -32,7 +32,7 @@ interface AuthOptions {
   json?: any;
   fetch: any;
   session: LayoutData;
-  endpointType: "bot" | "server" | "user";
+  endpointType: 'bot' | 'server' | 'user';
   entityAuth?: EntityAuth;
   /** Does this request need auth, defaults to false if unset */
   auth?: boolean;
@@ -41,43 +41,50 @@ interface AuthOptions {
 
 // Authenticated fetch (should always be preferred to fetch)
 export async function request(url: string, options: AuthOptions): Promise<Response> {
-  if(options.auth === undefined) options.auth = false;
+  if (options.auth === undefined) options.auth = false;
 
-  if(!options.headers) {
-    options.headers = {}
+  if (!options.headers) {
+    options.headers = {};
   }
 
-  if(!options.fetch) {
-    throw new Error("No fetch function provided");
+  if (!options.fetch) {
+    throw new Error('No fetch function provided');
   }
 
-  logger.info("RequestHandler", `Fetching ${url} with method ${options.method} (auth: ${options.auth})`);
+  logger.info(
+    'RequestHandler',
+    `Fetching ${url} with method ${options.method} (auth: ${options.auth})`
+  );
 
   if (!options.session) {
-    throw new Error("Session is undefined");
+    throw new Error('Session is undefined');
   }
 
-  if(options.endpointType == "bot" || options.endpointType == "server") {
-    if(!options.entityAuth && options.auth) {
+  if (options.endpointType == 'bot' || options.endpointType == 'server') {
+    if (!options.entityAuth && options.auth) {
       throw new Error(`entityAuth must be included for bot endpoint ${url}`);
     }
-    options.headers["Frostpaw-Auth"] = `${options.endpointType}|${options.entityAuth.id}|${options.entityAuth.apiToken}`;
+    options.headers[
+      'Frostpaw-Auth'
+    ] = `${options.endpointType}|${options.entityAuth.id}|${options.entityAuth.apiToken}`;
   } else {
-    if(options.session.token) {
-      options.headers["Frostpaw-Auth"] = `${options.endpointType}|${options.session.user.id}|${options.session.token}`
+    if (options.session.token) {
+      options.headers[
+        'Frostpaw-Auth'
+      ] = `${options.endpointType}|${options.session.user.id}|${options.session.token}`;
     }
   }
 
-  if(options.auth && !options.headers["Frostpaw-Auth"]) {
-    throw new Error("Could not set required authentication?");
+  if (options.auth && !options.headers['Frostpaw-Auth']) {
+    throw new Error('Could not set required authentication?');
   }
-  
-  options.headers["Origin"] = origin;
-  options.headers["Content-Type"] = "application/json";
 
-  if(options.json) {
-    if(options.body) {
-      throw new Error("Cannot specify both body and json");
+  options.headers['Origin'] = origin;
+  options.headers['Content-Type'] = 'application/json';
+
+  if (options.json) {
+    if (options.body) {
+      throw new Error('Cannot specify both body and json');
     }
 
     options.body = JSON.stringify(options.json);
@@ -87,15 +94,15 @@ export async function request(url: string, options: AuthOptions): Promise<Respon
     let res: Response = await options.fetch(url, {
       method: options.method,
       headers: options.headers,
-      body: options.body,
+      body: options.body
     });
 
-    if(options.errorOnFail && !res.ok) {
+    if (options.errorOnFail && !res.ok) {
       let err = await res.text();
       throw new Error(err);
     }
 
-    return res
+    return res;
   } catch (err) {
     logger.error(err);
     throw new Error(`${err} (url: ${url})`);
@@ -124,17 +131,17 @@ export async function roll(type: string | number, session: any) {
   let res = await request(`${api}/random?target_type=${targetType}&reroll=true`, {
     method: 'GET',
     session: session,
-    endpointType: "user",
+    endpointType: 'user',
     auth: false,
     fetch: fetch
-  })
+  });
 
-  if(res.ok) {
-    return await res.json()
+  if (res.ok) {
+    return await res.json();
   }
 
-  alert("Error: " + res.status + " " + res.statusText + " " + res.url)
-  return null
+  alert('Error: ' + res.status + ' ' + res.statusText + ' ' + res.url);
+  return null;
 }
 
 export async function loginUser() {
@@ -149,7 +156,7 @@ export async function loginUser() {
     },
     session: get(page).data,
     auth: false,
-    endpointType: "user",
+    endpointType: 'user',
     fetch: fetch
   });
   const json = await res.json();
@@ -158,7 +165,9 @@ export async function loginUser() {
 
   modifier['version'] = 11;
 
-  window.location.href = `${json.url}&state=${json.state}.${Base64.encode(JSON.stringify(modifier))}`;
+  window.location.href = `${json.url}&state=${json.state}.${Base64.encode(
+    JSON.stringify(modifier)
+  )}`;
 }
 
 export function logoutUser() {
@@ -167,11 +176,7 @@ export function logoutUser() {
   ).toUTCString()};samesite=lax;priority=High`;
 }
 
-export async function voteHandler(
-  id: string,
-  test: boolean,
-  type: string
-) {
+export async function voteHandler(id: string, test: boolean, type: string) {
   if (!browser) {
     return;
   }
@@ -182,7 +187,7 @@ export async function voteHandler(
     method: 'PATCH',
     session: get(page).data,
     auth: true,
-    endpointType: "user",
+    endpointType: 'user',
     fetch: fetch
   });
   return res;
@@ -215,23 +220,21 @@ export async function addReviewHandler(
       upvotes: [],
       downvotes: [],
       votes: []
-    },
+    }
   };
 
   if (review_id) {
-    json["id"] = review_id;
+    json['id'] = review_id;
   }
 
-  return await request(
-    `${api}/reviews/${target_id}?target_type=${targetType}`, {
-      method: method,
-      body: JSON.stringify(json),
-      session: get(page).data,
-      auth: true,
-      endpointType: "user",
-      fetch: fetch
-    }
-  );
+  return await request(`${api}/reviews/${target_id}?target_type=${targetType}`, {
+    method: method,
+    body: JSON.stringify(json),
+    session: get(page).data,
+    auth: true,
+    endpointType: 'user',
+    fetch: fetch
+  });
 }
 
 export async function subNotifs(user_id: string, token: string) {
@@ -259,7 +262,7 @@ export async function subNotifs(user_id: string, token: string) {
     fetch: fetch,
     session: get(page).data,
     auth: true,
-    endpointType: "user"
+    endpointType: 'user'
   });
 
   if (!resp.ok) {
@@ -293,7 +296,7 @@ export async function subNotifs(user_id: string, token: string) {
     fetch: fetch,
     session: get(page).data,
     auth: true,
-    endpointType: "user"
+    endpointType: 'user'
   });
 
   if (!res.ok) {

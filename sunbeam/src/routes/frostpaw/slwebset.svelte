@@ -28,7 +28,7 @@
     let res = await fetch(`${apiUrl}/slwebset`, {
       method: 'POST',
       headers: {
-        'Content-Type': 'application/json',
+        'Content-Type': 'application/json'
       },
       body: JSON.stringify({
         value: (document.querySelector('#value') as HTMLInputElement).value,

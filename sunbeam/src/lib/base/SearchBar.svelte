@@ -1,14 +1,14 @@
 <script lang="ts">
-import { browser } from '$app/environment';
+  import { browser } from '$app/environment';
 
-import { apiUrl } from '$lib/config';
-    import { request } from '$lib/request';
-    import { page } from '$app/stores';
+  import { apiUrl } from '$lib/config';
+  import { request } from '$lib/request';
+  import { page } from '$app/stores';
 
   import FormInput from './FormInput.svelte';
-import SearchRes from './SearchRes.svelte';
+  import SearchRes from './SearchRes.svelte';
   import Tip from './Tip.svelte';
-    import { onMount } from 'svelte';
+  import { onMount } from 'svelte';
 
   let type: string;
   let query: string;
@@ -25,11 +25,11 @@ import SearchRes from './SearchRes.svelte';
       gc_from = parseInt(url.searchParams.get('gcf') || '1');
       gc_to = parseInt(url.searchParams.get('gct') || '-1');
 
-      if(query) {
-        searchBot()
+      if (query) {
+        searchBot();
       }
     }
-  })
+  });
 
   let searching = false;
 
@@ -42,17 +42,17 @@ import SearchRes from './SearchRes.svelte';
   }
 
   async function searchBot() {
-    if(!query) {
-      data = null
+    if (!query) {
+      data = null;
       let url = new URL(window.location.href);
       url.searchParams.delete('q');
       url.searchParams.delete('t');
       url.searchParams.delete('gcf');
       url.searchParams.delete('gct');
       window.history.replaceState({}, '', url.href);
-      setTimeout(() => window.llhandler(), 300)
-      return
-    }; // Don't search if query is empty
+      setTimeout(() => window.llhandler(), 300);
+      return;
+    } // Don't search if query is empty
 
     // update location silently to include new query params
     let url = new URL(window.location.href);
@@ -68,12 +68,12 @@ import SearchRes from './SearchRes.svelte';
       endpointType: 'user',
       auth: false,
       session: $page.data,
-      fetch: fetch,
+      fetch: fetch
     });
 
     data = await res.json();
-    searching = false
-    setTimeout(() => window.llhandler(), 300)
+    searching = false;
+    setTimeout(() => window.llhandler(), 300);
   }
 
   function castToEl(a: any): HTMLInputElement {
@@ -81,14 +81,16 @@ import SearchRes from './SearchRes.svelte';
   }
 </script>
 
-<p>{#if searching}Searching...{:else}&nbsp{/if}</p>
+<p>
+  {#if searching}Searching...{:else}&nbsp{/if}
+</p>
 
 <div class="search">
   <input
     type="text"
     on:input={(event) => {
-      query = castToEl(event.target).value
-      searchBot()
+      query = castToEl(event.target).value;
+      searchBot();
     }}
     id="search-bar"
     class="form-control fform search"
@@ -104,8 +106,8 @@ import SearchRes from './SearchRes.svelte';
     <FormInput
       formclass="filter-inp filter-inp-left"
       oninput={(event) => {
-        gc_from = parseInt(castToEl(event.target).value) || -1
-        searchBot()
+        gc_from = parseInt(castToEl(event.target).value) || -1;
+        searchBot();
       }}
       id="gcf"
       name="From:"
@@ -116,8 +118,8 @@ import SearchRes from './SearchRes.svelte';
     <FormInput
       formclass="filter-inp filter-inp-right"
       oninput={(event) => {
-        gc_to = parseInt(castToEl(event.target).value) || -1
-        searchBot()
+        gc_to = parseInt(castToEl(event.target).value) || -1;
+        searchBot();
       }}
       id="gct"
       name="To:"
@@ -128,8 +130,8 @@ import SearchRes from './SearchRes.svelte';
 
     <h3>Display Order</h3>
     <Tip>
-      First display is either 'bot', 'server', 'pack' or 'profile' and chooses whether you want
-      bots first or servers first!
+      First display is either 'bot', 'server', 'pack' or 'profile' and chooses whether you want bots
+      first or servers first!
     </Tip>
     <FormInput
       onkeyup={keyHandle}

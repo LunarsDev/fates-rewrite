@@ -8,7 +8,7 @@
   import { genError } from '$lib/strings';
   import * as logger from '$lib/logger';
   import { enums } from '$lib/enums/enums';
-import Icon from '@iconify/svelte';
+  import Icon from '@iconify/svelte';
 
   export let review: any;
   export let index: number;
@@ -47,7 +47,7 @@ import Icon from '@iconify/svelte';
     let res = await request(`${api}/reviews/${reviewID}/votes`, {
       method: 'PATCH',
       body: JSON.stringify({ upvote: upvote, user_id: userID }),
-      endpointType: "user",
+      endpointType: 'user',
       session: $page.data,
       fetch: fetch
     });
@@ -73,13 +73,7 @@ import Icon from '@iconify/svelte';
     let reviewText = document.querySelector(`#review-${review.id}-reply`) as HTMLInputElement;
     let starRating = document.querySelector(`#rating-${review.id}-reply`) as HTMLInputElement;
 
-    let res = await addReviewHandler(
-      targetId,
-      targetType,
-      id,
-      reviewText.value,
-      starRating.value
-    );
+    let res = await addReviewHandler(targetId, targetType, id, reviewText.value, starRating.value);
     $navigationState = 'loaded';
 
     $navigationState = 'loaded';
@@ -156,7 +150,7 @@ import Icon from '@iconify/svelte';
 
     let res = await request(`${api}/reviews/${review.id}?user_id=${userID}&target_type=${type}`, {
       method: 'DELETE',
-      endpointType: "user",
+      endpointType: 'user',
       session: $page.data,
       fetch: fetch
     });
@@ -213,13 +207,13 @@ import Icon from '@iconify/svelte';
           <span class="white">{review.user.username}</span>
         </a>
         <span style="margin-right: 6px" />
-		<span on:click={() => voteReview(review.id, true)} class="cursor-pointer">
-			<Icon icon={"bx:upvote"} />
-		</span>
+        <span on:click={() => voteReview(review.id, true)} class="cursor-pointer">
+          <Icon icon={'bx:upvote'} />
+        </span>
         <span class="white">{review.votes.upvotes.length - review.votes.downvotes.length}</span>
-		<span on:click={() => voteReview(review.id, false)} class="cursor-pointer">
-			<Icon icon={"bx:downvote"} />
-		</span>
+        <span on:click={() => voteReview(review.id, false)} class="cursor-pointer">
+          <Icon icon={'bx:downvote'} />
+        </span>
         <span class="white" style="font-weight: bold">
           <i class="material-icons">star</i>
           <span>{Number(parseFloat(review.star_rating)).toFixed(1)}/10.0</span>

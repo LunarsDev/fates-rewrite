@@ -1,5 +1,5 @@
 <script lang="ts">
-    import * as logger from '$lib/logger';
+  import * as logger from '$lib/logger';
 
   let className: string = '';
   export { className as class };
@@ -42,8 +42,8 @@
   export let touch: boolean = false;
   export let variant: string = '';
 
-  if(variant) {
-    logger.info("Button", "touch and variant is deprecated. Please remove it.", touch, variant);
+  if (variant) {
+    logger.info('Button', 'touch and variant is deprecated. Please remove it.', touch, variant);
   }
 
   style += `--clickcolor: ${butClickColor}`;

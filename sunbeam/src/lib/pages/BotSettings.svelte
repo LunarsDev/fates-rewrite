@@ -595,7 +595,7 @@
     let bot = {};
     let errorFields = [];
 
-	logger.info("MultiSelect", selectedFeatures, selectedTags);
+    logger.info('MultiSelect', selectedFeatures, selectedTags);
 
     try {
       $inputstore.forEach((field) => {
@@ -960,51 +960,58 @@
     extraOwners = extraOwners; // Rerender
   }
 
-  let tagOptions: Option[] = []
+  let tagOptions: Option[] = [];
 
   context.tags.forEach((tag) => {
-	tagOptions.push({
-		value: tag.id,
-		label: tag.name,
-	})
-  })
+    tagOptions.push({
+      value: tag.id,
+      label: tag.name
+    });
+  });
 
   let featureOptions: Option[] = [];
 
   context.features.forEach((feature) => {
-	featureOptions.push({
-		value: feature.id,
-		label: feature.name,
-	})
-  })
+    featureOptions.push({
+      value: feature.id,
+      label: feature.name
+    });
+  });
 
-  logger.info("tagOpts", tagOptions)
+  logger.info('tagOpts', tagOptions);
 
   let selectedTags = [];
   let selectedFeatures = [];
 
-  if(mode == "edit") {
-	data.tags.forEach((tag) => {
-		selectedTags.push({
-			value: tag.id,
-			label: tag.name,
-		})
-	})
+  if (mode == 'edit') {
+    data.tags.forEach((tag) => {
+      selectedTags.push({
+        value: tag.id,
+        label: tag.name
+      });
+    });
 
-	data.features.forEach((feature) => {
-		selectedFeatures.push({
-			value: feature.id,
-			label: feature.name,
-		})
-	})
+    data.features.forEach((feature) => {
+      selectedFeatures.push({
+        value: feature.id,
+        label: feature.name
+      });
+    });
   }
 
   function generateSecret(length) {
-    return window.btoa(Array.from(crypto.getRandomValues(new Uint8Array(length * 2))).map((b) => String.fromCharCode(b)).join("")).replace(/[+/]/g, "").substring(0, length);
+    return window
+      .btoa(
+        Array.from(crypto.getRandomValues(new Uint8Array(length * 2)))
+          .map((b) => String.fromCharCode(b))
+          .join('')
+      )
+      .replace(/[+/]/g, '')
+      .substring(0, length);
   }
 
   function castAnyToInputEl(el: any): HTMLInputElement {
-    return el
+    return el;
   }
 </script>
 
@@ -1073,15 +1080,13 @@
         href={'javascript:void(0)'}
         onclick={showBotToken}
         class="button"
-        id="bot-token-show-btn"
-    ><span class="regen-btn">{showBtn}</span></Button
+        id="bot-token-show-btn"><span class="regen-btn">{showBtn}</span></Button
       >
       <Button
         href={'javascript:void(0)'}
         onclick={regenBotToken}
         class="button danger"
-        id="bot-token-regen-btn"
-    	><span class="regen-btn">Regenerate</span></Button
+        id="bot-token-regen-btn"><span class="regen-btn">Regenerate</span></Button
       >
 
       <h2>Action Logs</h2>
@@ -1111,9 +1116,7 @@
             style="width: 100%"
             placeholder="I feel like my bot was {enums.BotState[data.state]}.../I fixed all the..."
           />
-          <Button href={'#'} onclick={appealBot} class="button" id="appeal" 
-            >Send Appeal</Button
-          >
+          <Button href={'#'} onclick={appealBot} class="button" id="appeal">Send Appeal</Button>
         </div>
       {:else}
         <p class="white">All good! You have no critical actions pending (or pending approval)</p>
@@ -1145,9 +1148,7 @@
         placeholder="Optional"
         type="number"
       /><br />
-      <Button href={'#'} onclick={postStats} class="button" id="post-stats" 
-        >Post Stats</Button
-      >
+      <Button href={'#'} onclick={postStats} class="button" id="post-stats">Post Stats</Button>
 
       <h3 class="white section">Add a command</h3>
       <Tip>
@@ -1226,12 +1227,7 @@
       <Checkbox id="command-premium-only" data={false}>Premium Only</Checkbox>
       <Checkbox id="command-nsfw" data={false}>NSFW</Checkbox>
 
-      <Button
-        href={'#'}
-        onclick={createCommand}
-        class="button"
-        id="create-resource"
-        touch
+      <Button href={'#'} onclick={createCommand} class="button" id="create-resource" touch
         >Add Command</Button
       >
 
@@ -1257,8 +1253,7 @@
         onclick={requestCertification}
         class="button"
         id="request-certification"
-        touch
-        >Request Certification</Button
+        touch>Request Certification</Button
       >
       <h3 class="white section">Delete Bot</h3>
       <Tip icon="jam:triangle-danger-f" alertClass="tip-red alert-info">
@@ -1292,13 +1287,7 @@
       type="number"
       data={data.client_id}
     />
-    <Button
-      href={'#'}
-      onclick={autofillBot}
-      class="button"
-      id="autofill-bot"
-      touch
-      >Autofill</Button
+    <Button href={'#'} onclick={autofillBot} class="button" id="autofill-bot" touch>Autofill</Button
     ><br /><br />
     <h2>Extra Owners</h2>
     <section class="grid grid-cols-4 gap-6 ext-owners">
@@ -1389,15 +1378,22 @@
       required={true}
     />
     <label for="tags">Tags <RedStar /></label>
-    <MultiSelect options={tagOptions} id="tags" bind:selected={selectedTags} --sms-li-active-bg="#4f4242" --sms-options-bg="black" --sms-selected-bg="#423838" />
+    <MultiSelect
+      options={tagOptions}
+      id="tags"
+      bind:selected={selectedTags}
+      --sms-li-active-bg="#4f4242"
+      --sms-options-bg="black"
+      --sms-selected-bg="#423838"
+    />
     <label for="features">Features</label>
     <MultiSelect
       options={featureOptions}
       id="features"
       bind:selected={selectedFeatures}
-	  --sms-li-active-bg="#4f4242" 
-	  --sms-options-bg="black"
-	  --sms-selected-bg="#423838"
+      --sms-li-active-bg="#4f4242"
+      --sms-options-bg="black"
+      --sms-selected-bg="#423838"
     />
     <label for="site-lang">Long Description Type</label>
     <select name="long_description_type" id="long_description_type">
@@ -1460,9 +1456,9 @@
     />
     <Tip>
       API Token is used as the webhook secret if you do not set a webhook secret below. It is
-      recommended to use a webhook secret if you are a large bot. Using 'Create Secret For Me'
-      is highly recommended unless you can be certain that your secret is secure, it uses the 
-      Web Crypto API to generate a cryptographically secure secret.
+      recommended to use a webhook secret if you are a large bot. Using 'Create Secret For Me' is
+      highly recommended unless you can be certain that your secret is secure, it uses the Web
+      Crypto API to generate a cryptographically secure secret.
     </Tip>
     <FormInput
       name="Webhook Secret"
@@ -1470,10 +1466,12 @@
       placeholder="Make sure that this is random and secure!"
       data={data.webhook_secret}
     />
-    <Button onclick={() => {
-      let secret = generateSecret(96)
-      castAnyToInputEl(document.querySelector("#webhook_secret")).value = secret
-    }}>Create Secret For Me</Button>
+    <Button
+      onclick={() => {
+        let secret = generateSecret(96);
+        castAnyToInputEl(document.querySelector('#webhook_secret')).value = secret;
+      }}>Create Secret For Me</Button
+    >
     <Tip>
       HMAC request signing can be more secure than just a 'Authorization' header. This is
       recommended for large bots. Once you have enabled HMAC, it is a good idea to tick this option
@@ -1482,9 +1480,7 @@
     <Checkbox id="webhook_hmac_only" data={data.webhook_hmac_only}
       >HMAC Only (no 'Authorization' header)</Checkbox
     >
-    <Button href={'#'} onclick={sendTestWebhook} class="button" id="submit" 
-      >Test Webhook</Button
-    >
+    <Button href={'#'} onclick={sendTestWebhook} class="button" id="submit">Test Webhook</Button>
     <Tip>
       Didn't get anything? Make sure you have <em>saved</em> your bot first before clicking Test Webhook.
       Also check your firewall and network settings as well!
@@ -1577,13 +1573,7 @@
   </section>
 </Tab>
 <div class="center">
-  <Button
-    href={'#'}
-    onclick={updateBot}
-    class="button btn-save"
-    id="submit"
-    touch
-    >{saveTxt}</Button
+  <Button href={'#'} onclick={updateBot} class="button btn-save" id="submit" touch>{saveTxt}</Button
   >
 </div>
 <pre>{popUpMsg}</pre>

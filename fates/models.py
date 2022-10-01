@@ -81,6 +81,36 @@ class Entity:
             return self.id == getattr(other, "id", None)
         return self.id == other
 
+class Permission(BaseModel):
+    """A permission for a staff member on the list"""
+    index: int
+    roles: list[str]
+    name: str
+
+    def __eq__(self, other: "Permission") -> bool:
+        if not isinstance(other, Permission):
+            return False
+        return self.index == other.index
+    
+    def __lt__(self, other: "Permission") -> bool:
+        if not isinstance(other, Permission):
+            return False
+        return self.index < other.index
+    
+    def __gt__(self, other: "Permission") -> bool:
+        if not isinstance(other, Permission):
+            return False
+        return self.index > other.index
+    
+    def __le__(self, other: "Permission") -> bool:
+        if not isinstance(other, Permission):
+            return False
+        return self.index <= other.index
+    
+    def __ge__(self, other: "Permission") -> bool:
+        if not isinstance(other, Permission):
+            return False
+        return self.index >= other.index
 
 class Tag(BaseModel, Entity):
     """Represents a tag"""
@@ -310,8 +340,8 @@ class Login(BaseModel):
     code: str
     """The Discord OAuth2 code"""
 
-    state: Optional[str] = None
-    """The Discord OAuth2 state"""
+    em: bool
+    """Whether or not we are in a emergency action"""
 
 class OauthUser(BaseModel):
     """OAuth2 login response"""
@@ -320,13 +350,10 @@ class OauthUser(BaseModel):
     """The user's state"""
 
     token: str
-    """The user's token"""
+    """The user's token. If in data_action login mode, this will be the ticket for the action instead"""
 
     user: silver_types.DiscordUser
     """The user's user object"""
-
-    refresh_token: Optional[str] = None
-    """The user's refresh token"""
 
     site_lang: str
     """The user's site language"""
@@ -336,6 +363,9 @@ class OauthUser(BaseModel):
 
     user_experiments: list[UserExperiment]
     """The user's experiments"""
+
+    permissions: Permission
+    """The user's permissions"""
 
 class OAuth2Login(BaseModel):
     """OAuth2 login response"""
@@ -388,27 +418,6 @@ class ResponseRaise(Exception):
     def __init__(self, response: Response, status_code: int):
         self.status_code = status_code
         self.response = response 
-
-class Permission(BaseModel):
-    """A permission for a staff member on the list"""
-    index: int
-    roles: list[str]
-    name: str
-
-    def __eq__(self, other: "Permission") -> bool:
-        if not isinstance(other, Permission):
-            return False
-        return self.index == other.index
-    
-    def __lt__(self, other: "Permission") -> bool:
-        if not isinstance(other, Permission):
-            return False
-        return self.index < other.index
-    
-    def __gt__(self, other: "Permission") -> bool:
-        if not isinstance(other, Permission):
-            return False
-        return self.index > other.index
 
 # Test model
 class NestedModel(BaseModel):

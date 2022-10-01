@@ -37,8 +37,8 @@
     }
 
     let res = await request(url, {
-      method: "GET",
-      endpointType: "user",
+      method: 'GET',
+      endpointType: 'user',
       session: $page.data,
       fetch: fetch
     });
@@ -69,7 +69,7 @@
         setTimeout(setupInputs, 300);
       }
 
-      let sliderEl = slider[i] as HTMLInputElement
+      let sliderEl = slider[i] as HTMLInputElement;
 
       if (outputId == 'rating-desc-avg') {
         // Special case

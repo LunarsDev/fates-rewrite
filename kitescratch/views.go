@@ -264,8 +264,7 @@ func loginView() {
 	// RN, only do a normal auth, frostpaw auth is *NOT* needed
 	api.SetReason("Exchanging login code for token")
 	token := api.LoginUser("http://localhost:5001", api.LoginUserData{
-		Code:  login.code,
-		State: login.state,
+		Code: login.code,
 	})
 
 	ui.GreenText("\nAuth Done!")

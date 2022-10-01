@@ -1,12 +1,12 @@
 <script lang="ts">
-    import Section from "./Section.svelte";
-    import CardContainer from "../cards/CardContainer.svelte";
-    import BotCard from "../cards/BotCard.svelte";
-    import BotPack from "../base/BotPack.svelte";
-    import Tag from "../base/Tag.svelte";
+  import Section from './Section.svelte';
+  import CardContainer from '../cards/CardContainer.svelte';
+  import BotCard from '../cards/BotCard.svelte';
+  import BotPack from '../base/BotPack.svelte';
+  import Tag from '../base/Tag.svelte';
 
-    export let targetType: string;
-    export let data: any;
+  export let targetType: string;
+  export let data: any;
 </script>
 
 <!--First Display-->

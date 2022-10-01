@@ -43,6 +43,20 @@ Then, pen ``psql``, then run the following:
 
 ## Developer Docs
 
+### Oauth2
+
+In order for login to work, ``<YOUR DOMAIN>/frostpaw/login`` must be set in Discord Developer Portal as a Redirect URL for the Fates List bot configured in the ``secrets`` portion of ``config.yaml``.
+
+The ``state`` sent by the ``Get Oauth2`` API is generic for normal logins. There *are* two special state values that are special-cased in ``Sunbeam``:
+
+- ``api`` -> Used for a API internal login to get a user token
+- ``api-em`` -> Used for a API internal login for a emergency action (such as a GDPR data action etc.)
+
+### Emergency Action mode
+
+The ``em`` mode available by this API is to allow data actions such as requests and 
+deletions to be done without the need of a user token (to allow for global banned users to be able to delete their data)
+
 ### Routes
 
 A simple route on Fates List would look like this:
@@ -144,3 +158,4 @@ This is the source code for [Fates List](https://fateslist.xyz/)
 ## Custom Clients
 
 Custom clients are supported however you are responsible for keeping them up-to-date. **See Kitescratch for a good example of how to do this**
+

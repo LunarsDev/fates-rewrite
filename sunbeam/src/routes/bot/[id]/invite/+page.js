@@ -1,6 +1,6 @@
 import { api } from '$lib/config';
 import * as logger from '$lib/logger';
-  import { request } from '$lib/request';
+import { request } from '$lib/request';
 import { redirect, error } from '@sveltejs/kit';
 
 /** @type {import('./$types').PageLoad} */
@@ -13,7 +13,7 @@ export async function load({ params, fetch, parent }) {
     },
     endpointType: 'user',
     session: session,
-    fetch: fetch,
+    fetch: fetch
   });
   let inviteJson = await inviteUrl.json();
 
@@ -22,11 +22,6 @@ export async function load({ params, fetch, parent }) {
   }
 
   // JS and URLS do not go well together
-  logger.info(
-    'BotInvite',
-    'Parsed invite info',
-    inviteJson,
-    decodeURIComponent(inviteJson.invite)
-  );
-  throw redirect(307, decodeURIComponent(inviteJson.invite))
+  logger.info('BotInvite', 'Parsed invite info', inviteJson, decodeURIComponent(inviteJson.invite));
+  throw redirect(307, decodeURIComponent(inviteJson.invite));
 }

@@ -60,6 +60,16 @@
                 min-height: 0 !important;
                 padding: 0 !important;
             }
+
+            input, .choices__inner {
+                border: 1px solid #ccc;
+                border-radius: 4px;
+                padding: 5px;
+                width: 300px;
+                height: 30px;
+                background-color:white !important;
+                opacity: 1 !important;
+            }
         </style>
     </head>
     <redoc spec-url='/openapi.json'></redoc>
@@ -76,7 +86,68 @@
             } else {
                 document.addEventListener("DOMContentLoaded", fn);
             }
-        }    
+        }   
+
+        let sunbeamUrl = "{%sunbeam%}"
+        let clientId = "{%clientId%}"
+        
+        // LoginUser API
+        function loginUser(el, state, callback) {
+            if(!state) {
+                throw new Error("State is required");
+            }
+
+            // Create a iframe to https://fateslist.xyz to get the user token
+            let loginWindow = window.open(`https://discord.com/api/oauth2/authorize?client_id=${clientId}&redirect_uri=${sunbeamUrl}/frostpaw/login&response_type=code&scope=identify&state=${state}`);
+            
+            window.loginCallback = callback
+        }
+        window.addEventListener("message", (evt) => {
+            if(evt.origin != sunbeamUrl) return;
+            evt.source.close()
+            window.loginCallback(JSON.parse(atob(evt.data)))
+        })
+
+        // Data Action start
+        function dataAction(el, mode) {
+            if(window.dataActionSelected) {
+                alert("You have already selected an action")
+                return
+            }
+            loginUser(el, 'api-em', (user) => {
+                console.log(user)
+                let userIdInp = document.createElement("input")
+                userIdInp.id = "userId-da"
+                let userIdFor = document.createElement("label")
+                userIdFor.htmlFor = "userId-da"
+
+                userIdFor.innerText = "Enter User ID"
+                userIdInp.value = user.user.id
+
+                let actionDiv = document.createElement("div")
+                actionDiv.appendChild(userIdFor)
+                actionDiv.appendChild(userIdInp)
+                el.parentElement.appendChild(actionDiv)
+                el.parentElement.removeChild(el);
+
+                window.dataActionSelected = mode
+
+                let submitBtn = document.createElement("button")
+                submitBtn.innerText = "Submit"
+                submitBtn.onclick = () => {
+                    let userId = document.getElementById("userId-da").value
+                    fetch(`/data/${userId}?em_token=${user.token}&mode=${window.dataActionSelected}`).then(res => res.json()).then(res => {
+                        if(res.error) {
+                            alert(res.error)
+                        } else {
+                            alert("Success")
+                        }
+                    })
+                }
+
+                actionDiv.appendChild(submitBtn)
+            })
+        }
 
         String.prototype.toTitle = function() {
             return this.replaceAll("_", "").replace(/(^|\s)\S/g, function(t) { return t.toUpperCase() });

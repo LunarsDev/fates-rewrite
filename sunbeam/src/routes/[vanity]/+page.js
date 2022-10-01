@@ -14,10 +14,10 @@ export async function load({ params, fetch, parent }) {
   let session = await parent();
 
   const res = await request(`${api}/code/${params.vanity}`, {
-    method: "GET",
+    method: 'GET',
     fetch: fetch,
     session: session,
-    endpointType: "user"
+    endpointType: 'user'
   });
 
   if (res.ok) {
@@ -26,23 +26,23 @@ export async function load({ params, fetch, parent }) {
     let type = enums.TargetType[data.target_type];
 
     const pageRes = await request(`${api}/${type}/${id}`, {
-        method: "GET",
-        fetch: fetch,
-        session: session,
-        endpointType: "user"
-    })
+      method: 'GET',
+      fetch: fetch,
+      session: session,
+      endpointType: 'user'
+    });
 
     if (pageRes.ok) {
       let pageData = await pageRes.json();
       logger.info('Index', 'Index page data is: ', pageData);
       return {
-          data: pageData,
-          type: type
+        data: pageData,
+        type: type
       };
     }
 
-    throw error(pageRes.status, "Invalid Vanity")
+    throw error(pageRes.status, 'Invalid Vanity');
   }
 
-  throw error(404, "Invalid Vanity")
+  throw error(404, 'Invalid Vanity');
 }

@@ -7,8 +7,8 @@
   import BristlefrostMeta from '$lib/base/BristlefrostMeta.svelte';
   import Section from '$lib/base/Section.svelte';
   import Intl from '$lib/base/Intl.svelte';
-    import RandomCard from '$lib/base/RandomCard.svelte';
-  export let data: { index: any, random: any };
+  import RandomCard from '$lib/base/RandomCard.svelte';
+  export let data: { index: any; random: any };
 
   let searchData: any = null;
 </script>
@@ -25,7 +25,7 @@
   <h2 class="best-bots"><Intl key="index.best_bots" /></h2>
 </section>
 
-<SearchBar bind:data={searchData}/>
+<SearchBar bind:data={searchData} />
 
 {#if !searchData}
   <Tag targetType="bot" tags={data.index.tags} />

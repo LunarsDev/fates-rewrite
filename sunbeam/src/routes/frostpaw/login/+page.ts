@@ -1,12 +1,11 @@
-  import { request } from '$lib/request';
-  import { enums } from '$lib/enums/enums';
-  import Base64 from "$lib/b64";
-  import { error } from '@sveltejs/kit';
+import { request } from '$lib/request';
+import { enums } from '$lib/enums/enums';
+import Base64 from '$lib/b64';
+import { error } from '@sveltejs/kit';
 import { info } from '$lib/logger';
 import { api } from '$lib/config';
 
 export const prerender = false;
-
 
 /** @type {import('./$types').PageLoad} */
 export async function load({ parent, fetch }) {
@@ -32,53 +31,60 @@ export async function load({ parent, fetch }) {
     };
   }
 
-  let stateSplit = state.split('.');
-
-  if (stateSplit.length != 2) {
-    return {
-      error: 'Invalid state'
-    };
-  }
-
-  let nonce = stateSplit[0];
-  let modifier = stateSplit[1];
-
   let modifierInfo = {};
 
-  info("Login", Base64.decode(modifier))
+  let em = false
 
-  try {
-    modifierInfo = JSON.parse(Base64.decode(modifier));
-  } catch (e) {
-    return {
-      error: 'Invalid modifier info'
-    };
-  }
+  if(state == "api" || state == "api-em") {
+    em = (state == "api-em")
+    state = "api"
+  } else {
+    let stateSplit = state.split('.');
 
-  if (modifierInfo['state'] != nonce) {
-    return {
-      error: 'Invalid nonce'
-    };
-  }
+    if (stateSplit.length != 2) {
+      return {
+        error: 'Invalid state'
+      };
+    }
 
-  if (modifierInfo['version'] != 11) {
-    return {
-      error: 'Invalid login request, please try logging in again!!!'
-    };
+    let nonce = stateSplit[0];
+    let modifier = stateSplit[1];
+
+    info('Login', Base64.decode(modifier));
+
+    try {
+      modifierInfo = JSON.parse(Base64.decode(modifier));
+    } catch (e) {
+      return {
+        error: 'Invalid modifier info'
+      };
+    }
+
+    if (modifierInfo['state'] != nonce) {
+      return {
+        error: 'Invalid nonce'
+      };
+    }
+
+    if (modifierInfo['version'] != 11) {
+      return {
+        error: 'Invalid login request, please try logging in again!!!'
+      };
+    }
   }
 
   let res = await request(`${api}/oauth2`, {
     method: 'POST',
     headers: {
-      'Frostpaw-Server': url.origin,
+      'Frostpaw-Server': url.origin
     },
     json: {
       code: code,
-      state: nonce,
+      em: em
     },
     session: session,
     fetch: fetch,
-    endpointType: "user"
+    endpointType: 'user'
   });
 
   let json = {};
@@ -104,6 +110,7 @@ export async function load({ parent, fetch }) {
   return {
     cookie: Base64.encode(JSON.stringify(json)),
     href: modifierInfo['href'] || '/',
+    state: state,
     modifier: modifierInfo
   };
 }

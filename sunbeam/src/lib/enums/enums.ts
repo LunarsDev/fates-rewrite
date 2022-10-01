@@ -107,9 +107,8 @@ export enum AlertInputType {
 export enum TargetType {
   Bot = 0,
   Server = 1,
-  User = 2,
+  User = 2
 }
-
 
 export const enums = {
   BotState: BotState,

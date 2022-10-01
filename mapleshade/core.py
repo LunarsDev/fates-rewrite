@@ -307,7 +307,7 @@ class Mapleshade:
     
     def gen_secret(self, n: int = 32) -> str:
         """Generates a secret"""
-        bytes(random.choices(string.ascii_uppercase.encode('ascii'),k=n)).decode('ascii')
+        return bytes(random.choices(string.ascii_letters.encode('ascii'),k=n)).decode('ascii')
 
 
     async def login(self, code: str, redirect_url: str) -> models.OauthUser:
@@ -360,7 +360,8 @@ class Mapleshade:
                     username=duser["username"],
                     user_css="",
                     site_lang="en",
-                    api_token=self.gen_secret(128)
+                    api_token=self.gen_secret(128),
+                    permissions=await self.guppy(duser['id'])
                 )
             )
 
@@ -380,8 +381,8 @@ class Mapleshade:
             state=list_data["state"],
             token=list_data["api_token"],
             user=user,
-            refresh_token=None,
             site_lang=list_data["site_lang"],
             css=list_data["user_css"],
             user_experiments=models.DEFAULT_USER_EXPERIMENTS + list_data["experiments"],
+            permissions=await self.guppy(duser['id'])
         )

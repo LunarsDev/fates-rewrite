@@ -36,10 +36,16 @@ for file_name in meta:
             doc.read()
             .replace("{%static%}", mapleshade.config["static"])
             .replace("{%sunbeam%}", mapleshade.config["sunbeam"])
+            .replace("{%clientId%}", str(mapleshade.config["secrets"]["client_id"]))
         )
 
 with open("docs/__docs_page.html") as dp:
-    docs_page = dp.read()
+    docs_page = (
+        dp.read()
+        .replace("{%static%}", mapleshade.config["static"])
+        .replace("{%sunbeam%}", mapleshade.config["sunbeam"])
+        .replace("{%clientId%}", str(mapleshade.config["secrets"]["client_id"]))
+    )
 
 app = FastAPI(
     title="Fates List",

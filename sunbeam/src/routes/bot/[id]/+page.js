@@ -9,17 +9,17 @@ export async function load({ parent, params, fetch }) {
 
   let auth = '';
 
-  let session = null
-  let res = null
+  let session = null;
+  let res = null;
 
   session = await parent();
 
   res = await request(`${api}${url}`, {
-    method: "GET",
+    method: 'GET',
     session: session,
-    endpointType: "user",
-    fetch: fetch,
-  })
+    endpointType: 'user',
+    fetch: fetch
+  });
 
   if (res.ok) {
     let data = await res.json();
@@ -28,5 +28,5 @@ export async function load({ parent, params, fetch }) {
     };
   }
 
-  throw error(404, "Bot Not Found")
+  throw error(404, 'Bot Not Found');
 }

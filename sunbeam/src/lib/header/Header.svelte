@@ -232,7 +232,9 @@
       <li class:active={$page.url.pathname === '/servers'}>
         <a data-sveltekit-prefetch href="/servers">Servers</a>
       </li>
-      <li class:active={$page.url.pathname === '/'}><a data-sveltekit-prefetch href="/">Bots</a></li>
+      <li class:active={$page.url.pathname === '/'}>
+        <a data-sveltekit-prefetch href="/">Bots</a>
+      </li>
     </ul>
   </nav>
   <nav class="corner-two">

@@ -2,5 +2,5 @@ import { redirect } from '@sveltejs/kit';
 
 /** @type {import('./$types').PageLoad} */
 export async function load() {
-  throw redirect(307, 'https://fateslist.xyz/frostpaw/add-bot')
+  throw redirect(307, 'https://fateslist.xyz/frostpaw/add-bot');
 }

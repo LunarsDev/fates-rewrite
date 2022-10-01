@@ -12,7 +12,7 @@
     }
     let tagsRes = await fetch('/meta', {
       headers: {
-        origin: origin,
+        origin: origin
       }
     });
     if (!tagsRes.ok) {

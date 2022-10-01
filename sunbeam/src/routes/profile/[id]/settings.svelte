@@ -315,20 +315,10 @@
       it and make sure it doesn't happen again!
     </p>
     <pre id="user-token-field">{userToken}</pre>
-    <Button
-      href={'#'}
-      onclick={showUserToken}
-      class="button"
-      id="user-token-show-btn"
-      touch
+    <Button href={'#'} onclick={showUserToken} class="button" id="user-token-show-btn" touch
       >Show</Button
     >
-    <Button
-      href={'#'}
-      onclick={regenUserToken}
-      class="button"
-      id="user-token-regen-btn"
-      touch
+    <Button href={'#'} onclick={regenUserToken} class="button" id="user-token-regen-btn" touch
       >Regenerate</Button
     >
 
@@ -353,8 +343,7 @@
           class="button"
           id="danger-revoke-btn-{conn.client.id}"
           style="background-color: red"
-          touch
-          >Revoke</Button
+          touch>Revoke</Button
         >
       </div>
     {/each}
@@ -368,9 +357,7 @@
       Developer). Click here
     </p>
     <div id="new-roles" />
-    <Button href={'#'} onclick={getOldRoles} class="button" id="gor-btn" 
-      >Get Old Roles</Button
-    >
+    <Button href={'#'} onclick={getOldRoles} class="button" id="gor-btn">Get Old Roles</Button>
 
     <h2>Your Packs</h2>
     {#each data.packs as pack}
@@ -383,8 +370,7 @@
         }}
         class="button"
         id="del-bot-pack-btn"
-        touch
-        >Delete {pack.name}</Button
+        touch>Delete {pack.name}</Button
       >
     {/each}
     <h2>Profile Info</h2>
@@ -421,12 +407,7 @@
     />
     <label for="pack-bots">Bots (comma seperated)</label>
     <input id="pack-bots" name="pack-bots" class="fform" placeholder="10293,29392,39492 etc." />
-    <Button
-      href={'#'}
-      onclick={addBotPack}
-      class="button"
-      id="add-bot-pack-btn"
-      touch
+    <Button href={'#'} onclick={addBotPack} class="button" id="add-bot-pack-btn" touch
       >Add Pack</Button
     >
 
@@ -447,8 +428,7 @@
       }}
       class="button"
       id="del-bot-pack-btn"
-      touch
-      >Delete Pack</Button
+      touch>Delete Pack</Button
     >
   </section>
   <section id="basics-tab" class="tabcontent tabdesign">
@@ -510,12 +490,7 @@
     >
   </section>
 </Tab>
-<Button
-  href={'#'}
-  onclick={updateProfile}
-  class="button"
-  id="update-profile-btn"
-  touch
+<Button href={'#'} onclick={updateProfile} class="button" id="update-profile-btn" touch
   >Update Profile</Button
 >
 <pre>{popUpMsg}</pre>

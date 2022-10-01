@@ -9,7 +9,6 @@ interface UserInterface {
   avatar: string;
 }
 
-
 interface PageData {
   user: UserInterface;
   token: string;
@@ -31,19 +30,19 @@ declare global {
 
     interface Platform {}
 
-    interface PageData { 
+    interface PageData {
       user: UserInterface;
       token: string;
       css: string?;
       refresh_token: string?;
       user_experiments: number[];
       site_lang: string;
-      url: string
-    };
+      url: string;
+    }
 
     interface Error {
       message: string;
-    } 
+    }
 
     interface Stuff {}
   }

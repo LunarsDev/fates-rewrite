@@ -13,5 +13,5 @@
     "sourceMap": true,
     "strict": false
   },
-  "extends": "./.svelte-kit/tsconfig.json",
+  "extends": "./.svelte-kit/tsconfig.json"
 }

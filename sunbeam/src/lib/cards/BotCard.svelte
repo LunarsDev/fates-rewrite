@@ -12,11 +12,11 @@
   if (data.id && !data.user) {
     data.user = { id: data.id };
   }
-  
+
   data.banner = data.banner_card || `${apiUrl}/static/assets/prod/banner.webp?v=2`;
 
-  if(data.description && data.description.length > 150) {
-	data.description = data.description.substring(0, 150) + '...';
+  if (data.description && data.description.length > 150) {
+    data.description = data.description.substring(0, 150) + '...';
   }
 </script>
 

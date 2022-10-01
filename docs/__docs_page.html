@@ -4,17 +4,37 @@
         <meta charset="utf-8">
         <meta name="viewport" content="width=device-width, initial-scale=1">
         <link href="https://fonts.googleapis.com/css?family=Montserrat:300,400,700|Roboto:300,400,700" rel="stylesheet">
+        <link
+            rel="stylesheet"
+            href="https://cdn.jsdelivr.net/npm/choices.js/public/assets/styles/choices.min.css"
+        />    
         <style>
             body {
                 margin: 0;
                 padding: 0;
+            }
+
+            .tio-label {
+                font-family: Roboto, sans-serif;
+                font-weight: bold;
+                font-size: 14px;
+                line-height: 1.5em;
+                color: rgb(51, 51, 51);
+                -webkit-font-smoothing: antialiased;
+                text-size-adjust: 100%;
+                text-rendering: optimizespeed !important;
+                margin-right: 5px;
+                padding: 0;
+                margin-top: 0;
             }
         </style>
     </head>
     <redoc spec-url='/openapi.json'></redoc>
     <script src="https://cdn.jsdelivr.net/npm/redoc@2.0.0/bundles/redoc.standalone.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/insertion-query@1.1.0/insQ.min.js"></script>
-    <!--<script>
+
+    <script src="https://cdn.jsdelivr.net/npm/choices.js/public/assets/scripts/choices.min.js"></script>  
+    <script>
         function docReady(fn) {
             // see if DOM is already available
             if (document.readyState === "complete" || document.readyState === "interactive") {
@@ -25,13 +45,127 @@
             }
         }    
 
+        String.prototype.toTitle = function() {
+            return this.replaceAll("_", "").replace(/(^|\s)\S/g, function(t) { return t.toUpperCase() });
+        };
+
         handled = new Map()
 
         class TryItOut {
             constructor(el) {
                 this.el = el
-                console.log("TryItOut", el)
+                this.tidDat = JSON.parse(atob(el.getAttribute('data-tryitout')))
+
+                console.log("TryItOut", el, this.tidDat)
+
+                this.el.innerHTML = `
+<h3>Try it out</h3>
+
+<div id=${this.tidDat.name}-body></div>
+                `
+
+                if(Object.keys(this.tidDat.body).length > 0) {
+                    console.warn("Got body: ", this.tidDat.body)
+                    
+                    document.querySelector(`#${this.tidDat.name}-body`).innerHTML = "<h3>Body</h3>"
+
+                    this.addAtLevel(`${this.tidDat.name}-body`, this.tidDat.body);
+                }
             }
+
+            handleList(id, k, type) {
+                let baseType = type.split(":")[1];
+                let choiceEl = document.createElement("input");
+                choiceEl.id = k;
+                choiceEl.type = "text";
+
+                let label = document.createElement("label");
+                label.classList.add("tio-label")
+
+                label.innerText = k.toTitle();
+
+                let div = document.createElement("div");
+                div.classList.add("choice-div");
+                div.appendChild(label);
+                div.appendChild(choiceEl);
+
+                document.getElementById(id).appendChild(div);
+
+                let choices = new Choices(choiceEl, {
+                    allowHTML: true,
+                    items: [],
+                    choices: [],
+                    delimiter: ',',
+                    editItems: true,
+                    removeItemButton: true,
+                    renderSelectedChoices: 'auto',
+                    paste: true,
+                    searchEnabled: true,
+                    searchChoices: true,
+                    placeholder: true,
+                    addItemText: (value) => {
+                        return `Press Enter to add <b>"${value}"</b>`;
+                    },
+                    maxItemText: (maxItemCount) => {
+                        return `Only ${maxItemCount} values can be added`;
+                    },
+                    valueComparer: (value1, value2) => {
+                        return value1 === value2;
+                    },
+                    labelId: '',
+                    callbackOnInit: null,
+                    callbackOnCreateTemplates: null
+                })
+            }
+
+            addAtLevel(id, level) {
+                // Loop over body and add to body as inputs
+                for(var key in level) {
+                    if(key == "_nested") {
+                        continue
+                    }
+
+                    if(level[key]._nested) {
+                        console.log("Handling nested")
+                        let h3 = document.createElement("h4");
+                        h3.innerText = key.toTitle();
+                        document.getElementById(id).appendChild(h3);
+                        this.addAtLevel(id, level[key]);
+                        continue;
+                    }
+
+                    console.log(key)
+
+                    var val = level[key];
+
+                    let el = document.createElement("div");
+                    el.classList.add("input")
+
+                    let label = document.createElement("label");
+                    label.classList.add("tio-label")
+                    label.innerText = key.toTitle();
+                    label.htmlFor = id + "-" + "key";
+                    el.appendChild(label);
+
+                    console.log(val, level)
+
+                    if(val.startsWith("list")) {
+                        this.handleList(id, key, val)
+                        continue
+                    }
+
+                    let input = document.createElement("input");
+                    input.id = id + "-" + key;
+                    input.name = key;
+                    input.type = val;
+                    input.innerText = key.toTitle();
+                    input.placeholder = key.toTitle();
+                    el.appendChild(input);
+
+                    document.getElementById(id).appendChild(el);
+                }
+            }
+
         }
 
         function handleTryItOut(el) {
@@ -55,5 +189,5 @@
                 //callback
             });
         });
-    </script>-->
+    </script>
 </html>

@@ -117,12 +117,3 @@ async def docs():
 # Load all routes
 from fates import routes
 nop(routes)
-
-@app.get("/___", tags=["EOF"], responses={
-    200: {
-        "description": "This is the end of the documentation"
-    }
-})
-async def end_of_docs():
-    """Sometimes redoc does not handle end of list entries well. This is a dummy endpoint to resolve redoc"""
-    raise HTTPException(404, detail="Not Found")

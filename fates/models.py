@@ -289,6 +289,10 @@ class AuthData(BaseModel):
     token: str
     compat: bool
 
+class AuthDataHTTPResponse(AuthData):
+    """AuthData struct for HTTP responses"""
+    target_id: str
+
 class Vanity(BaseModel):
     """Represents a vanity"""
     target_id: str

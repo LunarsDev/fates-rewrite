@@ -261,7 +261,7 @@ Returns the secrets of a bot (``api_token``, ``webhook`` and ``webhook_secret`` 
         app=app,
         mapleshade=mapleshade,
         url="/@auth",
-        response_model=models.AuthData,
+        response_model=models.AuthDataHTTPResponse,
         method=Method.get,
         tags=[tags.generic],
         ratelimit=SharedRatelimit.new("core"),
@@ -364,7 +364,7 @@ async def get_meta(request: Request):
         ratelimit=SharedRatelimit.new("core")
     )
 )
-async def get_code(request: Request, vanity: str):
+async def resolve_vanity(request: Request, vanity: str):
     """Resolves a vanity based on the code"""
 
     nop(request)

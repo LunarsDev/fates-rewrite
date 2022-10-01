@@ -258,3 +258,10 @@ type Permission struct {
 	Roles []int  `json:"roles"`
 	Name  string `json:"name"`
 }
+
+type AuthCheck struct {
+	AuthType TargetType `json:"auth_type"`
+	TargetID string     `json:"target_id"`
+	Token    string     `json:"token"`
+	Compat   bool       `json:"compat"`
+}

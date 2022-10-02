@@ -341,3 +341,66 @@ func viewTaskView() {
 
 	ui.BlueText(task)
 }
+
+func viewBotView() {
+	// Get bot ID
+	botId := ui.AskInput("Enter the bot ID to view")
+
+	// Get bot
+	api.SetReason("Fetching bot")
+	bot := api.GetBot(botId)
+
+	ui.PageOutput(renderers.RenderMap(bot))
+}
+
+func viewBotInvView() {
+	// Get bot ID
+	botId := ui.AskInput("Enter the bot ID to view")
+
+	// Get bot
+	api.SetReason("Fetching bot")
+	bot := api.GetBotInvite(botId)
+
+	ui.PageOutput(bot.Invite)
+}
+
+func viewBotSecretsView() {
+	// Get bot ID
+	botId := ui.AskInput("Enter the bot ID to view")
+
+	// Get bot
+	api.SetReason("Fetching bot")
+	bot := api.GetBotSecrets(botId)
+
+	ui.PurpleText("API Token: " + bot.APIToken + "\nWebhook: " + bot.Webhook + "\nWebhook Secret: " + bot.WebhookSecret)
+}
+
+func checkAuthView() {
+	api.SetReason("Verifying auth with API")
+
+	authDat := api.CheckAuthHeader(state.GlobalState.Auth)
+
+	ui.GreenText("API verified auth as", authDat.TargetID, "(compat:", authDat.Compat, ")")
+}
+
+func dataActionView() {
+	userId := ui.AskInput("Enter the user ID to perform the action on")
+	action := ui.AskInput("What action (req/del)")
+
+	var mode types.DataAction
+
+	if action == "req" {
+		api.SetReason("Requesting data for user")
+		mode = types.DataActionRequest
+	} else if action == "del" {
+		api.SetReason("Deleting data for user")
+		mode = types.DataActionDelete
+	} else {
+		ui.RedText("Invalid action")
+		return
+	}
+
+	act := api.PerformDataAction(userId, mode)
+
+	ui.GreenText("Action performed and got task ID of", act.TaskID)
+}

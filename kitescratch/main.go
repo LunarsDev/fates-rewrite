@@ -2,7 +2,6 @@ package main
 
 import (
 	"fmt"
-	"kitescratch/api"
 	"kitescratch/state"
 	"kitescratch/ui"
 	"net/http"
@@ -69,9 +68,7 @@ func mainMenu() {
 					Char: "VA",
 					Text: "Verify Auth With API",
 					Handler: func() error {
-						api.SetReason("Verifying auth with API")
-						authDat := api.CheckAuthHeader(state.GlobalState.Auth)
-						ui.GreenText("API verified auth as", authDat.TargetID, "(compat:", authDat.Compat, ")")
+						checkAuthView()
 						return nil
 					},
 				},
@@ -129,6 +126,38 @@ func mainMenu() {
 				Char: "FT",
 				Handler: func() error {
 					viewTaskView()
+					return nil
+				},
+			},
+			{
+				Text: "Perform a data action",
+				Char: "PDA",
+				Handler: func() error {
+					dataActionView()
+					return nil
+				},
+			},
+			{
+				Text: "Fetch a bot",
+				Char: "FB",
+				Handler: func() error {
+					viewBotView()
+					return nil
+				},
+			},
+			{
+				Text: "Fetch a bot's invite",
+				Char: "FBI",
+				Handler: func() error {
+					viewBotInvView()
+					return nil
+				},
+			},
+			{
+				Text: "Fetch a bot's secrets",
+				Char: "FBS",
+				Handler: func() error {
+					viewBotSecretsView()
 					return nil
 				},
 			},

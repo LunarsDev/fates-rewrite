@@ -270,3 +270,24 @@ type AuthCheck struct {
 	Token    string     `json:"token"`
 	Compat   bool       `json:"compat"`
 }
+
+type DataAction string
+
+const (
+	DataActionRequest DataAction = "req"
+	DataActionDelete  DataAction = "upd"
+)
+
+type DataResponse struct {
+	TaskID string `json:"task_id"`
+}
+
+type Invite struct {
+	Invite string `json:"invite"`
+}
+
+type BotSecrets struct {
+	APIToken      string `json:"api_token"`
+	Webhook       string `json:"webhook"`
+	WebhookSecret string `json:"webhook_secret"`
+}

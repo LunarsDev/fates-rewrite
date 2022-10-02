@@ -9,7 +9,7 @@ from enum import IntEnum
 from pydantic import BaseModel
 from inspect import signature
 from fates import models, consts
-from mapleshade import Mapleshade
+from fates.mapleshade import Mapleshade
 import base64
 import orjson
 import asyncpg

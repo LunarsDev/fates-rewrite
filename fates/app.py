@@ -10,7 +10,7 @@ from starlette.routing import Mount
 from piccolo_admin.endpoints import create_admin
 from piccolo.engine import engine_finder
 
-from mapleshade import Mapleshade
+from fates.mapleshade import Mapleshade
 
 mapleshade = Mapleshade()
 

@@ -1,6 +1,7 @@
+"""The Mapleshade class contains a set of common primitives for the Fates List backend"""
 import random
 import string
-from typing import Any, Optional, Union
+from typing import Any, Optional
 from fates import tables, models
 from ruamel.yaml import YAML
 import orjson

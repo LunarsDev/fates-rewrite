@@ -10,15 +10,12 @@ from piccolo.columns.column_types import JSONB
 from piccolo.columns.column_types import Numeric
 from piccolo.columns.column_types import Serial
 from piccolo.columns.column_types import Text
-from piccolo.columns.column_types import Timestamp
 from piccolo.columns.column_types import Timestamptz
 from piccolo.columns.column_types import UUID
-from piccolo.columns.column_types import Varchar
 from piccolo.columns.defaults.interval import IntervalCustom
-from piccolo.columns.defaults.timestamp import TimestampNow
 from piccolo.columns.defaults.timestamptz import TimestamptzNow
 from piccolo.columns.defaults.uuid import UUID4
-from piccolo.table import Table, Column
+from piccolo.table import Table
 from decimal import Decimal
 import secrets
 from fates import enums

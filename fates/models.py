@@ -4,7 +4,6 @@ from .tables import BotCommands, Bots, Users, UserBotLogs
 from piccolo.utils.pydantic import create_pydantic_model
 from piccolo.query import Select
 from pydantic import BaseModel
-from fastapi import HTTPException
 import silverpelt.types.types as silver_types
 from fates.enums import *
 

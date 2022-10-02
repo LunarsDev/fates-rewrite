@@ -1,14 +1,13 @@
-from typing import Optional
 import uuid
 from fates import models
 from fates.auth import auth
 from fates.decorators import Ratelimit, SharedRatelimit, route, Route, Method, nop
 from . import tables
 from . import tags
-from fastapi import HTTPException, Request, Depends
+from fastapi import Request, Depends
 from piccolo.columns.combination import WhereRaw
 
-from mapleshade import SilverNoData
+from fates.mapleshade import SilverNoData
 import silverpelt.types.types as silver_types
 from fates.app import app, mapleshade
 

@@ -177,3 +177,12 @@ class UserExperiment(IntEnum):
 
     DevPortal = 6
     """The ability for users to access the dev portal. This needs explicit whitelisting and cannot be rolled out"""
+
+class DataAction(Enum):
+    """Data actions"""
+
+    Request = "req"
+    """Unknown action"""
+
+    Delete = "del"
+    """Create action"""

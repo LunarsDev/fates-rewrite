@@ -505,7 +505,7 @@ async def test_tio(request: Request, user_id: int, b: int, permission:models.Nes
         ratelimit=SharedRatelimit.new("core")
     )
 )
-async def perform_data_action(request: Request, user_id: int, mode: str, auth: models.AuthData = Depends(auth)):
+async def perform_data_action(request: Request, user_id: int, mode: models.DataAction, auth: models.AuthData = Depends(auth)):
     """
 Performs a GDPR data action on a user
 
@@ -526,6 +526,6 @@ Performs a GDPR data action on a user
     if perms < mapleshade.perms["sudo"] and user_id != auth.target_id:
         models.Response(
             done=False,
-            reason="You can't use this endpoint on someone elses data",
+            reason="You can't use this endpoint on someone else's data",
             code=models.ResponseCode.INVALID_DATA
         ).error(400)

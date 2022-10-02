@@ -168,9 +168,9 @@ Gets a bot based on its ``bot_id``
 )
 async def get_bot_invite(request: Request, bot_id: int):
     """
-    Gets the invite for a bot.
+Gets the invite for a bot.
 
-    If ``Frostpaw-Target`` is set to ``invite``, then this also updates invite_amount
+If ``Frostpaw-Target`` is set to ``invite``, then this also updates invite_amount
     """
 
     nop(request)

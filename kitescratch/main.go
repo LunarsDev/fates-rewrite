@@ -125,6 +125,14 @@ func mainMenu() {
 				},
 			},
 			{
+				Text: "Fetch a task",
+				Char: "FT",
+				Handler: func() error {
+					viewTaskView()
+					return nil
+				},
+			},
+			{
 				Text: "Check config",
 				Char: "C",
 				Handler: func() error {

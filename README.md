@@ -12,6 +12,11 @@
 - ``Sunbeam`` - Fates List Frontend
 - ``Kitescratch`` - A simple CLI for Fates List (mostly for development, but may become full cli-only replacement for sunbeam (one day?))
 
+## Commits
+
+- **All commits made to this repo must pass the tests present in ``tests`` folder 
+(run ``python3 tests/run_tests.py``)
+
 ## Requirements
 
 - Python 3.10+
@@ -43,7 +48,11 @@ Then, pen ``psql``, then run the following:
 
 ## Developer Docs
 
-### Notes on docs
+### Kitescratch
+
+- All API routes in ``fates`` must be implemented in ``api`` (and if possible, in ``views``)
+
+### API Docs
 
 - All styles should be in ``docs/styles.html`` *only*. This is to ensure that other users using the OpenAPI
 specification also get decent styling (if their OpenAPI client supports CSS)

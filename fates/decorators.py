@@ -7,13 +7,15 @@ from fastapi import FastAPI, Request, HTTPException
 from fastapi.responses import ORJSONResponse
 from fastapi.params import Depends as DependsType
 from enum import IntEnum
-from pydantic import BaseModel
+from pydantic import BaseModel, validator
 from inspect import signature
 from fates import models, consts
 from fates.mapleshade import Mapleshade
 import base64
 import orjson
 import asyncpg
+
+from fates.tags import Tag
 
 class Method(IntEnum):
     get = 0
@@ -52,12 +54,18 @@ class Route(BaseModel):
     url: str
     response_model: Any
     method: Method
-    tags: list[str]
+    tags: list[Tag]
     ratelimit: Ratelimit # We don't actually ratelimit yet, this is for forwards-compat
     auth: Optional[models.TargetType | bool] = None # Either None, a target type or true (for all)
 
     class Config:
         arbitrary_types_allowed = True
+
+    @validator("tags")
+    def tag_length(cls, v):
+        if len(v) > 1:
+            raise ValueError("A route can only have 1 tags")
+        return v
 
 class __RouteData:
     """Internal class for handling routes"""
@@ -225,7 +233,7 @@ def route(route: Route):
         rmap[route.method](
             route.url, 
             response_model=route.response_model, 
-            tags=route.tags,
+            tags=[tag.fname for tag in route.tags],
             operation_id=func.__name__,
             responses={
                 404: {

@@ -92,3 +92,15 @@ func GetAllPermissions() types.PermissionList {
 
 	return perms
 }
+
+func GetTask(taskId string) any {
+	var task any
+
+	requests.RequestToStruct(requests.HTTPRequest{
+		Method: "GET",
+		Url:    "/tasks/" + taskId,
+		Reason: Reason,
+	}, &task)
+
+	return task
+}

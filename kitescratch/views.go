@@ -330,3 +330,14 @@ func listPermsView() {
 
 	ui.GreenText(outputStr)
 }
+
+func viewTaskView() {
+	// Get task ID
+	taskId := ui.AskInput("Enter the task ID to view")
+
+	// Get task
+	api.SetReason("Fetching task")
+	task := api.GetTask(taskId)
+
+	ui.BlueText(task)
+}

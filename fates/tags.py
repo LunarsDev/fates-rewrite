@@ -1,19 +1,28 @@
 # Doc tags
 
-bot = "Bot-related endpoints"
-tests = "Experimental test endpoints"
-login = "Login"
-generic = "Generic endpoints"
-user = "User-related endpoints"
-data = "Data-related endpoints"
+from pydantic import BaseModel
+
+class Tag(BaseModel):
+    name: str
+    """The internal name of tag"""
+
+    fname: str
+    """The external name presented on API docs"""
+
+bot = Tag(name="bot", fname="Bot-related endpoints")
+tests = Tag(name="tests", fname="Experimental test endpoints")
+login = Tag(name="login", fname="Login")
+generic = Tag(name="generic", fname="Generic endpoints")
+user = Tag(name="user", fname="User-related endpoints")
+data = Tag(name="data", fname="Data-related endpoints")
 
 tags_metadata = [
     {
-        "name": bot,
+        "name": bot.fname,
         "description": "Operations related to bots",
     },
     {
-        "name": tests,
+        "name": tests.fname,
         "description": """Experimental test endpoints. 
         
 These endpoints are not guaranteed to be stable and do not have to be implemented in any library/frontend 
@@ -21,19 +30,20 @@ These endpoints are not guaranteed to be stable and do not have to be implemente
 """,
     },
     {
-        "name": login,
+        "name": login.fname,
         "description": "Login-related endpoints",
     },
     {
-        "name": generic,
+        "name": generic.fname,
         "description": "Generic endpoints that don't fit into any other category",
     },
     {
-        "name": user,
+        "name": user.fname,
         "description": "Operations related to users",
     },
     {
-        "name": data,
+        "name": data.fname,
         "description": "Operations related to data (user data, to be specific)",
     },
 ]
+    

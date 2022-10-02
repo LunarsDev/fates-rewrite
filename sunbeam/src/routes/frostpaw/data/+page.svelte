@@ -45,7 +45,7 @@
       status = "Waiting for server to process your request..."
 
       let interval = setInterval(async () => {
-        let resp = await request(`${api}/tasks?task_id=${taskId}`, {
+        let resp = await request(`${api}/tasks/${taskId}`, {
           method: 'GET',
           session: $page.data,
           fetch: fetch,
@@ -77,7 +77,7 @@
   }
 </script>
 
-{status}
+<p>{status}</p>
 
 {#if $page.data.token}
 

@@ -376,7 +376,6 @@ class Mapleshade:
                     user_css="",
                     site_lang="en",
                     api_token=self.gen_secret(128),
-                    permissions=await self.guppy(duser['id'])
                 )
             )
 

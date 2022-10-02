@@ -7,6 +7,8 @@
 
   export let data: {all_permissions: any, action: string};
 
+  var status: string;
+
    if (!$page.data.token) {
     if (browser) {
       loginUser({
@@ -38,10 +40,44 @@
     } else {
       let json = await resp.json();
 
-      alert(json.task_id)
+      let taskId = json.task_id;
+
+      status = "Waiting for server to process your request..."
+
+      let interval = setInterval(async () => {
+        let resp = await request(`${api}/tasks?task_id=${taskId}`, {
+          method: 'GET',
+          session: $page.data,
+          fetch: fetch,
+          endpointType: "user"
+        });
+
+        if(!resp.ok) {
+          alert("Error: " + JSON.stringify(await resp.json()))
+        } else {
+          let data = await resp.text();
+
+          if(data != "running") {
+            clearInterval(interval);
+            status = "Done! Parsing result..."
+
+            if(act == "del") {
+              status = data
+            } else {
+              // Turn file into download
+              let a = document.createElement("a");
+              a.href = URL.createObjectURL(new Blob([data], {type: "text/plain"}));
+              a.download = `${userId}.json`;
+              a.click();
+            }
+          }
+        }
+      }, 1000)
     }
   }
 </script>
+
+{status}
 
 {#if $page.data.token}
 

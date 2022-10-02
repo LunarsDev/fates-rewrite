@@ -260,6 +260,10 @@ type Permission struct {
 	Name  string   `json:"name"`
 }
 
+type PermissionList struct {
+	Perms map[string]Permission `json:"perms"`
+}
+
 type AuthCheck struct {
 	AuthType TargetType `json:"auth_type"`
 	TargetID string     `json:"target_id"`

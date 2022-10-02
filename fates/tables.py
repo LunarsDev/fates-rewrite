@@ -723,44 +723,6 @@ class LynxData(Table, tablename="lynx_data"):
     )
 
 
-class LynxNotifications(Table, tablename="lynx_notifications"):
-    id = UUID(
-        default=UUID4(),
-        null=False,
-        primary_key=True,
-        unique=False,
-        secret=False,
-    )
-    acked_users = Array(
-        base_column=BigInt(),
-        null=False,
-        primary_key=False,
-        unique=False,
-        secret=False,
-    )
-    message = Text(
-        default="",
-        null=False,
-        primary_key=False,
-        unique=False,
-        secret=False,
-    )
-    type = Text(
-        default="",
-        null=False,
-        primary_key=False,
-        unique=False,
-        secret=False,
-    )
-    staff_only = Boolean(
-        default=False,
-        null=True,
-        primary_key=False,
-        unique=False,
-        secret=False,
-    )
-
-
 class LynxSurveys(Table, tablename="lynx_surveys"):
     id = UUID(
         default=UUID4(),

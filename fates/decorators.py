@@ -2,6 +2,7 @@ import datetime
 from functools import wraps
 import traceback
 from typing import Awaitable, Any, Optional, Protocol, Type, TypeVar
+import typing
 from fastapi import FastAPI, Request, HTTPException
 from fastapi.responses import ORJSONResponse
 from fastapi.params import Depends as DependsType
@@ -217,6 +218,9 @@ def route(route: Route):
                 )
 
             return res
+
+        if route.response_model == typing.Any:
+            route.response_model = None
 
         rmap[route.method](
             route.url, 

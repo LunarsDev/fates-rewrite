@@ -111,6 +111,9 @@ class Permission(BaseModel):
             return False
         return self.index >= other.index
 
+class PermissionList(BaseModel):
+    perms: dict[str, Permission]
+
 class Tag(BaseModel, Entity):
     """Represents a tag"""
 
@@ -419,3 +422,9 @@ class ResponseRaise(Exception):
 class NestedModel(BaseModel):
     test: str
     perms: Permission
+
+class TaskResponse(BaseModel):
+    """A created task response"""
+
+    task_id: str
+    """The task ID"""

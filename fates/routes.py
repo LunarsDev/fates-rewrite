@@ -1,10 +1,13 @@
+import asyncio
+import datetime
+from typing import Any
 import uuid
-from fates import models
+from fates import models, tasks
 from fates.auth import auth
 from fates.decorators import Ratelimit, SharedRatelimit, route, Route, Method, nop
 from . import tables
 from . import tags
-from fastapi import Request, Depends
+from fastapi import BackgroundTasks, Request, Depends
 from piccolo.columns.combination import WhereRaw
 
 from fates.mapleshade import SilverNoData
@@ -356,6 +359,53 @@ async def get_meta(request: Request):
     Route(  
         app=app,
         mapleshade=mapleshade,
+        url="/permissions",
+        response_model=models.PermissionList,
+        method=Method.get,
+        tags=[tags.generic],
+        ratelimit=SharedRatelimit.new("core")
+    )
+)
+async def get_all_permissions(request: Request):
+    """Returns all the permissions in the database"""
+
+    nop(request)
+
+    return models.PermissionList(
+        perms=mapleshade.perms
+    )
+
+@route(
+    Route(  
+        app=app,
+        mapleshade=mapleshade,
+        url="/tasks/{task_id}",
+        response_model=Any,
+        method=Method.get,
+        tags=[tags.generic],
+        ratelimit=SharedRatelimit.new("core")
+    )
+)
+async def get_task(request: Request, task_id: str):
+    """Returns the result of a task"""
+
+    nop(request)
+
+    task = mapleshade.cache.get(f"task-{task_id}")
+
+    if task is None:
+        models.Response(
+            done=False,
+            reason="The specified task could not be found",
+            code=models.ResponseCode.NOT_FOUND
+        ).error(404)
+
+    return task.value()
+
+@route(
+    Route(  
+        app=app,
+        mapleshade=mapleshade,
         url="/code/{vanity}",
         response_model=models.Vanity,
         method=Method.get,
@@ -498,13 +548,18 @@ async def test_tio(request: Request, user_id: int, b: int, permission:models.Nes
         app=app,
         mapleshade=mapleshade,
         url="/data",
-        response_model=models.Response,
+        response_model=models.TaskResponse,
         method=Method.get,
         tags=[tags.data],
         ratelimit=SharedRatelimit.new("core")
     )
 )
-async def perform_data_action(request: Request, user_id: int, mode: models.DataAction, auth: models.AuthData = Depends(auth)):
+async def perform_data_action(
+    request: Request, 
+    user_id: int, 
+    mode: models.DataAction, 
+    auth: models.AuthData = Depends(auth),
+):
     """
 Performs a GDPR data action on a user
 
@@ -528,3 +583,61 @@ Performs a GDPR data action on a user
             reason="You can't use this endpoint on someone else's data",
             code=models.ResponseCode.INVALID_DATA
         ).error(400)
+    
+    if mode == models.DataAction.Request:
+        task_id = mapleshade.gen_secret(64)
+
+        await asyncio.create_task(
+            tasks.task(
+                tasks.data_request(user_id),
+                task_id
+            )
+        ) 
+
+        return models.TaskResponse(
+            task_id=task_id
+        )
+
+    elif mode == models.DataAction.Delete:
+        # Check if user has a vote for a bot/server currently pending
+        expires_on = await tables.UserVoteTable.select(
+            tables.UserVoteTable.bot_id, 
+            tables.UserVoteTable.expires_on
+        ).where(
+            tables.UserVoteTable.user_id == user_id
+        ).first()
+
+        if expires_on and mapleshade.compare_dt(expires_on["expires_on"], datetime.datetime.now()):
+            models.Response(
+                done=False,
+                reason=f"You have a vote for a bot ({expires_on['bot_id']}) currently pending, please wait until it expires",
+                code=models.ResponseCode.INVALID_DATA
+            ).error(400)
+        
+        expires_on = await tables.UserServerVoteTable.select(
+            tables.UserServerVoteTable.guild_id, 
+            tables.UserServerVoteTable.expires_on
+        ).where(
+            tables.UserServerVoteTable.user_id == user_id
+        ).first()
+
+        if expires_on and mapleshade.compare_dt(expires_on["expires_on"], datetime.datetime.now()):
+            models.Response(
+                done=False,
+                reason=f"You have a vote for a server ({expires_on['guild_id']}) currently pending, please wait until it expires",
+                code=models.ResponseCode.INVALID_DATA
+            ).error(400)
+
+
+        task_id = mapleshade.gen_secret(64)
+
+        await asyncio.create_task(
+            tasks.task(
+                tasks.data_delete(user_id),
+                task_id
+            )
+        ) 
+
+        return models.TaskResponse(
+            task_id=task_id
+        )

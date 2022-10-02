@@ -1,4 +1,5 @@
 """The Mapleshade class contains a set of common primitives for the Fates List backend"""
+from datetime import datetime
 import random
 import string
 from typing import Any, Optional
@@ -11,6 +12,7 @@ import msgpack
 import aiohttp
 from cmarkgfm.cmark import Options as cmarkgfmOptions
 from maplecache import *
+import pytz
 
 class SilverException(Exception):
     """Base exception for Silverpelt"""
@@ -43,7 +45,8 @@ class Mapleshade:
         "cache",
         "cmark_opts",
         "cmark_exts",
-        "perms"
+        "perms",
+        "utc"
     ]
 
     def __init__(self):
@@ -123,7 +126,18 @@ class Mapleshade:
                 "srcset",
             ],
         }
+
+        self.utc = pytz.UTC
     
+    def load_sql(self, fn: str) -> str:
+        """Load SQL from a file"""
+        with open(f"fates/sql/{fn}.sql") as doc:
+            return doc.read()
+
+    def compare_dt(self, dt1: datetime, dt2: datetime):
+        """Return True if dt1 is greater than dt2. Handles both naive and aware datetimes"""
+        return self.utc.localize(dt1.replace(tzinfo=None)) > dt2.replace(tzinfo=self.utc)
+
     async def guppy(self, user_id: int) -> models.Permission:
         """Guppy: (Get User Permissions Pretty Please You!"""
         try:

@@ -305,7 +305,7 @@ We use Discord Oauth2 to verify your identity. This internally creates a ``ticke
 
 Click "Request My Data" if you wish to request a copy of your data.
 
-<a href="{%sunbeam%}/frostpaw/data/request">
+<a href="{%sunbeam%}/frostpaw/data?act=req">
 <button class="doc-button">Request My Data</button>
 </a>
 
@@ -319,6 +319,6 @@ Click "Request My Data" if you wish to request a copy of your data.
 - This does not delete vote epoch which is temporary anyways which is removed after 8 hours automatically. This is to prevent abuse
 - If you are **global banned**, your data will be deleted, *but* a stub user entry (with default DB values only) will be created with the global ban set to prevent abuse
 
-<a href="{%sunbeam%}/frostpaw/data/delete">
+<a href="{%sunbeam%}/frostpaw/data?act=del">
 <button class="doc-button">Delete My Data</button>
 </a>

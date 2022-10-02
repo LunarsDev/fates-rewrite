@@ -80,3 +80,15 @@ func GetDiscordUser(userId string) types.DiscordUser {
 
 	return user
 }
+
+func GetAllPermissions() types.PermissionList {
+	var perms types.PermissionList
+
+	requests.RequestToStruct(requests.HTTPRequest{
+		Method: "GET",
+		Url:    "/permissions",
+		Reason: Reason,
+	}, &perms)
+
+	return perms
+}

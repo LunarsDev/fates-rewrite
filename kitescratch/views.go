@@ -316,3 +316,17 @@ func viewUserView() {
 
 	ui.GreenText("User", userId, "has the following information:\nUsername:", user.Username+"#"+user.Discriminator, "\nAvatar:", user.Avatar, "\nBot:", user.Bot, "\nSystem:", user.System, "\nStatus:", user.Status, "\nFlags:", user.Flags)
 }
+
+func listPermsView() {
+	perms := api.GetAllPermissions()
+
+	ui.GreenText("Loaded", len(perms.Perms), "permissions")
+
+	var outputStr string
+
+	for name, perm := range perms.Perms {
+		outputStr += ui.BlueTextS(name, "-", perm.Name, " (index:", perm.Index, "\nRoles:", perm.Roles)
+	}
+
+	ui.GreenText(outputStr)
+}

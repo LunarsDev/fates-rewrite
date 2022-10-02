@@ -117,6 +117,14 @@ func mainMenu() {
 				},
 			},
 			{
+				Text: "Fetch all list permissions",
+				Char: "FLP",
+				Handler: func() error {
+					listPermsView()
+					return nil
+				},
+			},
+			{
 				Text: "Check config",
 				Char: "C",
 				Handler: func() error {

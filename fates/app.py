@@ -1,4 +1,5 @@
-from fates import models, consts
+import enum
+from fates import models, consts, enums
 from fates import tags
 from fates.decorators import nop
 from . import tables
@@ -46,6 +47,61 @@ with open("docs/__docs_page.html") as dp:
         .replace("{%sunbeam%}", mapleshade.config["sunbeam"])
         .replace("{%clientId%}", str(mapleshade.config["secrets"]["client_id"]))
     )
+
+# Get enums
+def document_enums():
+    """Converts the enums into markdown for api docs"""
+    md = {}
+
+    for key in enums.__dict__.keys():
+        # Ignore internal or dunder keys
+        if key.startswith("_") or key in ("IntEnum", "Enum"):
+            continue
+
+        v = enums.__dict__[key]
+        if isinstance(v, enum.EnumMeta):
+            props = list(v)
+            try:
+                fields = v._init_
+            except AttributeError:
+                fields = []
+            md[key] = {}
+            md[key]["doc"] = "\n"
+            md[key]["table"] = "| Name | Value | Description |"
+            nl = "\n| :--- | :--- | :--- |"
+            keys = []
+            for ext in fields:
+                if ext in ("value", "__doc__"):
+                    continue
+                md[key]["table"] += f" {ext.strip('_').replace('_', ' ').title()} |"
+                nl += " :--- |"
+                keys.append(ext)
+            md[key]["table"] += f"{nl}\n"
+
+            if v.__doc__ and v.__doc__ != "An enumeration.":
+                md[key]["doc"] = "\n" + v.__doc__ + "\n\n"
+
+            for prop in props:
+                md[key][
+                    "table"] += f"| {prop.name} | {prop.value} | {prop.__doc__} |"
+                for prop_key in keys:
+                    tmp = getattr(prop, prop_key)
+                    try:
+                        tmp = str(tmp) + f" ({tmp.value})"
+                    except AttributeError:
+                        tmp = str(tmp)
+                    md[key]["table"] += f" {tmp} |"
+                md[key]["table"] += "\n"
+
+    md = dict(sorted(md.items()))
+
+    md_out = []
+    for key in md.keys():
+        md_out.append(f'### {key}\n{md[key]["doc"]}{md[key]["table"]}')
+
+    return "## Enums\n" + "\n\n".join(md_out)
+
+docs.append(document_enums())
 
 app = FastAPI(
     title="Fates List",
@@ -119,6 +175,7 @@ async def close_database_connection_pool():
 @app.get("/docs", include_in_schema=False)
 async def docs():
     return HTMLResponse(docs_page)
+
 
 # Load all routes
 from fates import routes

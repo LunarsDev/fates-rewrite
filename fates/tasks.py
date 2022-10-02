@@ -52,7 +52,7 @@ async def data_request(user_id: int):
             await tables.Bots.select().where(tables.Bots.bot_id == bot["bot_id"]).first()
         )
     
-    return jsonable_encoder(data)
+    return mapleshade.parse_dict(jsonable_encoder(data))
 
 async def data_delete(user_id: int):
     """Delete a user's data"""

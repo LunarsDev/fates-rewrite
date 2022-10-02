@@ -1,4 +1,4 @@
-from fastapi import Depends
+from fastapi import Depends, Request
 from fastapi.security.api_key import APIKeyHeader
 
 from fates import tables
@@ -11,7 +11,12 @@ import secrets
 frostpaw_auth = APIKeyHeader(name="Frostpaw-Auth", scheme_name="Frostpaw-Auth", description="**Format**: user/bot/server|ID|TOKEN", auto_error=False)
 compat_header = APIKeyHeader(name="Authorization", scheme_name="Bot (compat)", description="**Format**: TOKEN (*for backwards compatibility only, only some bot endpoints supported*)", auto_error=False)
 
-async def auth(header: str = Depends(frostpaw_auth), compat: str = Depends(compat_header)):
+# Routes allowed for global banned users
+GLOBAL_BANNED_ALLOWED_ROUTES = (
+    "/data",
+)
+
+async def auth(request: Request, header: str = Depends(frostpaw_auth), compat: str = Depends(compat_header)):
     if compat:
         auth_data = await tables.Bots.select(tables.Bots.bot_id).where(tables.Bots.api_token == compat.replace("Bot ", "")).first()
 
@@ -43,7 +48,11 @@ async def auth(header: str = Depends(frostpaw_auth), compat: str = Depends(compa
         ).error(400)
     
     if auth_type == "user":
-        auth_data = await tables.Users.select(tables.Users.api_token).where(tables.Users.user_id == id, tables.Users.state != enums.UserState.GlobalBan.value).first()
+        if request.url.path in GLOBAL_BANNED_ALLOWED_ROUTES:
+            print("Ignoring global ban for user")
+            auth_data = await tables.Users.select(tables.Users.api_token).where(tables.Users.user_id == id).first()
+        else:
+            auth_data = await tables.Users.select(tables.Users.api_token).where(tables.Users.user_id == id, tables.Users.state != enums.UserState.GlobalBan.value).first()
 
         if not auth_data:
             Response(

@@ -8,69 +8,6 @@
             rel="stylesheet"
             href="https://cdn.jsdelivr.net/npm/choices.js/public/assets/styles/choices.min.css"
         />    
-        <style>
-            body {
-                margin: 0;
-                padding: 0;
-            }
-
-            .tio-label {
-                font-family: Roboto, sans-serif;
-                font-weight: bold;
-                font-size: 14px;
-                line-height: 1.5em;
-                color: rgb(51, 51, 51);
-                -webkit-font-smoothing: antialiased;
-                text-size-adjust: 100%;
-                text-rendering: optimizespeed !important;
-                margin-right: 5px;
-                padding: 0;
-                margin-top: 0;
-            }
-
-            .choices__inner {
-                font-family: Roboto, sans-serif;
-                font-weight: 400;
-                font-size: 14px;
-                line-height: 1.0em;
-                color: rgb(51, 51, 51);
-                -webkit-font-smoothing: antialiased;
-                text-size-adjust: 100%;
-                text-rendering: optimizespeed !important;
-                padding: 0 !important;
-                margin: 0 !important;
-                max-width: 300px !important;
-            }
-
-            .choices {
-                display: inline;
-            }
-
-            .choice-div {
-                margin-top: 10px;
-                margin-bottom: 10px;
-            }
-
-            .choices__inner {
-                min-height: 0 !important;
-                padding: 0 !important;
-            }
-
-            .choices__list--dropdown {
-                min-height: 0 !important;
-                padding: 0 !important;
-            }
-
-            input, .choices__inner {
-                border: 1px solid #ccc;
-                border-radius: 4px;
-                padding: 5px;
-                width: 300px;
-                height: 30px;
-                background-color:white !important;
-                opacity: 1 !important;
-            }
-        </style>
     </head>
     <redoc spec-url='/openapi.json'></redoc>
     <script src="https://cdn.jsdelivr.net/npm/redoc@2.0.0/bundles/redoc.standalone.min.js"></script>
@@ -87,68 +24,7 @@
                 document.addEventListener("DOMContentLoaded", fn);
             }
         }   
-
-        let sunbeamUrl = "{%sunbeam%}"
-        let clientId = "{%clientId%}"
         
-        // LoginUser API
-        function loginUser(el, state, callback) {
-            if(!state) {
-                throw new Error("State is required");
-            }
-
-            // Create a iframe to https://fateslist.xyz to get the user token
-            let loginWindow = window.open(`https://discord.com/api/oauth2/authorize?client_id=${clientId}&redirect_uri=${sunbeamUrl}/frostpaw/login&response_type=code&scope=identify&state=${state}`);
-            
-            window.loginCallback = callback
-        }
-        window.addEventListener("message", (evt) => {
-            if(evt.origin != sunbeamUrl) return;
-            evt.source.close()
-            window.loginCallback(JSON.parse(atob(evt.data)))
-        })
-
-        // Data Action start
-        function dataAction(el, mode) {
-            if(window.dataActionSelected) {
-                alert("You have already selected an action")
-                return
-            }
-            loginUser(el, 'api-em', (user) => {
-                console.log(user)
-                let userIdInp = document.createElement("input")
-                userIdInp.id = "userId-da"
-                let userIdFor = document.createElement("label")
-                userIdFor.htmlFor = "userId-da"
-
-                userIdFor.innerText = "Enter User ID"
-                userIdInp.value = user.user.id
-
-                let actionDiv = document.createElement("div")
-                actionDiv.appendChild(userIdFor)
-                actionDiv.appendChild(userIdInp)
-                el.parentElement.appendChild(actionDiv)
-                el.parentElement.removeChild(el);
-
-                window.dataActionSelected = mode
-
-                let submitBtn = document.createElement("button")
-                submitBtn.innerText = "Submit"
-                submitBtn.onclick = () => {
-                    let userId = document.getElementById("userId-da").value
-                    fetch(`/data/${userId}?em_token=${user.token}&mode=${window.dataActionSelected}`).then(res => res.json()).then(res => {
-                        if(res.error) {
-                            alert(res.error)
-                        } else {
-                            alert("Success")
-                        }
-                    })
-                }
-
-                actionDiv.appendChild(submitBtn)
-            })
-        }
-
         String.prototype.toTitle = function() {
             return this.replaceAll("_", "").replace(/(^|\s)\S/g, function(t) { return t.toUpperCase() });
         };
@@ -288,7 +164,7 @@
                 handleTryItOut(el)
             });
 
-            insertionQ('.try-it-out').every((el) => {
+            insertionQ('.try-it-out').every(el => {
                 handleTryItOut(el)
                 //callback
             });

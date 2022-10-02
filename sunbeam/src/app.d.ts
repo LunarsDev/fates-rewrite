@@ -30,6 +30,12 @@ declare global {
 
     interface Platform {}
 
+    interface Permission {
+      index: number;
+      roles: string[];
+      name: string;
+    }
+
     interface PageData {
       user: UserInterface;
       token: string;
@@ -38,6 +44,8 @@ declare global {
       user_experiments: number[];
       site_lang: string;
       url: string;
+      allowBanned: boolean; // Whether or not the user was allowed to do this action despite being banned
+      permissions: Permission;
     }
 
     interface Error {

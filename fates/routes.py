@@ -223,7 +223,6 @@ Returns the secrets of a bot (``api_token``, ``webhook`` and ``webhook_secret`` 
             reason="User-only endpoint",
             code=models.ResponseCode.FORBIDDEN
         ).error(401)
-        raise HTTPException(401, "User-only endpoint")
     
     nop(request)
 
@@ -411,23 +410,7 @@ async def resolve_vanity(request: Request, vanity: str):
     )
 )
 async def get_oauth2(request: Request):
-    """
-Returns the OAuth2 login URL to redirect to
-
-<blockquote class="quote info">
-
-### State Information
-
-The ``state`` sent by this API is generic. There *are* two special state values
-
-- ``api`` -> Used for a API internal login to get a user token
-- ``api-da`` -> Used for a API internal login for a data action
-
-See https://github.com/LunarsDev/fates-rewrite#developer-docs for more information
-
-</blockquote>
-
-    """
+    """Returns the OAuth2 login URL to redirect to"""
     if not request.headers.get("Frostpaw-Server"):
         models.Response(
             done=False,
@@ -452,18 +435,7 @@ See https://github.com/LunarsDev/fates-rewrite#developer-docs for more informati
     )
 )
 async def login_user(request: Request, login: models.Login):
-    """
-Logs in a user and returns a OauthUser including their User ID and Token among other things
-
-<blockquote class="quote info">
-
-### Emergency Action mode
-
-The ``em`` mode available by this API is to allow data actions such as requests and 
-deletions to be done without the need of a user token (to allow for global banned users to be able to delete their data)
-
-</blockquote>
-    """
+    """Logs in a user and returns a OauthUser including their User ID and Token among other things"""
     redirect_url_d = request.headers.get("Frostpaw-Server")
 
     if not redirect_url_d:
@@ -483,13 +455,7 @@ deletions to be done without the need of a user token (to allow for global banne
             reason=f"An error occurred while logging in the user: {e}",
             code=models.ResponseCode.INVALID_DATA
         ).error(400)
-    
-    if login.em:
-        # Create ticket
-        ticket = mapleshade.gen_secret(64)
-        mapleshade.cache.set(f"em-{ticket}", oauth.user.id, expiry=60*5)
-        oauth.token = ticket
-    
+        
     return oauth
 
 @route(
@@ -532,45 +498,32 @@ async def test_tio(request: Request, user_id: int, b: int, permission:models.Nes
     Route(  
         app=app,
         mapleshade=mapleshade,
-        url="/data/{user_id}",
+        url="/data",
         response_model=models.Response,
         method=Method.get,
         tags=[tags.data],
         ratelimit=SharedRatelimit.new("core")
     )
 )
-async def perform_data_action(request: Request, user_id: int, em_token: str, mode: str):
+async def perform_data_action(request: Request, user_id: int, mode: str, auth: models.AuthData = Depends(auth)):
     """
 Performs a GDPR data action on a user
 
-- ``em_token`` -> Token from an emergency login taken here
 - ``mode`` -> The mode to perform the action in (del/req)
 - ``user_id`` -> The user ID to perform the action on
 """
+    if auth.auth_type != models.TargetType.User:
+        models.Response(
+            done=False,
+            reason="User-only endpoint",
+            code=models.ResponseCode.FORBIDDEN
+        ).error(401)
+
     nop(request, mode)
 
-    _user_id_requested = mapleshade.cache.get(f"em-{em_token}")
-    if not _user_id_requested:
-        models.Response(
-            done=False,
-            reason="The specified emergency token is invalid",
-            code=models.ResponseCode.INVALID_DATA
-        ).error(400)
-    
-    user_id_requested: str = _user_id_requested.value()
+    perms = await mapleshade.guppy(auth.target_id)
 
-    if not user_id_requested.isdigit():
-        models.Response(
-            done=False,
-            reason="The specified emergency token is invalid",
-            code=models.ResponseCode.INVALID_DATA
-        ).error(400)
-    
-    user_id_requested = int(user_id_requested)
-
-    perms = await mapleshade.guppy(user_id_requested)
-
-    if perms < mapleshade.perms["sudo"] and user_id_requested != user_id:
+    if perms < mapleshade.perms["sudo"] and user_id != auth.target_id:
         models.Response(
             done=False,
             reason="You can't use this endpoint on someone elses data",

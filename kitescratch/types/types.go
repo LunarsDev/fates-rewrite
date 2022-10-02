@@ -179,6 +179,7 @@ type OauthUser struct {
 	SiteLang        string           `json:"site_lang"`
 	CSS             string           `json:"css"`
 	UserExperiments []UserExperiment `json:"user_experiments"`
+	Permissions     Permission       `json:"permissions"`
 }
 
 type BotServerFlag int
@@ -254,9 +255,9 @@ type Index struct {
 }
 
 type Permission struct {
-	Index int    `json:"index"`
-	Roles []int  `json:"roles"`
-	Name  string `json:"name"`
+	Index int      `json:"index"`
+	Roles []string `json:"roles"`
+	Name  string   `json:"name"`
 }
 
 type AuthCheck struct {

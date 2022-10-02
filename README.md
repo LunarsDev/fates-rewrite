@@ -43,19 +43,14 @@ Then, pen ``psql``, then run the following:
 
 ## Developer Docs
 
+### Notes on docs
+
+- All styles should be in ``docs/styles.html`` *only*. This is to ensure that other users using the OpenAPI
+specification also get decent styling (if their OpenAPI client supports CSS)
+
 ### Oauth2
 
 In order for login to work, ``<YOUR DOMAIN>/frostpaw/login`` must be set in Discord Developer Portal as a Redirect URL for the Fates List bot configured in the ``secrets`` portion of ``config.yaml``.
-
-The ``state`` sent by the ``Get Oauth2`` API is generic for normal logins. There *are* two special state values that are special-cased in ``Sunbeam``:
-
-- ``api`` -> Used for a API internal login to get a user token
-- ``api-em`` -> Used for a API internal login for a emergency action (such as a GDPR data action etc.)
-
-### Emergency Action mode
-
-The ``em`` mode available by this API is to allow data actions such as requests and 
-deletions to be done without the need of a user token (to allow for global banned users to be able to delete their data)
 
 ### Routes
 

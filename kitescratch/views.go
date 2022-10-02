@@ -270,6 +270,8 @@ func loginView() {
 	ui.GreenText("\nAuth Done!")
 	ui.PurpleText("User ID:", token.User.ID, "\nUsername:", token.User.Username, "\nUser Token:", token.Token)
 
+	ui.BlueText("\nUser Permissions\nIndex:", token.Permissions.Index, "\nRoles:", token.Permissions.Roles, "\nName:", token.Permissions.Name)
+
 	state.GlobalState.Auth = &auth.Auth{
 		Token:      token.Token,
 		ID:         token.User.ID,

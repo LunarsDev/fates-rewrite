@@ -144,8 +144,11 @@ export async function roll(type: string | number, session: any) {
   return null;
 }
 
-export async function loginUser() {
-  let modifier = {};
+export async function loginUser(initialModifier = null) {
+  if(!initialModifier) {
+    initialModifier = {}
+  }
+  let modifier = initialModifier;
 
   modifier['href'] = window.location.href;
 

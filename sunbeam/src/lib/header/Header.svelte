@@ -18,11 +18,7 @@
   if ($page.data.user) {
     username = $page.data.user.username;
     userID = $page.data.user.id;
-    if ($page.data.user.avatar) {
-      avatar = `https://cdn.discordapp.com/avatars/${userID}/${$page.data.user.avatar}.webp`;
-    } else {
-      avatar = 'https://cdn.discordapp.com/embed/avatars/4.png';
-    }
+    avatar = $page.data.user.avatar;
     logger.info('Header', 'Got avatar', avatar);
   }
 

@@ -340,9 +340,6 @@ class Login(BaseModel):
     code: str
     """The Discord OAuth2 code"""
 
-    em: bool
-    """Whether or not we are in a emergency action"""
-
 class OauthUser(BaseModel):
     """OAuth2 login response"""
 

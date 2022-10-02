@@ -33,44 +33,37 @@ export async function load({ parent, fetch }) {
 
   let modifierInfo = {};
 
-  let em = false
+  let stateSplit = state.split('.');
 
-  if(state == "api" || state == "api-em") {
-    em = (state == "api-em")
-    state = "api"
-  } else {
-    let stateSplit = state.split('.');
+  if (stateSplit.length != 2) {
+    return {
+      error: 'Invalid state'
+    };
+  }
 
-    if (stateSplit.length != 2) {
-      return {
-        error: 'Invalid state'
-      };
-    }
+  let nonce = stateSplit[0];
+  let modifier = stateSplit[1];
 
-    let nonce = stateSplit[0];
-    let modifier = stateSplit[1];
+  info('Login', Base64.decode(modifier));
 
-    info('Login', Base64.decode(modifier));
+  try {
+    modifierInfo = JSON.parse(Base64.decode(modifier));
+  } catch (e) {
+    return {
+      error: 'Invalid modifier info'
+    };
+  }
 
-    try {
-      modifierInfo = JSON.parse(Base64.decode(modifier));
-    } catch (e) {
-      return {
-        error: 'Invalid modifier info'
-      };
-    }
+  if (modifierInfo['state'] != nonce) {
+    return {
+      error: 'Invalid nonce'
+    };
+  }
 
-    if (modifierInfo['state'] != nonce) {
-      return {
-        error: 'Invalid nonce'
-      };
-    }
-
-    if (modifierInfo['version'] != 11) {
-      return {
-        error: 'Invalid login request, please try logging in again!!!'
-      };
-    }
+  if (modifierInfo['version'] != 11) {
+    return {
+      error: 'Invalid login request, please try logging in again!!!'
+    };
   }
 
   let res = await request(`${api}/oauth2`, {
@@ -80,7 +73,6 @@ export async function load({ parent, fetch }) {
     },
     json: {
       code: code,
-      em: em
     },
     session: session,
     fetch: fetch,
@@ -97,7 +89,7 @@ export async function load({ parent, fetch }) {
     };
   }
 
-  if (json['state'] == enums.UserState.global_ban) {
+  if (json['state'] == enums.UserState.global_ban && !modifierInfo["allowBanned"]) {
     return {
       error: `<h1>You are global banned</h1><br/><h2>This is a global ban and as such, you may not login/use our API.</h2><br/>You can try to appeal this ban at <a href="https://fateslist.xyz/staffserver">our ban appeal server</a>`
     };
@@ -106,6 +98,8 @@ export async function load({ parent, fetch }) {
       error: `Got error: ${JSON.stringify(json)}.`
     };
   }
+
+  json["allowBanned"] = modifierInfo["allowBanned"];
 
   return {
     cookie: Base64.encode(JSON.stringify(json)),

@@ -3,7 +3,7 @@ import * as logger from '$lib/logger';
 import Base64 from '$lib/b64';
 
 /** @type {import('./$types').LayoutServerLoad} */
-export async function load({ request, setHeaders }) {
+export async function load({ request }) {
   logger.info('Auth', 'getSession called');
 
   const cookies = cookie.parse(
@@ -22,7 +22,14 @@ export async function load({ request, setHeaders }) {
     refresh_token: '',
     user_experiments: [2, 5, 6],
     site_lang: 'en',
-    url: request.url
+    url: request.url,
+    allowBanned: false,
+    permissions: {
+      index: 0,
+      roles: [],
+      name: "default"
+
+    }
   };
 
   if (cookies['sunbeam-session']) {

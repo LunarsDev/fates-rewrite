@@ -26,7 +26,7 @@
         }   
         
         String.prototype.toTitle = function() {
-            return this.replaceAll("_", "").replace(/(^|\s)\S/g, function(t) { return t.toUpperCase() });
+            return this.replaceAll("_", " ").replace(/(^|\s)\S/g, function(t) { return t.toUpperCase() });
         };
 
         handled = new Map()

@@ -403,6 +403,28 @@ async def get_task(request: Request, task_id: str):
     return task.value()
 
 @route(
+    Route(
+        app=app,
+        mapleshade=mapleshade,
+        url="/search",
+        response_model=models.SearchResponse,
+        method=Method.post,
+        tags=[tags.generic],
+        ratelimit=SharedRatelimit.new("core")
+    )
+)
+async def search(request: Request, query: models.SearchQuery):
+    """
+Searches the list for a query
+
+**This uses POST to allow for a request body**
+"""
+
+    nop(request)
+
+    return await mapleshade.search(query)
+
+@route(
     Route(  
         app=app,
         mapleshade=mapleshade,

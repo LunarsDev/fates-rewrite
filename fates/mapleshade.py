@@ -13,6 +13,7 @@ import aiohttp
 from cmarkgfm.cmark import Options as cmarkgfmOptions
 from maplecache import *
 import pytz
+import asyncpg
 
 class SilverException(Exception):
     """Base exception for Silverpelt"""
@@ -36,6 +37,20 @@ class SilverNoData(SilverException):
     """Exception for when there is no data"""
     ...
 
+class SQLFiles:
+    def load_sql(self, fn: str) -> str:
+        """Load SQL from a file"""
+        with open(f"fates/sql/{fn}.sql") as doc:
+            return doc.read()
+
+    def __init__(self):
+        self.data_delete_find_bots = self.load_sql("data_delete_find_bots")
+        self.data_request_get_tables = self.load_sql("data_request_get_tables")
+        self.search_bots = self.load_sql("search_bots")
+        self.search_servers = self.load_sql("search_servers")
+        self.search_profiles = self.load_sql("search_profiles")
+        self.search_packs = self.load_sql("search_packs")
+
 class Mapleshade:
     __slots__ = [
         "yaml",
@@ -46,7 +61,9 @@ class Mapleshade:
         "cmark_opts",
         "cmark_exts",
         "perms",
-        "utc"
+        "utc",
+        "sql",
+        "pool", # Raw SQL pool
     ]
 
     def __init__(self):
@@ -128,11 +145,8 @@ class Mapleshade:
         }
 
         self.utc = pytz.UTC
-    
-    def load_sql(self, fn: str) -> str:
-        """Load SQL from a file"""
-        with open(f"fates/sql/{fn}.sql") as doc:
-            return doc.read()
+        self.sql = SQLFiles()
+        self.pool: asyncpg.Pool | None = None # Initially none
 
     def compare_dt(self, dt1: datetime, dt2: datetime):
         """Return True if dt1 is greater than dt2. Handles both naive and aware datetimes"""
@@ -304,7 +318,7 @@ class Mapleshade:
                 raise SilverException("Could not connect to Silverpelt")
 
     async def to_snippet(self, data: list[dict]) -> models.Snippet:
-        """Converts a dict to a snippet"""
+        """Converts a dict to a snippet (bots/servers only). Profiles should use to_profile_snippet"""
         snippet = []
         for entity in data:
             if entity.get("bot_id"):
@@ -316,10 +330,77 @@ class Mapleshade:
                 except:
                     print(f"Failed to get user for bot {entity['bot_id']}")
                     continue
+            elif entity.get("guild_id"):
+                # This is a guild
+                try:
+                    guild_data = await tables.Servers.select(
+                        tables.Servers.name_cached,
+                        tables.Servers.avatar_cached,
+                    ).where(tables.Servers.guild_id == entity["guild_id"]).first()
+
+                    entity["user"] = {
+                        "id": entity["guild_id"],
+                        "username": guild_data["name_cached"],
+                        "disc": "0001",
+                        "avatar": guild_data["avatar_cached"],
+                        "bot": False,
+                        "system": False,
+                        "status": 0,
+                        "flags": 0,
+                    }
+                except:
+                    print(f"Failed to get guild for {entity['guild_id']}")
+                    continue
+            else:
+                raise ValueError("Invalid entity")
             snippet.append(models.Snippet(**entity))
 
         return snippet
     
+    async def to_profile_snippet(self, data: list[dict]) -> models.ProfileSnippet:
+        """Converts a dict to a snippet (profiles only)"""
+        snippet = []
+        for entity in data:
+            try:
+                entity["user"] = await self.silverpelt_req(f"users/{entity['user_id']}")
+            except:
+                print(f"Failed to get user for profile {entity['user_id']}")
+                continue
+            snippet.append(models.ProfileSnippet(**entity))
+
+        return snippet
+    
+    async def resolve_packs(self, data: list[dict]) -> list[models.BotPack]:
+        packs = []
+        for pack in data:
+            resolved_bots = []
+
+            for bot in pack["bots"]:
+                description = await tables.Bots.select(tables.Bots.description).where(tables.Bots.bot_id == bot).first()
+
+                if description:
+                    try:
+                        user = await self.silverpelt_req(f"users/{bot}")
+                    except:
+                        print(f"Failed to get user for bot {bot}")
+                        continue
+                    resolved_bots.append(
+                        models.ResolvedPackBot(
+                            user=user,
+                            description=description["description"],
+                        )
+                    )
+        
+            try:
+                pack["owner"] = await self.silverpelt_req(f"users/{pack['owner']}")
+            except:
+                print(f"Failed to get user for pack owner {pack['owner']}")
+                continue
+
+            packs.append(models.BotPack(**pack, resolved_bots=resolved_bots))
+
+        return packs
+
     def gen_secret(self, n: int = 32) -> str:
         """Generates a secret"""
         return bytes(random.choices(string.ascii_letters.encode('ascii'),k=n)).decode('ascii')
@@ -399,4 +480,68 @@ class Mapleshade:
             css=list_data["user_css"],
             user_experiments=models.DEFAULT_USER_EXPERIMENTS + list_data["experiments"],
             permissions=await self.guppy(duser['id'])
+        )
+    
+    def parse_records(self, records: list) -> list[dict]:
+        """Parses a list of records"""
+        if records:
+            return [dict(record) for record in records]
+        else:
+            return records
+    
+    async def search(
+        self,
+        query: models.SearchQuery,
+    ):
+        record_bots = self.parse_records(
+            await self.pool.fetch(
+                self.sql.search_bots,
+                f"%{query.query}%",
+                models.BotServerState.Approved,
+                models.BotServerState.Certified,
+                *query.guild_count,
+                *query.votes
+            )
+        )
+
+        bots = await self.to_snippet(record_bots)
+
+        record_servers = self.parse_records(
+            await self.pool.fetch(
+                self.sql.search_servers,
+                f"%{query.query}%",
+                models.BotServerState.Approved,
+                models.BotServerState.Certified,
+                *query.guild_count,
+                *query.votes
+            )
+        )
+
+        servers = await self.to_snippet(record_servers)
+
+        record_profiles = self.parse_records(
+            await self.pool.fetch(
+                self.sql.search_profiles,
+                f"%{query.query}%",
+                models.BotServerState.Approved,
+                models.BotServerState.Certified,
+            )
+        )
+
+        profiles = await self.to_profile_snippet(record_profiles)
+
+        record_packs = self.parse_records(
+            await self.pool.fetch(
+                self.sql.search_packs,
+                f"%{query.query}%",
+            )
+        )
+
+        packs = await self.resolve_packs(record_packs)
+
+        return models.SearchResponse(
+            bots=bots,
+            servers=servers,
+            profiles=profiles,
+            packs=packs,
         )

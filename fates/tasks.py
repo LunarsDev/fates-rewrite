@@ -4,8 +4,6 @@ from fates.app import mapleshade
 from fastapi.encoders import jsonable_encoder
 import traceback
 
-data_delete_find_bots = mapleshade.load_sql("data_delete_find_bots")
-data_request_get_tables = mapleshade.load_sql("data_request_get_tables")
 
 async def task(task: Awaitable, task_id: str):
     """Creates a task"""
@@ -28,7 +26,7 @@ async def data_request(user_id: int):
     user = await tables.Users.select().where(tables.Users.user_id == user_id).first()
     owners = await tables.BotOwner.select().where(tables.BotOwner.owner == user_id)
 
-    fk_keys = await tables.Users.raw(data_request_get_tables)
+    fk_keys = await mapleshade.pool.fetch(mapleshade.sql.data_request_get_tables)
 
     related_data = {}
 
@@ -61,8 +59,8 @@ async def data_delete(user_id: int):
     await tables.Users.delete().where(tables.Users.user_id == user_id)
 
     # Delete all bot data of a user
-    bots = await tables.Users.raw(
-        data_delete_find_bots,
+    bots = await mapleshade.pool.fetch(
+        mapleshade.sql.data_delete_find_bots,
         user_id,
     )
     for bot in bots:

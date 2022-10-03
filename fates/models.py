@@ -1,9 +1,12 @@
-from typing import Optional
+import datetime
+from typing import Any, Optional, Generic, TypeVar
+import uuid
 
 from .tables import BotCommands, Bots, Users, UserBotLogs
 from piccolo.utils.pydantic import create_pydantic_model
 from piccolo.query import Select
 from pydantic import BaseModel
+from pydantic.generics import GenericModel
 import silverpelt.types.types as silver_types
 from fates.enums import *
 
@@ -79,6 +82,42 @@ class Entity:
         if getattr(other, "id", None):
             return self.id == getattr(other, "id", None)
         return self.id == other
+
+class ResolvedPackBot(BaseModel):
+    """Represents a bot that is part of a pack"""
+
+    user: silver_types.DiscordUser
+    """The bot's user"""
+
+    description: str
+    """The bot's description"""
+
+class BotPack(BaseModel):
+    """Represents a bot pack on the list"""
+    id: uuid.UUID
+    """The pack's ID"""
+
+    name: str
+    """The pack's name"""
+
+    description: str
+    """The pack's description"""
+
+    icon: str
+    """The pack's icon"""
+
+    banner: Optional[str] = None
+    """The pack's banner"""
+
+    resolved_bots: list[ResolvedPackBot]
+    """The bots in the pack"""
+
+    owner: silver_types.DiscordUser
+    """The pack's owner"""
+
+    created_at: datetime.datetime
+    """The pack's creation date"""
+
 
 class Permission(BaseModel):
     """A permission for a staff member on the list"""
@@ -260,6 +299,20 @@ class Snippet(BaseModel):
     guild_count: int
     """The bot's/server's guild count"""
 
+class ProfileSnippet(BaseModel):
+    """
+    Represents a snippet which is essentially a miniature version of a profile where a full Profile is too expensive to return
+
+    - This applies to both ``User`` entities
+    """
+    user: silver_types.DiscordUser
+    """The user's user object"""
+
+    banner: Optional[str] = None
+    """The user's banner"""
+
+    description: str
+    """The user's description"""
 
 class Index(BaseModel):
     """Represents an index"""
@@ -310,20 +363,6 @@ class BotSecrets(BaseModel):
 
     webhook_secret: Optional[str] = None
     """The bot's webhook secret"""
-
-
-## Internal API
-
-class AuthData(BaseModel):
-    """INTERNAL Auth struct"""
-    auth_type: TargetType
-    target_id: int 
-    token: str
-    compat: bool
-
-class AuthDataHTTPResponse(AuthData):
-    """AuthData struct for HTTP responses"""
-    target_id: str
 
 class Vanity(BaseModel):
     """Represents a vanity"""
@@ -428,3 +467,55 @@ class TaskResponse(BaseModel):
 
     task_id: str
     """The task ID"""
+
+class AuthData(BaseModel):
+    """INTERNAL: Auth struct"""
+    auth_type: TargetType
+    target_id: int 
+    token: str
+    compat: bool
+
+class AuthDataHTTPResponse(AuthData):
+    """AuthData struct for HTTP responses"""
+    target_id: str
+
+DataT = TypeVar('DataT')
+class SearchFilter(GenericModel, Generic[DataT]):
+    """A filter for search"""
+    filter_from: DataT
+    """The value to filter from"""
+
+    filter_to: DataT
+    """The value to filter to"""
+
+    def __iter__(self):
+        yield self.filter_from
+        yield self.filter_to
+
+
+class SearchQuery(BaseModel):
+    """A search query"""
+
+    query: str
+    """The search query"""
+
+    guild_count: SearchFilter[int] = SearchFilter[int](filter_from=0, filter_to=-1)
+    """The guild count filter"""
+
+    votes: SearchFilter[int] = SearchFilter[int](filter_from=0, filter_to=-1)
+    """The vote count filter"""
+
+
+class SearchResponse(BaseModel):
+    """A search response"""
+
+    bots: list[Snippet]
+    """The bots that matched the search query"""
+
+    servers: list[Snippet]
+    """The servers that matched the search query"""
+
+    profiles: list[ProfileSnippet]
+    """The profiles that matched the search query"""
+
+    packs: list[BotPack]

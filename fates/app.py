@@ -168,6 +168,8 @@ async def open_database_connection_pool():
     # await bot.load_extension("jishaku")
     await engine.start_connnection_pool()
 
+    mapleshade.pool = engine.pool
+
 
 @app.on_event("shutdown")
 async def close_database_connection_pool():

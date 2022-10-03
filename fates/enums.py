@@ -154,8 +154,6 @@ class UserExperiment(IntEnum):
 
 class DataAction(Enum):
     """Data actions"""
-    _init_ = "value __doc__"
+    Request = "req"
 
-    Request = "req", "Request action"
-
-    Delete = "del", "Delete action"
+    Delete = "del"

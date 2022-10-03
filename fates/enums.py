@@ -55,7 +55,7 @@ class UserState(IntEnum):
     """User states"""
     _init_ = "value __doc__"
 
-    Normal = 0, "User is normal (no bans)"
+    Normal = 0, "User is normal (not banned)"
 
     GlobalBan = 1, "User is globally banned from the list (apart from data actions)"
 
@@ -63,6 +63,7 @@ class UserState(IntEnum):
 
 
 class BotServerState(IntEnum):
+    """Bot or server state"""
     Approved = 0
     Pending = 1
     Denied = 2
@@ -75,58 +76,62 @@ class BotServerState(IntEnum):
     PrivateStaffOnly = 9
 
 
-class EventType(IntEnum):
-    promotion = 0
-    maintenance = 1
-    announcement = 2
-
-
-class Vanity(IntEnum):
-    server = 0
-    bot = 1
-
-
 class UserBotAction(IntEnum):
-    approve = 0
-    deny = 1
-    certify = 2
-    ban = 3
-    claim = 4
-    unclaim = 5
-    transfer_ownership = 6
-    edit_bot = 7
-    delete_bot = 8
-    unban = 9
-    uncertify = 10
-    unverify = 11
-    requeue = 12
+    """Actions a user can take on a bot"""
+    Approve = 0
+    Deny = 1
+    Certify = 2
+    Ban = 3
+    Claim = 4
+    Unclaim = 5
+    TransferOwnership = 6
+    EditBot = 7
+    DeleteBot = 8
+    Unban = 9
+    Uncertify = 10
+    Unverify = 11
+    Requeue = 12
 
 
 class LongDescriptionType(IntEnum):
-    Html = 0
-    MarkdownServerSide = 1
+    """The type of long description. This is used to determine how the long description should be processed/rendered"""
+    _init_ = "value __doc__"
+    
+    Html = 0, "Raw HTML. No markdown processing is applied"
+
+    MarkdownServerSide = 1, "Markdown. Markdown is processed server side using the ``cmarkgfm`` library."
 
 
 class WebhookType(IntEnum):
-    vote = 0
-    discord = 1
-
+    """The type of webhook (Fates Client is deprecated and has no effect anymore)"""
+    Vote = 0
+    DiscordIntegration = 1
+    DeprecatedFatesClient = 2 # There in case any bots are still using it
 
 class CommandType(IntEnum):
-    regular = 0
-    guild_slash = 1
-    global_slash = 2
-
+    """The type of bot command"""
+    PrefixCommand = 0
+    SlashCommandGlobal = 1
+    SlashCommandGuild = 2
 
 class TargetType(IntEnum):
-    Bot = 0
-    Server = 1
-    User = 2
+    """A bot/server/user etc."""
+    _init_ = "value __doc__"
+
+    Bot = 0, "A bot"
+
+    Server = 1, "A server"
+
+    User = 2, "A user"
 
 
 class PageStyle(IntEnum):
-    tabs = 0
-    single_scroll = 1
+    """Page style for the bot/server page"""
+    _init_ = "value __doc__"
+
+    Tabs = 0, "Legacy tabs style"
+
+    SingleScroll = 1, "Single scroll/no tabs style"
 
 class UserExperiment(IntEnum):
     """User experiments"""
@@ -149,9 +154,8 @@ class UserExperiment(IntEnum):
 
 class DataAction(Enum):
     """Data actions"""
+    _init_ = "value __doc__"
 
-    Request = "req"
-    """Unknown action"""
+    Request = "req", "Request action"
 
-    Delete = "del"
-    """Create action"""
+    Delete = "del", "Delete action"

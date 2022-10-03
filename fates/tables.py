@@ -544,53 +544,6 @@ class WsEvents(Table, tablename="ws_events"):
     )
 
 
-class BotEvents(Table, tablename="bot_events"):
-    id = UUID(
-        default=UUID4(),
-        primary_key=True,
-    )
-    bot_id = ForeignKey(
-        references=Bots,
-        on_delete=OnDelete.cascade,
-        on_update=OnUpdate.cascade,
-        null=True,
-        primary_key=False,
-        unique=False,
-        secret=False,
-    )
-    event_type = Integer(
-        choices=enums.EventType,
-        null=False,
-        primary_key=False,
-        unique=False,
-        secret=False,
-    )
-
-    ts = Timestamptz(
-        default=TimestamptzNow(),
-        null=False,
-        primary_key=False,
-        unique=False,
-        secret=False,
-    )
-
-    reason = Text(
-        default="",
-        null=False,
-        primary_key=False,
-        unique=False,
-        secret=False,
-    )
-
-    css = Text(
-        default="",
-        null=False,
-        primary_key=False,
-        unique=False,
-        secret=False,
-    )
-
-
 class Features(Table, tablename="features"):
     id = Text(
         default="",

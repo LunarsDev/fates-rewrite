@@ -67,13 +67,16 @@ def document_enums():
                 fields = []
             md[key] = {}
             md[key]["doc"] = "\n"
-            md[key]["table"] = "| Name | Value | Description |"
-            nl = "\n| :--- | :--- | :--- |"
+            md[key]["table"] = "| Name | Value |"
+            nl = "\n| :--- | :--- |"
             keys = []
             for ext in fields:
-                if ext in ("value", "__doc__"):
+                if ext == "value":
                     continue
-                md[key]["table"] += f" {ext.strip('_').replace('_', ' ').title()} |"
+                if ext == "__doc__":
+                    md[key]["table"] += " Description |"
+                else:
+                    md[key]["table"] += f" {ext.strip('_').replace('_', ' ').title()} |"
                 nl += " :--- |"
                 keys.append(ext)
             md[key]["table"] += f"{nl}\n"
@@ -83,7 +86,7 @@ def document_enums():
 
             for prop in props:
                 md[key][
-                    "table"] += f"| {prop.name} | {prop.value} | {prop.__doc__} |"
+                    "table"] += f"| {prop.name} | {prop.value} |"
                 for prop_key in keys:
                     tmp = getattr(prop, prop_key)
                     try:

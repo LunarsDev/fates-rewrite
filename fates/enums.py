@@ -116,13 +116,9 @@ class CommandType(IntEnum):
 
 class TargetType(IntEnum):
     """A bot/server/user etc."""
-    _init_ = "value __doc__"
-
-    Bot = 0, "A bot"
-
-    Server = 1, "A server"
-
-    User = 2, "A user"
+    Bot = 0
+    Server = 1
+    User = 2
 
 
 class PageStyle(IntEnum):

@@ -1,32 +1,70 @@
 <script lang="ts">
   import { browser } from '$app/environment';
 
-  import { apiUrl } from '$lib/config';
+  import { api } from '$lib/config';
   import { request } from '$lib/request';
   import { page } from '$app/stores';
 
   import FormInput from './FormInput.svelte';
-  import SearchRes from './SearchRes.svelte';
   import Tip from './Tip.svelte';
+  import Tag from './Tag.svelte';
   import { onMount } from 'svelte';
+  import Section from './Section.svelte';
+  import CardContainer from '../cards/CardContainer.svelte';
+  import BotCard from '../cards/BotCard.svelte';
+  import BotPack from './BotPack.svelte';
+  import { enums, type TargetType } from '$lib/enums/enums';
+    import { info } from '$lib/logger';
 
-  let type: string;
+  let type: TargetType = enums.TargetType.Bot;
   let query: string;
   let gc_from = 1;
   let gc_to = -1;
   export let data: any = null;
 
+  export let meta;
+
+  let serverTags = [];
+  let botTags = [];
+
+  // Used by tags
+  function botTagsSelect(s: string[]) {
+    botTags = s;
+  }
+
+  function serverTagsSelect(s: string[]) {
+    serverTags = s;
+  }
+
+  let sTagAction = {
+    func: () => searchBot(true),
+    text: "Search",
+  }
+
   onMount(() => {
     if (browser) {
       let url = new URL(window.location.href);
 
-      type = url.searchParams.get('t') || 'bot';
+      let tgtType = url.searchParams.get('t') || 'bot';
+      
+      if(tgtType == "server") {
+        type = enums.TargetType.Server;
+      }
+
       query = url.searchParams.get('q') || '';
-      gc_from = parseInt(url.searchParams.get('gcf') || '1');
+      gc_from = parseInt(url.searchParams.get('gcf') || '0');
       gc_to = parseInt(url.searchParams.get('gct') || '-1');
 
-      if (query) {
-        searchBot();
+      let bt = url.searchParams.get('bt') || '';
+      botTags = bt.split(",").filter((x) => x != "");
+
+      let st = url.searchParams.get('st') || '';
+      serverTags = st.split(",").filter((x) => x != "");
+
+      info("SearchBar", type, query, gc_from, gc_to, botTags, serverTags);
+
+      if (query || botTags.length > 0 || serverTags.length > 0) {
+        searchBot(true);
       }
     }
   });
@@ -41,33 +79,71 @@
     }
   }
 
-  async function searchBot() {
-    if (!query) {
-      data = null;
-      let url = new URL(window.location.href);
+  async function searchBot(tagsSearch = false) {
+    // update location silently to include new query params
+    let url = new URL(window.location.href);
+
+    if(query) {
+      url.searchParams.set('q', query);
+    } else {
       url.searchParams.delete('q');
+    }
+
+    if(type) {
+      url.searchParams.set('t', enums.helpers.targetTypeString(type));
+    } else {
       url.searchParams.delete('t');
+    }
+
+    if(gc_from) {
+      url.searchParams.set('gcf', gc_from.toString());
+    } else {
       url.searchParams.delete('gcf');
+    }
+
+    if(gc_to && gc_to != -1) {
+      url.searchParams.set('gct', gc_to.toString());
+    } else {
       url.searchParams.delete('gct');
-      window.history.replaceState({}, '', url.href);
+    }
+
+    if(botTags.length > 0) {
+      url.searchParams.set('bt', botTags.join(','));
+    } else {
+      url.searchParams.delete('bt');
+    }
+
+    if(serverTags.length > 0) {
+      url.searchParams.set('st', serverTags.join(','));
+    } else {
+      url.searchParams.delete('st');
+    }
+
+    window.history.replaceState({}, '', url.href);
+
+    if (!query && !tagsSearch) {
+      data = null;
       setTimeout(() => window.llhandler(), 300);
       return;
     } // Don't search if query is empty
 
-    // update location silently to include new query params
-    let url = new URL(window.location.href);
-    url.searchParams.set('q', query);
-    url.searchParams.set('t', type);
-    url.searchParams.set('gcf', gc_from.toString());
-    url.searchParams.set('gct', gc_to.toString());
-    window.history.replaceState({}, '', url.href);
-
     searching = true;
-    let res = await request(`${apiUrl}/search?q=${query}&gc_from=${gc_from}&gc_to=${gc_to}`, {
-      method: 'GET',
+    let res = await request(`${api}/search`, {
+      method: 'POST',
       endpointType: 'user',
       auth: false,
       session: $page.data,
+      json: {
+        query: query,
+        guild_count: {
+          filter_from: gc_from,
+          filter_to: gc_to,
+        },
+        tags: {
+          bot: botTags,
+          server: serverTags,
+        }
+      },
       fetch: fetch
     });
 
@@ -90,11 +166,11 @@
     type="text"
     on:input={(event) => {
       query = castToEl(event.target).value;
-      searchBot();
+      searchBot(false);
     }}
     id="search-bar"
     class="form-control fform search"
-    placeholder="Search for {type}s (ENTER to search)"
+    placeholder="Search for {enums.helpers.targetTypeString(type)}s (ENTER to search)"
     name="q"
     value={query}
     aria-label="Search for something.."
@@ -107,7 +183,7 @@
       formclass="filter-inp filter-inp-left"
       oninput={(event) => {
         gc_from = parseInt(castToEl(event.target).value) || -1;
-        searchBot();
+        searchBot(false);
       }}
       id="gcf"
       name="From:"
@@ -119,7 +195,7 @@
       formclass="filter-inp filter-inp-right"
       oninput={(event) => {
         gc_to = parseInt(castToEl(event.target).value) || -1;
-        searchBot();
+        searchBot(false);
       }}
       id="gct"
       name="To:"
@@ -144,7 +220,142 @@
 </div>
 
 {#if data}
-  <SearchRes targetType={type} data={data} />
+  <!--First Display-->
+  {#if type == enums.TargetType.Bot}
+    <Section title="Bots" icon="fa-solid:search" id="search-res-bots">
+      <Tag tagAction={sTagAction} onclick={botTagsSelect} initialSelected={botTags} tags={meta.bot.tags} />
+      <CardContainer>
+        {#each data.bots as bot}
+          <BotCard data={bot} type={enums.TargetType.Bot} rand={false} />
+        {/each}
+      </CardContainer>
+    </Section>
+
+    <Section title="Bot Packs" icon="bx:bx-package" id="search-res-packs">
+      {#each data.packs as pack}
+        <BotPack pack={pack} />
+      {/each}
+    </Section>
+
+    <Section title="Servers" icon="fa-solid:search" id="search-res-servers">
+      <Tag tagAction={sTagAction} onclick={serverTagsSelect} initialSelected={serverTags} tags={meta.server.tags} />
+      <CardContainer>
+        {#each data.servers as server}
+          <BotCard data={server} type={enums.TargetType.Server} rand={false} />
+        {/each}
+      </CardContainer>
+    </Section>
+
+    <Section title="Profiles" icon="fa-solid:search" id="search-res-profiles">
+      <CardContainer>
+        {#each data.profiles as profile}
+          <BotCard data={profile} type={enums.TargetType.User} rand={false} />
+        {/each}
+      </CardContainer>
+    </Section>
+  {:else if type == enums.TargetType.Pack}
+    <Section title="Bot Packs" icon="bx:bx-package" id="search-res-packs">
+      {#each data.packs as pack}
+        <BotPack pack={pack} />
+      {/each}
+    </Section>
+
+    <Section title="Bots" icon="fa-solid:search" id="search-res-bots">
+      <Tag tagAction={sTagAction} onclick={botTagsSelect} initialSelected={botTags} tags={meta.bot.tags} />
+      <CardContainer>
+        {#each data.bots as bot}
+          <BotCard data={bot} type={enums.TargetType.Bot} rand={false} />
+        {/each}
+      </CardContainer>
+    </Section>
+
+    <Section title="Servers" icon="fa-solid:search" id="search-res-servers">
+      <Tag tagAction={sTagAction} onclick={serverTagsSelect} initialSelected={serverTags} tags={meta.server.tags} />
+      <CardContainer>
+        {#each data.servers as server}
+          <BotCard data={server} type={enums.TargetType.Server} rand={false} />
+        {/each}
+      </CardContainer>
+    </Section>
+
+    <Section title="Profiles" icon="fa-solid:search" id="search-res-profiles">
+      <CardContainer>
+        {#each data.profiles as profile}
+          <BotCard data={profile} type={enums.TargetType.User} rand={false} />
+        {/each}
+      </CardContainer>
+    </Section>
+  {:else if type == enums.TargetType.Server}
+    <Section title="Servers" icon="fa-solid:search" id="search-res-servers">
+      <Tag tagAction={sTagAction} onclick={serverTagsSelect} initialSelected={serverTags} tags={meta.server.tags} />
+      <CardContainer>
+        {#each data.servers as server}
+          <BotCard data={server} type={enums.TargetType.Server} rand={false} />
+        {/each}
+      </CardContainer>
+    </Section>
+
+    <Section title="Profiles" icon="fa-solid:search" id="search-res-profiles">
+      <CardContainer>
+        {#each data.profiles as profile}
+          <BotCard data={profile} type={enums.TargetType.User} rand={false} />
+        {/each}
+      </CardContainer>
+    </Section>
+
+    <Section title="Bots" icon="fa-solid:search" id="search-res-bots">
+      <Tag tagAction={sTagAction} onclick={botTagsSelect} initialSelected={botTags} tags={meta.bot.tags} />
+      <CardContainer>
+        {#each data.bots as bot}
+          <BotCard data={bot} type={enums.TargetType.Bot} rand={false} />
+        {/each}
+      </CardContainer>
+    </Section>
+
+    <Section title="Bot Packs" icon="bx:bx-package" id="search-res-packs">
+      {#each data.packs as pack}
+        <BotPack pack={pack} />
+      {/each}
+    </Section>
+  {:else}
+    <Section title="Profiles" icon="fa-solid:search" id="search-res-profiles">
+      <CardContainer>
+        {#each data.profiles as profile}
+          <BotCard data={profile} type={enums.TargetType.User} rand={false} />
+        {/each}
+      </CardContainer>
+    </Section>
+
+    <Section title="Servers" icon="fa-solid:search" id="search-res-servers">
+      <Tag tagAction={sTagAction} onclick={serverTagsSelect} initialSelected={serverTags} tags={meta.server.tags} />
+      <CardContainer>
+        {#each data.servers as server}
+          <BotCard data={server} type={enums.TargetType.Server} rand={false} />
+        {/each}
+      </CardContainer>
+    </Section>
+
+    <Section title="Bot Packs" icon="bx:bx-package" id="search-res-packs">
+      {#each data.packs as pack}
+        <BotPack pack={pack} />
+      {/each}
+    </Section>
+
+    <Section title="Bots" icon="fa-solid:search" id="search-res-bots">
+      <Tag tagAction={sTagAction} onclick={botTagsSelect} initialSelected={botTags} tags={meta.bot.tags} />
+      <CardContainer>
+        {#each data.bots as bot}
+          <BotCard data={bot} type={enums.TargetType.Bot} rand={false} />
+        {/each}
+      </CardContainer>
+    </Section>
+  {/if}
+{:else}
+  {#if type == enums.TargetType.Bot}
+    <Tag tagAction={sTagAction} onclick={botTagsSelect} initialSelected={botTags} tags={meta.bot.tags} />
+  {:else}
+    <Tag tagAction={sTagAction} onclick={serverTagsSelect} initialSelected={serverTags} tags={meta.server.tags} />
+  {/if}
 {/if}
 
 <style lang="scss">

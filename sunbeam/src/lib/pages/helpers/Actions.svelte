@@ -160,7 +160,7 @@ If you still wish to report, type the reason for reporting this ${type} below. R
 </div>
 {#if extLinks.length > 0 && !limited}
   <div class="links-pane">
-    <Tag buttonTag={true} targetType={type} tags={extLinks} />
+    <Tag buttonTag={true} tags={extLinks} />
   </div>
 {/if}
 

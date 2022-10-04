@@ -4,8 +4,9 @@
   import Icon from '@iconify/svelte';
   import Button from '$lib/base/Button.svelte';
   import { enums } from '../enums/enums';
+  import type { TargetType } from '../enums/enums';
   export let data: any;
-  export let type: string;
+  export let type: TargetType;
   export let rand: boolean;
 
   // Do some processing
@@ -22,10 +23,10 @@
 
 <section class="bot-card">
   <div class="bot-card-banner lazy" style="--background: url('{data.banner}');">
-    {#if (type == 'bot' || type == 'server') && data.state == enums.BotState.certified}
+    {#if (type == enums.TargetType.Bot || type == enums.TargetType.Server) && data.state == enums.BotState.certified}
       <Icon class="bot-card-cert" icon="fa-solid:certificate" inline={false} height="3em" />
     {/if}
-    <a href="/{type}/{data.user.id}" class="bot-card-view-link bot-card-avatar-container">
+    <a href="/{enums.helpers.targetTypeString(type)}/{data.user.id}" class="bot-card-view-link bot-card-avatar-container">
       <img
         alt="Bot Avatar"
         class="bot-card-avatar"
@@ -37,7 +38,7 @@
       />
     </a>
     <div>
-      <a href="/{type}/{data.user.id}" class="bot-card-view-link">
+      <a href="/{enums.helpers.targetTypeString(type)}/{data.user.id}" class="bot-card-view-link">
         <div class="bot-card-username">
           <p class="bot-card-username-txt white-bold">
             {#if rand}Fetching random bot...{:else}{data.user.username}{/if}
@@ -52,7 +53,7 @@
       >
     </p>
 
-    {#if type == 'bot' || type == 'server'}
+    {#if type == enums.TargetType.Bot || type == enums.TargetType.Server}
       <div class="d-flex bot-card-footer">
         <div class="bot-card-footer-stats">
           <p class="text-center white-bold">
@@ -75,24 +76,24 @@
     <div class="bot-card-actions">
       <Button
         ariaLabel="View"
-        href="/{type}/{data.user.id}"
+        href="/{enums.helpers.targetTypeString(type)}/{data.user.id}"
         class="bot-card-actions-link button"
         onclick={() => {}}>View</Button
       >
-      {#if type != 'profile'}
+      {#if type != enums.TargetType.User}
         <Button
           ariaLabel="Invite"
-          href="/{type}/{data.user.id}/invite"
+          href="/{enums.helpers.targetTypeString(type)}/{data.user.id}/invite"
           class="bot-card-actions-link button"
           target="_blank"
           onclick={() => {}}
-          >{#if type == 'server'}Join{:else}Invite{/if}</Button
+          >{#if type == enums.TargetType.Server}Join{:else}Invite{/if}</Button
         >
       {:else if $page.data.token && data.user.id == $page.data.user.id}
         <Button
           id="bot-card-action-settings-{data.user.id}"
           ariaLabel="Settings"
-          href="/{type}/{data.user.id}/settings"
+          href="/{enums.helpers.targetTypeString(type)}/{data.user.id}/settings"
           onclick={() => {}}
           class="bot-card-actions-link profile-settings-btn button">Settings</Button
         >

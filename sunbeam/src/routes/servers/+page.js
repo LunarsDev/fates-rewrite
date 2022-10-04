@@ -7,7 +7,7 @@ import { error } from '@sveltejs/kit';
 export async function load({ parent, fetch }) {
   let session = await parent();
   logger.info('Page', session);
-  const url = `/index?target_type=0`;
+  const url = `/index?target_type=1`;
   let res = null;
   res = await request(`${api}${url}`, {
     method: 'GET',
@@ -36,9 +36,9 @@ export async function load({ parent, fetch }) {
     throw error(500, 'Failed to fetch list metadata');
   }
 
-  // Fetch random bot
+  // Fetch random server
   let randomJson = null;
-  const random = await request(`${api}/random?target_type=0`, {
+  const random = await request(`${api}/random?target_type=1`, {
     method: 'GET',
     session: session,
     endpointType: 'user',
@@ -49,7 +49,7 @@ export async function load({ parent, fetch }) {
   if (random.ok) {
     randomJson = await random.json();
   } else {
-    throw error(404, 'Random bot not found');
+    throw error(404, 'Random server not found');
   }
 
   if (res.ok) {

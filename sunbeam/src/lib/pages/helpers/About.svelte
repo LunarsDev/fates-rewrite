@@ -39,7 +39,7 @@
 {/if}
 
 <h2>Tags</h2>
-<Tag targetType={type} tags={data.tags} modWidth={false} />
+<Tag redirectUser={true} tags={data.tags} modWidth={false} />
 
 {#if type == 'bot'}
   <h2>Uptime</h2>

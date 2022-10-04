@@ -2,7 +2,7 @@ import datetime
 from typing import Any, Optional, Generic, TypeVar
 import uuid
 
-from .tables import BotCommands, Bots, Users, UserBotLogs
+from .tables import BotCommands, Bots, Users, UserBotLogs, Servers
 from piccolo.utils.pydantic import create_pydantic_model
 from piccolo.query import Select
 from pydantic import BaseModel
@@ -38,6 +38,16 @@ BOT_SNIPPET_COLS = (
     Bots.guild_count,
     Bots.banner_card,
     Bots.state,
+)
+
+SERVER_SNIPPET_COLS = (
+    Servers.guild_id,
+    Servers.votes,
+    Servers.description,
+    Servers.flags,
+    Servers.guild_count,
+    Servers.banner_card,
+    Servers.state,
 )
 
 DEFAULT_USER_EXPERIMENTS = [

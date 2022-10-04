@@ -147,6 +147,7 @@ class TargetType(IntEnum):
     Bot = 0
     Server = 1
     User = 2
+    Pack = 3
 
 
 class PageStyle(IntEnum):

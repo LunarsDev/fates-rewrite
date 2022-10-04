@@ -1,16 +1,37 @@
 <script lang="ts">
   import Icon from '@iconify/svelte';
   import Button from '$lib/base/Button.svelte';
+    import { goto } from '$app/navigation';
   export let tags;
-  export let targetType: string;
   export let modWidth = true; // Whether to set width to 90% or not, needed in bot pages to make showing tags look decent
   export let buttonTag = false; // Button tag or not
+
+  export let redirectUser = false;
+
+  export let onclick = (s: string[]) => {};
+
+  interface TagAction {
+    func: () => void,
+    text: string,
+  }
+
+  export let tagAction: TagAction = null;
 
   if (!tags) {
     tags = [];
   }
 
+  export let initialSelected: string[] = [];
+
   // Add first maxTags to initial render view
+  let selected = [];
+
+  console.log(initialSelected)
+
+  if(initialSelected.length > 0) {
+    selected = initialSelected;
+  }
+
   let maxTags = 4;
   let classList = 'tag-container';
   let tagClasses = 'tag-item button';
@@ -46,16 +67,39 @@
       tagsToDisplay = tags;
     }
   }
+
+  function selectTag(tag) {
+    if(buttonTag) {
+      window.location.href = tag.href;
+      return
+    }
+
+    if(redirectUser) {
+      goto(`/?tags=${tag.id}`)
+      return
+    }
+
+    tag = tag.id
+
+    if (selected.includes(tag)) {
+      selected = selected.filter((t) => t !== tag);
+    } else {
+      selected.push(tag);
+    }
+
+    selected = selected;
+    onclick(selected)
+  }
 </script>
 
 <div class={classList}>
   {#each tagsToDisplay as tag}
     <span class={spanClasses}>
       <Button
-        onclick={() => {}}
+        onclick={() => selectTag(tag)}
         id="tags-{tag.id}"
         class={tagClasses}
-        href={tag.href || `/frostpaw/search/tags?tag=${tag.id}&target_type=${targetType}`}
+        href={tag.href || "javascript:void(0)"}
       >
         {#if !buttonTag}
           <Icon class="white tag-icon" icon={tag.iconify_data} inline={false} aria-hidden="true" />
@@ -64,6 +108,10 @@
           {tag.name}
         {:else}
           <strong>{tag.name}</strong>
+        {/if}
+
+        {#if selected.includes(tag.id)}
+          <Icon class="white tag-icon" icon="mdi:check" inline={false} aria-hidden="true" />
         {/if}
       </Button>
     </span>
@@ -76,6 +124,9 @@
     {:else}
       <Button id="hide-all-tags" class="show-all" onclick={showAllTags}>hide</Button>
     {/if}
+  {/if}
+  {#if tagAction && selected.length > 0}
+    <Button class="tag-actions" onclick={tagAction.func}>{tagAction.text}</Button>
   {/if}
 </div>
 
@@ -122,6 +173,13 @@
   :global(.show-all) {
     border: none !important;
     background-color: white !important;
+    color: black !important;
+    --clickcolor: #d2edf3 !important;
+  }
+
+  :global(.tag-actions) {
+    border: none !important;
+    background-color: rgb(193, 125, 125) !important;
     color: black !important;
     --clickcolor: #d2edf3 !important;
   }

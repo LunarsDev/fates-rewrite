@@ -113,6 +113,33 @@ async def get_index(request: Request, target_type: models.TargetType):
         )
         mapleshade.cache.set("bot_index", index, expiry=30)
         return index
+    elif target_type == models.TargetType.Server:
+        if cached_index := mapleshade.cache.get("server_index"):
+            return cached_index.value()
+            
+        index = models.Index(
+            top_voted=await mapleshade.to_snippet(
+                await tables.Servers.select(*models.SERVER_SNIPPET_COLS)
+                .where(tables.Servers.state == models.BotServerState.Approved)
+                .order_by(tables.Servers.votes, ascending=False)
+                .limit(12)
+            ),
+            new=await mapleshade.to_snippet(
+                await tables.Servers.select(*models.SERVER_SNIPPET_COLS)
+                .where(tables.Servers.state == models.BotServerState.Approved)
+                .order_by(tables.Servers.created_at, ascending=False)
+                .limit(12)
+            ),
+            certified=await mapleshade.to_snippet(
+                await tables.Servers.select(*models.SERVER_SNIPPET_COLS)
+                .where(tables.Servers.state == models.BotServerState.Certified)
+                .order_by(tables.Servers.votes, ascending=False)
+                .limit(12)
+            ),
+        )
+        mapleshade.cache.set("server_index", index, expiry=30)
+        return index
+
     else:
         models.Response.not_implemented()  # TODO: Implement this
 

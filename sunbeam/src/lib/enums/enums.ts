@@ -107,7 +107,8 @@ export enum AlertInputType {
 export enum TargetType {
   Bot = 0,
   Server = 1,
-  User = 2
+  User = 2,
+  Pack = 3,
 }
 
 export const enums = {
@@ -139,6 +140,16 @@ export const enums = {
 
       return flagsParsed.some((item) => allFlags.includes(item));
       // End of function
+    },
+    targetTypeString: function (type: TargetType) {
+      switch (type) {
+        case TargetType.Bot:
+          return 'bot';
+        case TargetType.Server:
+          return 'server';
+        case TargetType.User:
+          return 'user';
+      }
     }
   }
 };

@@ -3,7 +3,8 @@
   import BotCard from '$lib/cards/BotCard.svelte';
   import { roll } from '$lib/request';
   import { page } from '$app/stores';
-  export let type: string;
+  import type { TargetType } from '$lib/enums/enums';
+  export let type: TargetType;
 
   export let randomBot: any;
 

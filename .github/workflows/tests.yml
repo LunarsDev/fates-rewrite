@@ -45,10 +45,7 @@ jobs:
           go build -v 
           ./kitehelper test
       
-      - name: Push changes
-        run: |
-          git config --global user.name "Kitescratch Tests[bot]"
-          git config --global user.email "kts+github-actions[bot]@users.noreply.github.com"
-          git add -v .
-          git commit -m "Kitescratch: Lint+Format task"
-          git push
+      - uses: stefanzweifel/git-auto-commit-action@v4
+        with:
+          commit_message: "Kitescratch: Lint+Format task"
+          commit_user_name: "Kitescratch Tests[bot]"

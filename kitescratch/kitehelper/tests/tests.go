@@ -208,6 +208,12 @@ func (ts testset) Run() {
 			}
 		}
 	}
+
+	if len(failed) > 0 {
+		os.Exit(1)
+	} else {
+		os.Exit(0)
+	}
 }
 
 func Tester(progname string, args []string) {

@@ -2,6 +2,8 @@ package main
 
 import (
 	"fmt"
+	"kitehelper/sveltekit"
+	"kitehelper/tests"
 	"os"
 )
 
@@ -11,9 +13,13 @@ type command struct {
 }
 
 var cmds = map[string]command{
-	"newsun": command{
-		Func: newsun,
+	"newsun": {
+		Func: sveltekit.Newsun,
 		Help: "Create a new sunbeam route",
+	},
+	"test": {
+		Func: tests.Tester,
+		Help: "Run tests [Set NO_INTERACTION environment variable to disable all input interaction]",
 	},
 }
 

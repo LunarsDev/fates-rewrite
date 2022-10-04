@@ -1,4 +1,4 @@
-package main
+package sveltekit
 
 import (
 	"fmt"
@@ -13,7 +13,7 @@ export async function load({ params }) {
 	`
 )
 
-func newsun(progname string, args []string) {
+func Newsun(progname string, args []string) {
 	// Do smth
 	if len(args) == 0 {
 		fmt.Printf("usage: %s newsun <sunbeam route name>\n", progname)

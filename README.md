@@ -14,8 +14,7 @@
 
 ## Commits
 
-- **All commits made to this repo must pass the tests present in ``tests`` folder 
-(run ``python3 tests/run_tests.py``)
+- **All commits made to this repo must pass the tests (run ``kitehelper test``)
 
 ## Requirements
 

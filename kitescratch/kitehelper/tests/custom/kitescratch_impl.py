@@ -1,3 +1,4 @@
+"""Custom test to validate kitescratch"""
 import pathlib
 import sys
 sys.path.append(".")

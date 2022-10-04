@@ -79,6 +79,8 @@ tester.add("kitescratch_routes_impl.py", ["python3", "tests/kitescratch_routes_i
 tester.add("sunbeam (format)", ["npm", "run", "format"], cwd="sunbeam")
 tester.add("sunbeam (lint)", ["npm", "run", "lint-fix"], cwd="sunbeam", ignore_errors="Still initial stages of the rewrite")
 tester.add("fates (black)", ["black", "fates"])
+tester.add("silverpelt (black)", ["black", "silverpelt"])
+
 
 
 tester.run()

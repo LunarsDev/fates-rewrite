@@ -33,7 +33,7 @@ class IDiscordUser(BaseModel):
     system: bool
     status: Status
     flags: int
-    
+
 
 class DiscordUser(IDiscordUser):
     """Represents a discord user"""

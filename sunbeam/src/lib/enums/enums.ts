@@ -149,6 +149,20 @@ export const enums = {
           return 'server';
         case TargetType.User:
           return 'user';
+        case TargetType.Pack:
+          return 'pack';
+      }
+    },
+    strToTargetType: function (type: string) {
+      switch (type) {
+        case 'bot':
+          return TargetType.Bot;
+        case 'server':
+          return TargetType.Server;
+        case 'user':
+          return TargetType.User;
+        case "pack":
+          return TargetType.Pack;
       }
     }
   }

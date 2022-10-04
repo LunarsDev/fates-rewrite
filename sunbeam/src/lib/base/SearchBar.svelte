@@ -16,7 +16,7 @@
   import { enums, type TargetType } from '$lib/enums/enums';
     import { info } from '$lib/logger';
 
-  let type: TargetType = enums.TargetType.Bot;
+  export let type: TargetType = enums.TargetType.Bot;
   let query: string;
   let gc_from = 1;
   let gc_to = -1;
@@ -45,26 +45,24 @@
     if (browser) {
       let url = new URL(window.location.href);
 
-      let tgtType = url.searchParams.get('t') || 'bot';
-      
-      if(tgtType == "server") {
-        type = enums.TargetType.Server;
-      }
+      type = enums.helpers.strToTargetType(url.searchParams.get('t') || 'bot');
 
       query = url.searchParams.get('q') || '';
       gc_from = parseInt(url.searchParams.get('gcf') || '0');
       gc_to = parseInt(url.searchParams.get('gct') || '-1');
 
       let bt = url.searchParams.get('bt') || '';
-      botTags = bt.split(",").filter((x) => x != "");
+      botTags = bt.split(".").filter((x) => x != "");
 
       let st = url.searchParams.get('st') || '';
-      serverTags = st.split(",").filter((x) => x != "");
+      serverTags = st.split(".").filter((x) => x != "");
 
       info("SearchBar", type, query, gc_from, gc_to, botTags, serverTags);
 
       if (query || botTags.length > 0 || serverTags.length > 0) {
         searchBot(true);
+      } else {
+        data = null;
       }
     }
   });
@@ -74,8 +72,7 @@
   function keyHandle(event) {
     event.preventDefault();
     if (event.keyCode === 13) {
-      let form = document.querySelector('#search') as HTMLFormElement;
-      form.submit();
+      searchBot(true);
     }
   }
 
@@ -89,7 +86,7 @@
       url.searchParams.delete('q');
     }
 
-    if(type) {
+    if(type || type == enums.TargetType.Bot) {
       url.searchParams.set('t', enums.helpers.targetTypeString(type));
     } else {
       url.searchParams.delete('t');
@@ -108,13 +105,13 @@
     }
 
     if(botTags.length > 0) {
-      url.searchParams.set('bt', botTags.join(','));
+      url.searchParams.set('bt', botTags.join('.'));
     } else {
       url.searchParams.delete('bt');
     }
 
     if(serverTags.length > 0) {
-      url.searchParams.set('st', serverTags.join(','));
+      url.searchParams.set('st', serverTags.join('.'));
     } else {
       url.searchParams.delete('st');
     }
@@ -182,7 +179,7 @@
     <FormInput
       formclass="filter-inp filter-inp-left"
       oninput={(event) => {
-        gc_from = parseInt(castToEl(event.target).value) || -1;
+        gc_from = parseInt(castToEl(event.target).value) || 0;
         searchBot(false);
       }}
       id="gcf"
@@ -206,16 +203,23 @@
 
     <h3>Display Order</h3>
     <Tip>
-      First display is either 'bot', 'server', 'pack' or 'profile' and chooses whether you want bots
+      First display is either 'bot', 'server', 'pack' or 'user' and chooses whether you want bots
       first or servers first!
     </Tip>
-    <FormInput
-      onkeyup={keyHandle}
-      id="f"
-      name="First Display"
-      data={type}
-      placeholder="First display, see tip"
-    />
+    <select on:change={(event) => {
+        if(castToEl(event).value == "#") {
+          return
+        }
+
+        type = enums.helpers.strToTargetType(castToEl(event.target).value || "bot");
+        searchBot(false);
+    }}>
+      <option value="#" disabled>Choose a display order</option>
+      <option value="bot" selected={type == enums.TargetType.Bot}>Bots First</option>
+      <option value="server" selected={type == enums.TargetType.Server}>Servers First</option>
+      <option value="pack" selected={type == enums.TargetType.Pack}>Packs First</option>
+      <option value="user" selected={type == enums.TargetType.User}>Users First</option>
+    </select>
   </details>
 </div>
 

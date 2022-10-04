@@ -25,13 +25,13 @@
     <h2 class="best-server"><Intl key="index.best_servers" /></h2>
   </section>
   
-  <SearchBar bind:data={searchData} meta={data.meta} />
+  <SearchBar type={enums.TargetType.Server} bind:data={searchData} meta={data.meta} />
   
   {#if !searchData}
     <Tag tags={data.meta.tags} />
   
     {#if data.random}
-      <RandomCard type={enums.TargetType.Bot} randomBot={data.random} />
+      <RandomCard type={enums.TargetType.Server} randomBot={data.random} />
     {/if}
   
     <Section icon="fa-solid:certificate" title="Certified" id="certified-index">

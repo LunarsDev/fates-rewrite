@@ -52,13 +52,37 @@ async def random_snippet(
                     await mapleshade.to_snippet(
                         await models.augment(
                             tables.Bots.select(*models.BOT_SNIPPET_COLS).where(
-                                tables.Bots.state == models.BotServerState.Certified
+                                (tables.Bots.state == models.BotServerState.Approved) |
+                                (tables.Bots.state != models.BotServerState.Certified),
                             ),
                             "ORDER BY RANDOM() LIMIT 1",
                         )
                     )
                 )[0]
                 mapleshade.cache.set("random-bot", v, expiry=60 * 60 * 3)
+                return v
+            except Exception as exc:
+                print(exc)
+                flag += 1
+    elif target_type == models.TargetType.Server:
+        if not reroll:
+            if cached := mapleshade.cache.get("random-server"):
+                return cached.value()
+        flag = 0
+        while flag < 10:
+            try:
+                v = (
+                    await mapleshade.to_snippet(
+                        await models.augment(
+                            tables.Servers.select(*models.SERVER_SNIPPET_COLS).where(
+                                (tables.Servers.state == models.BotServerState.Approved) |
+                                (tables.Servers.state == models.BotServerState.Certified)
+                            ),
+                            "ORDER BY RANDOM() LIMIT 1",
+                        )
+                    )
+                )[0]
+                mapleshade.cache.set("random-server", v, expiry=60 * 60 * 3)
                 return v
             except Exception as exc:
                 print(exc)

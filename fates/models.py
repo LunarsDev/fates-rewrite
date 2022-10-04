@@ -83,6 +83,7 @@ class Entity:
             return self.id == getattr(other, "id", None)
         return self.id == other
 
+
 class ResolvedPackBot(BaseModel):
     """Represents a bot that is part of a pack"""
 
@@ -92,8 +93,10 @@ class ResolvedPackBot(BaseModel):
     description: str
     """The bot's description"""
 
+
 class BotPack(BaseModel):
     """Represents a bot pack on the list"""
+
     id: uuid.UUID
     """The pack's ID"""
 
@@ -121,6 +124,7 @@ class BotPack(BaseModel):
 
 class Permission(BaseModel):
     """A permission for a staff member on the list"""
+
     index: int
     roles: list[str]
     name: str
@@ -129,29 +133,31 @@ class Permission(BaseModel):
         if not isinstance(other, Permission):
             return False
         return self.index == other.index
-    
+
     def __lt__(self, other: "Permission") -> bool:
         if not isinstance(other, Permission):
             return False
         return self.index < other.index
-    
+
     def __gt__(self, other: "Permission") -> bool:
         if not isinstance(other, Permission):
             return False
         return self.index > other.index
-    
+
     def __le__(self, other: "Permission") -> bool:
         if not isinstance(other, Permission):
             return False
         return self.index <= other.index
-    
+
     def __ge__(self, other: "Permission") -> bool:
         if not isinstance(other, Permission):
             return False
         return self.index >= other.index
 
+
 class PermissionList(BaseModel):
     perms: dict[str, Permission]
+
 
 class Tag(BaseModel, Entity):
     """Represents a tag"""
@@ -299,12 +305,14 @@ class Snippet(BaseModel):
     guild_count: int
     """The bot's/server's guild count"""
 
+
 class ProfileSnippet(BaseModel):
     """
     Represents a snippet which is essentially a miniature version of a profile where a full Profile is too expensive to return
 
     - This applies to both ``User`` entities
     """
+
     user: silver_types.DiscordUser
     """The user's user object"""
 
@@ -313,6 +321,7 @@ class ProfileSnippet(BaseModel):
 
     description: str
     """The user's description"""
+
 
 class Index(BaseModel):
     """Represents an index"""
@@ -364,8 +373,10 @@ class BotSecrets(BaseModel):
     webhook_secret: Optional[str] = None
     """The bot's webhook secret"""
 
+
 class Vanity(BaseModel):
     """Represents a vanity"""
+
     target_id: str
     """The vanity's target ID"""
 
@@ -375,11 +386,13 @@ class Vanity(BaseModel):
     code: str
     """The vanity's code"""
 
+
 class Login(BaseModel):
     """Represents a login"""
-    
+
     code: str
     """The Discord OAuth2 code"""
+
 
 class OauthUser(BaseModel):
     """OAuth2 login response"""
@@ -405,6 +418,7 @@ class OauthUser(BaseModel):
     permissions: Permission
     """The user's permissions"""
 
+
 class OAuth2Login(BaseModel):
     """OAuth2 login response"""
 
@@ -414,19 +428,23 @@ class OAuth2Login(BaseModel):
     url: str
     """The url to redirect to"""
 
+
 class Invite(BaseModel):
     """A invite for a bot/server"""
 
     invite: str
 
+
 class ResponseCode(Enum):
     """A API response code (can be used for programatic error handling)"""
+
     OK = "ok"
     AUTH_FAIL = "auth_fail"
     NOT_FOUND = "not_found"
     UNKNOWN = "unknown"
     INVALID_DATA = "invalid_data"
     FORBIDDEN = "forbidden"
+
 
 class Response(BaseModel):
     """A API Response"""
@@ -441,26 +459,32 @@ class Response(BaseModel):
     """The reason for the request failing (if any)"""
 
     def error(self, status_code: int):
-        raise ResponseRaise(self, status_code) 
+        raise ResponseRaise(self, status_code)
 
     @staticmethod
     def not_implemented():
         Response(
             done=False,
             code=ResponseCode.UNKNOWN,
-            reason="This feature/endpoint is not implemented yet"
-        ).error(409) # Conflict
+            reason="This feature/endpoint is not implemented yet",
+        ).error(
+            409
+        )  # Conflict
+
 
 class ResponseRaise(Exception):
     """Raised via ``Response.error``"""
+
     def __init__(self, response: Response, status_code: int):
         self.status_code = status_code
-        self.response = response 
+        self.response = response
+
 
 # Test model
 class NestedModel(BaseModel):
     test: str
     perms: Permission
+
 
 class TaskResponse(BaseModel):
     """A created task response"""
@@ -468,20 +492,28 @@ class TaskResponse(BaseModel):
     task_id: str
     """The task ID"""
 
+
 class AuthData(BaseModel):
     """INTERNAL: Auth struct"""
+
     auth_type: TargetType
-    target_id: int 
+    target_id: int
     token: str
     compat: bool
 
+
 class AuthDataHTTPResponse(AuthData):
     """AuthData struct for HTTP responses"""
+
     target_id: str
 
-DataT = TypeVar('DataT')
+
+DataT = TypeVar("DataT")
+
+
 class SearchFilter(GenericModel, Generic[DataT]):
     """A filter for search"""
+
     filter_from: DataT
     """The value to filter from"""
 

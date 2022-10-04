@@ -104,3 +104,22 @@ func GetTask(taskId string) any {
 
 	return task
 }
+
+func Search(query string, guildCount types.SearchFilter, votes types.SearchFilter) types.SearchResponse {
+	body := map[string]any{
+		"query":       query,
+		"guild_count": guildCount.Map(),
+		"votes":       votes.Map(),
+	}
+
+	var resp types.SearchResponse
+
+	requests.RequestToStruct(requests.HTTPRequest{
+		Method: "POST",
+		Url:    "/search",
+		Reason: Reason,
+		Data:   body,
+	}, &resp)
+
+	return resp
+}

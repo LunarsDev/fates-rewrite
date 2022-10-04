@@ -9,8 +9,8 @@ import { redirect, error } from '@sveltejs/kit';
 export async function load({ url, fetch, parent }) {
   let session = await parent();
 
-  if(!session.token) {
-    return {}
+  if (!session.token) {
+    return {};
   }
 
   let allPerms = await request(`${api}/permissions`, {
@@ -18,14 +18,14 @@ export async function load({ url, fetch, parent }) {
     session: session,
     endpointType: 'user',
     fetch: fetch
-    });
+  });
 
-  if(!allPerms.ok) {
+  if (!allPerms.ok) {
     throw error(500, 'Failed to get permissions');
   }
 
   return {
-    all_permissions: (await allPerms.json())["perms"],
-    action: url.searchParams.get("act"),
-  }
+    all_permissions: (await allPerms.json())['perms'],
+    action: url.searchParams.get('act')
+  };
 }

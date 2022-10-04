@@ -138,6 +138,14 @@ func mainMenu() {
 				},
 			},
 			{
+				Text: "Search List",
+				Char: "SL",
+				Handler: func() error {
+					searchView()
+					return nil
+				},
+			},
+			{
 				Text: "Fetch a bot",
 				Char: "FB",
 				Handler: func() error {

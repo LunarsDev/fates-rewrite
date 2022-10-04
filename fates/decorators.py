@@ -17,6 +17,7 @@ import asyncpg
 
 from fates.tags import Tag
 
+
 class Method(IntEnum):
     get = 0
     post = 1
@@ -24,6 +25,7 @@ class Method(IntEnum):
     patch = 3
     delete = 5
     head = 6
+
 
 class Ratelimit(BaseModel):
     num: int
@@ -35,18 +37,20 @@ class Ratelimit(BaseModel):
     name: str
     """The name of the ratelimit (the rl will apply to all ratelimits with said name)"""
 
-class SharedRatelimit():
+
+class SharedRatelimit:
     _shared_rls = {
         "core": Ratelimit(
-            num=200, # Avoid ratelimiting core endpoints as far as possible 
+            num=200,  # Avoid ratelimiting core endpoints as far as possible
             interval=1,
-            name="core"
+            name="core",
         )
     }
 
     @staticmethod
     def new(name: str) -> "Ratelimit":
         return SharedRatelimit._shared_rls[name]
+
 
 class Route(BaseModel):
     app: FastAPI
@@ -55,8 +59,10 @@ class Route(BaseModel):
     response_model: Any
     method: Method
     tags: list[Tag]
-    ratelimit: Ratelimit # We don't actually ratelimit yet, this is for forwards-compat
-    auth: Optional[models.TargetType | bool] = None # Either None, a target type or true (for all)
+    ratelimit: Ratelimit  # We don't actually ratelimit yet, this is for forwards-compat
+    auth: Optional[
+        models.TargetType | bool
+    ] = None  # Either None, a target type or true (for all)
 
     class Config:
         arbitrary_types_allowed = True
@@ -67,13 +73,14 @@ class Route(BaseModel):
             raise ValueError("A route can only have 1 tags")
         return v
 
+
 class __RouteData:
     """Internal class for handling routes"""
 
     def __init__(self, func: Awaitable, route: Route):
         self.func: Awaitable = func
         self.route: Route = route
-    
+
     def get_tio_type(self, v: Any) -> str:
         tio_types = {
             str: "text",
@@ -92,12 +99,14 @@ class __RouteData:
 
         for field in bm.__fields__.values():
             if issubclass(field.type_, BaseModel):
-                fields[field.name] = {"_nested": True} | self.extract_bm(field.annotation)
+                fields[field.name] = {"_nested": True} | self.extract_bm(
+                    field.annotation
+                )
                 continue
             fields[field.name] = self.get_tio_type(field.annotation)
 
         return fields
-        
+
     def extract_tryitout(self) -> dict[str, Any]:
         """Extracts the tryitout data (query params, path params, body, headers) from the function"""
         tryitout = {
@@ -105,18 +114,28 @@ class __RouteData:
             "query": {},
             "path": {},
             "body": {},
-            "auth": [v.name for v in models.TargetType] if self.route.auth == True else [self.route.auth.name] if self.route.auth else [],
+            "auth": [v.name for v in models.TargetType]
+            if self.route.auth == True
+            else [self.route.auth.name]
+            if self.route.auth
+            else [],
         }
 
         sig = signature(self.func)
 
         # Get all the path params for route.url
-        path_params = [v[1:-1].split(":")[0] for v in self.route.url.split("/") if v.startswith("{") and v.endswith("}")]
+        path_params = [
+            v[1:-1].split(":")[0]
+            for v in self.route.url.split("/")
+            if v.startswith("{") and v.endswith("}")
+        ]
 
         # Handle path params
         for param in path_params:
             if param in sig.parameters:
-                tryitout["path"][param] = self.get_tio_type(sig.parameters[param].annotation)
+                tryitout["path"][param] = self.get_tio_type(
+                    sig.parameters[param].annotation
+                )
 
         # First find the body param
         for key, param in sig.parameters.items():
@@ -129,25 +148,29 @@ class __RouteData:
 
                 # Loop over all fields of the base model
                 tryitout["body"] = self.extract_bm(param.annotation)
-            
+
             else:
                 # Query param or path param
                 if key in path_params or key == "request":
                     continue
 
                 tryitout["query"][key] = self.get_tio_type(param.annotation)
-        
+
         return tryitout
 
+
 T = TypeVar("T", covariant=True)
+
+
 class __RouteProtocol(Protocol[T]):
     """Type hints for a route"""
+
     def __init__(
-        self, 
-        path: str, 
+        self,
+        path: str,
         responses: dict[int, Any],
-        response_model: Any = None, 
-        tags: list[str] = None, 
+        response_model: Any = None,
+        tags: list[str] = None,
         operation_id: str = None,
     ) -> None:
         ...
@@ -165,7 +188,7 @@ def route(route: Route):
             raise ValueError("Function name must be unique")
 
         route_data = __RouteData(func, route)
-        
+
         routes[func.__name__] = route_data
 
         try_data = orjson.dumps(route_data.extract_tryitout())
@@ -186,7 +209,7 @@ def route(route: Route):
 
         # Check the args of func
         func_sig = signature(func)
-        
+
         if not func_sig.parameters.get("request"):
             raise ValueError("Function must take request")
 
@@ -199,9 +222,11 @@ def route(route: Route):
                     models.Response(
                         done=False,
                         reason=e.detail,
-                        code=consts.DEFAULT_EXC.get(e.status_code, models.ResponseCode.UNKNOWN),
+                        code=consts.DEFAULT_EXC.get(
+                            e.status_code, models.ResponseCode.UNKNOWN
+                        ),
                     ).dict(),
-                    status_code=e.status_code
+                    status_code=e.status_code,
                 )
             except models.ResponseRaise as e:
                 return ORJSONResponse(e.response.dict(), status_code=e.status_code)
@@ -212,7 +237,7 @@ def route(route: Route):
                         reason=str(e),
                         code=models.ResponseCode.INVALID_DATA,
                     ).dict(),
-                    status_code=400
+                    status_code=400,
                 )
             except Exception as e:
                 traceback.print_exc()
@@ -222,7 +247,7 @@ def route(route: Route):
                         reason=repr(e),
                         code=models.ResponseCode.UNKNOWN,
                     ).dict(),
-                    status_code=500
+                    status_code=500,
                 )
 
             return res
@@ -231,25 +256,19 @@ def route(route: Route):
             route.response_model = None
 
         rmap[route.method](
-            route.url, 
-            response_model=route.response_model, 
+            route.url,
+            response_model=route.response_model,
             tags=[tag.fname for tag in route.tags],
             operation_id=func.__name__,
             responses={
-                404: {
-                    "model": models.Response
-                },
-                400: {
-                    "model": models.Response
-                },
-                409: {
-                    "description": "Not Implemented",
-                    "model": models.Response
-                }
-            }
+                404: {"model": models.Response},
+                400: {"model": models.Response},
+                409: {"description": "Not Implemented", "model": models.Response},
+            },
         )(custom_route)
 
     return rw
+
 
 def nop(*_):
     """NOP (unused request can use this)"""

@@ -21,7 +21,7 @@
   import './../css/tailwind.css';
   import { enums } from '$lib/enums/enums';
   import Alert from '$lib/base/Alert.svelte';
-    import { logoutUser } from '$lib/request';
+  import { logoutUser } from '$lib/request';
 
   function llhandler() {
     logger.info('Nav', 'Called lazy load handler');
@@ -99,17 +99,17 @@
         logger.info('Nav', 'navigating to different host');
         $navigationState = 'loaded';
       } else {
-        if($page.data.allowBanned) {
+        if ($page.data.allowBanned) {
           logoutUser(); // This route should be isolated from the rest of the site
           alert({
-            title: "Warning",
-            id: "warning",
-            message: "Going to log you out as you are exiting a sanitized portal",
+            title: 'Warning',
+            id: 'warning',
+            message: 'Going to log you out as you are exiting a sanitized portal',
             type: enums.AlertType.Warning,
             close: () => {
-              window.location.href = "/";
+              window.location.href = '/';
             }
-          })
+          });
         }
         $inputstore = [];
         $loadstore = 'Loading...';

@@ -27,8 +27,7 @@ export async function load({ request }) {
     permissions: {
       index: 0,
       roles: [],
-      name: "default"
-
+      name: 'default'
     }
   };
 

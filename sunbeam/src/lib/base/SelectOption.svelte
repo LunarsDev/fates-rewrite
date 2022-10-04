@@ -1,7 +1,7 @@
 <script lang="ts">
   export let value: string;
   export let masterValue: string;
-  export let disabled: boolean = false;
+  export let disabled = false;
 </script>
 
 {#if `${masterValue}` == `${value}`}

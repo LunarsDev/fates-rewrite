@@ -91,14 +91,14 @@ export async function request(url: string, options: AuthOptions): Promise<Respon
   }
 
   try {
-    let res: Response = await options.fetch(url, {
+    const res: Response = await options.fetch(url, {
       method: options.method,
       headers: options.headers,
       body: options.body
     });
 
     if (options.errorOnFail && !res.ok) {
-      let err = await res.text();
+      const err = await res.text();
       throw new Error(err);
     }
 
@@ -127,8 +127,8 @@ export function parseState(v) {
 }
 
 export async function roll(type: string | number, session: any) {
-  let targetType = getTargetType(type);
-  let res = await request(`${api}/random?target_type=${targetType}&reroll=true`, {
+  const targetType = getTargetType(type);
+  const res = await request(`${api}/random?target_type=${targetType}&reroll=true`, {
     method: 'GET',
     session: session,
     endpointType: 'user',
@@ -145,10 +145,10 @@ export async function roll(type: string | number, session: any) {
 }
 
 export async function loginUser(initialModifier = null) {
-  if(!initialModifier) {
-    initialModifier = {}
+  if (!initialModifier) {
+    initialModifier = {};
   }
-  let modifier = initialModifier;
+  const modifier = initialModifier;
 
   modifier['href'] = window.location.href;
 
@@ -184,7 +184,7 @@ export async function voteHandler(id: string, test: boolean, type: string) {
     return;
   }
 
-  let targetType = getTargetType(type);
+  const targetType = getTargetType(type);
 
   const res = await request(`${api}/votes/${id}?target_type=${targetType}&test=${test}`, {
     method: 'PATCH',
@@ -209,9 +209,9 @@ export async function addReviewHandler(
     return;
   }
 
-  let targetType = getTargetType(type);
+  const targetType = getTargetType(type);
 
-  let json = {
+  const json = {
     review_text: review_text,
     star_rating: star_rating,
     flagged: false,

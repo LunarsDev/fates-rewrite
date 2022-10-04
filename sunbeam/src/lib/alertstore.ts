@@ -33,4 +33,4 @@ type AlertStore = Alert;
 
 export default writable<AlertStore>();
 
-export let errorStore = writable<boolean>();
+export const errorStore = writable<boolean>();

@@ -85,8 +85,7 @@ def document_enums():
                 md[key]["doc"] = "\n" + v.__doc__ + "\n\n"
 
             for prop in props:
-                md[key][
-                    "table"] += f"| {prop.name} | {prop.value} |"
+                md[key]["table"] += f"| {prop.name} | {prop.value} |"
                 for prop_key in keys:
                     tmp = getattr(prop, prop_key)
                     try:
@@ -103,6 +102,7 @@ def document_enums():
         md_out.append(f'### {key}\n{md[key]["doc"]}{md[key]["table"]}')
 
     return "## Enums\n" + "\n\n".join(md_out)
+
 
 docs.append(document_enums())
 
@@ -127,13 +127,14 @@ app = FastAPI(
     description="\n\n".join(docs),
 )
 
+
 @app.exception_handler(404)
 async def not_found(_: Request, exc: HTTPException):
     return ORJSONResponse(
         models.Response(
             done=False,
             reason=exc.detail,
-            code=consts.DEFAULT_EXC.get(exc.status_code, models.ResponseCode.UNKNOWN)
+            code=consts.DEFAULT_EXC.get(exc.status_code, models.ResponseCode.UNKNOWN),
         ).dict(),
         status_code=exc.status_code,
     )
@@ -145,6 +146,7 @@ async def unicorn_exception_handler(_: Request, exc: models.ResponseRaise):
         status_code=exc.status_code,
         content=exc.response.dict(),
     )
+
 
 @app.middleware("http")
 async def cors(request: Request, call_next):
@@ -176,6 +178,7 @@ async def close_database_connection_pool():
     engine = engine_finder()
     await engine.close_connnection_pool()
 
+
 # This is the only exception to not using @route
 @app.get("/docs", include_in_schema=False)
 async def docs():
@@ -184,4 +187,5 @@ async def docs():
 
 # Load all routes
 from fates import routes
+
 nop(routes)

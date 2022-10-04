@@ -2,12 +2,14 @@
 
 from pydantic import BaseModel
 
+
 class Tag(BaseModel):
     name: str
     """The internal name of tag"""
 
     fname: str
     """The external name presented on API docs"""
+
 
 bot = Tag(name="bot", fname="Bot-related endpoints")
 tests = Tag(name="tests", fname="Experimental test endpoints")
@@ -46,4 +48,3 @@ These endpoints are not guaranteed to be stable and do not have to be implemente
         "description": "Operations related to data (user data, to be specific)",
     },
 ]
-    

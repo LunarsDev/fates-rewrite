@@ -1,13 +1,13 @@
 <script lang="ts">
   import * as logger from '$lib/logger';
 
-  let className: string = '';
+  let className = '';
   export { className as class };
   export let onclick: () => void;
 
-  export let href: string = '';
-  export let useLink: boolean = true;
-  export let id: string = '';
+  export let href = '';
+  export let useLink = true;
+  export let id = '';
 
   if (!className.includes(' button') && className != 'button') {
     className += ' button';
@@ -26,9 +26,9 @@
   export let butClickColor = '#332a2a';
 
   export let ariaLabel: string = null;
-  export let ariaDisabled: boolean = false;
-  export let disabled: boolean = false;
-  export let style: string = '';
+  export let ariaDisabled = false;
+  export let disabled = false;
+  export let style = '';
 
   if (ariaDisabled || disabled) {
     className += ' disabled';
@@ -39,8 +39,8 @@
   export let target: string = null;
 
   // For backwards compatibility
-  export let touch: boolean = false;
-  export let variant: string = '';
+  export let touch = false;
+  export let variant = '';
 
   if (variant) {
     logger.info('Button', 'touch and variant is deprecated. Please remove it.', touch, variant);

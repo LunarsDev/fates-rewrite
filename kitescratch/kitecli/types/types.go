@@ -1,5 +1,9 @@
 package types
 
+import (
+	"time"
+)
+
 type Tag struct {
 	ID          string  `json:"id"`
 	IconifyData string  `json:"iconify_data"`
@@ -171,6 +175,10 @@ type DiscordUser struct {
 	Flags         int        `json:"flags"`
 }
 
+func (d DiscordUser) String() string {
+	return d.Username + "#" + d.Discriminator + " [" + d.ID + "]"
+}
+
 type OauthUser struct {
 	State           UserState        `json:"state"`
 	Token           string           `json:"token"`
@@ -248,6 +256,40 @@ type Snippet struct {
 	GuildCount  int             `json:"guild_count"`
 }
 
+type ProfileSnippet struct {
+	User        DiscordUser `json:"user"`
+	Banner      string      `json:"banner"`
+	Description string      `json:"description"`
+}
+
+/* name: str
+   """The pack's name"""
+
+   description: str
+   """The pack's description"""
+
+   icon: str
+   """The pack's icon"""
+
+   banner: Optional[str] = None
+   """The pack's banner"""*/
+
+type ResolvedPackBot struct {
+	User        DiscordUser `json:"user"`
+	Description string      `json:"description"`
+}
+
+type BotPack struct {
+	ID           string            `json:"id"`
+	Name         string            `json:"name"`
+	Description  string            `json:"description"`
+	Icon         string            `json:"icon"`
+	Banner       string            `json:"banner"`
+	ResolvedBots []ResolvedPackBot `json:"resolved_bots"`
+	Owner        DiscordUser       `json:"owner"`
+	CreatedAt    time.Time         `json:"created_at"`
+}
+
 type Index struct {
 	New       []Snippet `json:"new"`
 	TopVoted  []Snippet `json:"top_voted"`
@@ -290,4 +332,39 @@ type BotSecrets struct {
 	APIToken      string `json:"api_token"`
 	Webhook       string `json:"webhook"`
 	WebhookSecret string `json:"webhook_secret"`
+}
+
+/*
+class SearchResponse(BaseModel):
+
+	"""A search response"""
+
+	bots: list[Snippet]
+	"""The bots that matched the search query"""
+
+	servers: list[Snippet]
+	"""The servers that matched the search query"""
+
+	profiles: list[ProfileSnippet]
+	"""The profiles that matched the search query"""
+
+	packs: list[BotPack]
+*/
+type SearchResponse struct {
+	Bots     []Snippet        `json:"bots"`
+	Servers  []Snippet        `json:"servers"`
+	Profiles []ProfileSnippet `json:"profiles"`
+	Packs    []BotPack        `json:"packs"`
+}
+
+type SearchFilter struct {
+	From any `json:"from"`
+	To   any `json:"to"`
+}
+
+func (f SearchFilter) Map() map[string]any {
+	return map[string]interface{}{
+		"filter_from": f.From,
+		"filter_to":   f.To,
+	}
 }

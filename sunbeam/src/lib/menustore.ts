@@ -6,4 +6,4 @@ interface MenuStore {
 
 export default writable<MenuStore>({ open: '' });
 
-export let errorStore = writable<MenuStore>({ open: '' });
+export const errorStore = writable<MenuStore>({ open: '' });

@@ -9,13 +9,13 @@ export const prerender = false;
 
 /** @type {import('./$types').PageLoad} */
 export async function load({ parent, fetch }) {
-  let session = await parent();
-  let url = new URL(session.url);
-  let searchParams = url.searchParams;
+  const session = await parent();
+  const url = new URL(session.url);
+  const searchParams = url.searchParams;
 
-  let retry = "<br/><br/><a href='https://fateslist.xyz'>Try Again?</a>";
+  const retry = "<br/><br/><a href='https://fateslist.xyz'>Try Again?</a>";
 
-  let error = searchParams.get('error');
+  const error = searchParams.get('error');
 
   if (error) {
     return {
@@ -23,8 +23,8 @@ export async function load({ parent, fetch }) {
     };
   }
 
-  let code = searchParams.get('code');
-  let state = searchParams.get('state');
+  const code = searchParams.get('code');
+  const state = searchParams.get('state');
   if (!code || !state) {
     return {
       error: 'Invalid code/state' + retry
@@ -33,7 +33,7 @@ export async function load({ parent, fetch }) {
 
   let modifierInfo = {};
 
-  let stateSplit = state.split('.');
+  const stateSplit = state.split('.');
 
   if (stateSplit.length != 2) {
     return {
@@ -41,8 +41,8 @@ export async function load({ parent, fetch }) {
     };
   }
 
-  let nonce = stateSplit[0];
-  let modifier = stateSplit[1];
+  const nonce = stateSplit[0];
+  const modifier = stateSplit[1];
 
   info('Login', Base64.decode(modifier));
 
@@ -66,13 +66,13 @@ export async function load({ parent, fetch }) {
     };
   }
 
-  let res = await request(`${api}/oauth2`, {
+  const res = await request(`${api}/oauth2`, {
     method: 'POST',
     headers: {
       'Frostpaw-Server': url.origin
     },
     json: {
-      code: code,
+      code: code
     },
     session: session,
     fetch: fetch,
@@ -89,7 +89,7 @@ export async function load({ parent, fetch }) {
     };
   }
 
-  if (json['state'] == enums.UserState.global_ban && !modifierInfo["allowBanned"]) {
+  if (json['state'] == enums.UserState.global_ban && !modifierInfo['allowBanned']) {
     return {
       error: `<h1>You are global banned</h1><br/><h2>This is a global ban and as such, you may not login/use our API.</h2><br/>You can try to appeal this ban at <a href="https://fateslist.xyz/staffserver">our ban appeal server</a>`
     };
@@ -99,7 +99,7 @@ export async function load({ parent, fetch }) {
     };
   }
 
-  json["allowBanned"] = modifierInfo["allowBanned"];
+  json['allowBanned'] = modifierInfo['allowBanned'];
 
   return {
     cookie: Base64.encode(JSON.stringify(json)),

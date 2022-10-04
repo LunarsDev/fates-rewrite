@@ -1,7 +1,9 @@
 from aenum import IntEnum, StrEnum as Enum
 
+
 class WidgetFormat(Enum):
     """Widget format"""
+
     _init_ = "value __doc__"
 
     json = "json", "Raw JSON format"
@@ -15,13 +17,20 @@ class WidgetFormat(Enum):
 
 class BotServerFlag(IntEnum):
     """Flags that apply to both bots and servers"""
+
     _init_ = "value __doc__"
 
     Unlocked = 0, "Bot or server is unlocked and can be freely editted"
 
-    EditLocked = 1, "Bot or server is locked and cannot be editted but can be unlocked by the owner"
+    EditLocked = (
+        1,
+        "Bot or server is locked and cannot be editted but can be unlocked by the owner",
+    )
 
-    StaffLocked = 2, "Bot or server is locked by staff and can only be unlocked by staff"
+    StaffLocked = (
+        2,
+        "Bot or server is locked by staff and can only be unlocked by staff",
+    )
 
     StatsLocked = 3, "Bot or server stats are locked due to abuse"
 
@@ -29,9 +38,15 @@ class BotServerFlag(IntEnum):
 
     System = 5, "Bot or server is a system bot or server"
 
-    WhitelistOnly = 6, "Server is a whitelist only server (it cannot be joined without being whitelisted by staff on said server)"
+    WhitelistOnly = (
+        6,
+        "Server is a whitelist only server (it cannot be joined without being whitelisted by staff on said server)",
+    )
 
-    KeepBannerDecor = 7, "Bot or server banner should keep special fallback banner styles"
+    KeepBannerDecor = (
+        7,
+        "Bot or server banner should keep special fallback banner styles",
+    )
 
     NSFW = 8, "Bot or server is NSFW"
 
@@ -40,6 +55,7 @@ class BotServerFlag(IntEnum):
 
 class UserFlag(IntEnum):
     """Flags that apply to users"""
+
     _init_ = "value __doc__"
 
     Unknown = 0, "Unknown flag"
@@ -53,6 +69,7 @@ class UserFlag(IntEnum):
 
 class UserState(IntEnum):
     """User states"""
+
     _init_ = "value __doc__"
 
     Normal = 0, "User is normal (not banned)"
@@ -64,6 +81,7 @@ class UserState(IntEnum):
 
 class BotServerState(IntEnum):
     """Bot or server state"""
+
     Approved = 0
     Pending = 1
     Denied = 2
@@ -78,6 +96,7 @@ class BotServerState(IntEnum):
 
 class UserBotAction(IntEnum):
     """Actions a user can take on a bot"""
+
     Approve = 0
     Deny = 1
     Certify = 2
@@ -95,27 +114,36 @@ class UserBotAction(IntEnum):
 
 class LongDescriptionType(IntEnum):
     """The type of long description. This is used to determine how the long description should be processed/rendered"""
+
     _init_ = "value __doc__"
-    
+
     Html = 0, "Raw HTML. No markdown processing is applied"
 
-    MarkdownServerSide = 1, "Markdown. Markdown is processed server side using the ``cmarkgfm`` library."
+    MarkdownServerSide = (
+        1,
+        "Markdown. Markdown is processed server side using the ``cmarkgfm`` library.",
+    )
 
 
 class WebhookType(IntEnum):
     """The type of webhook (Fates Client is deprecated and has no effect anymore)"""
+
     Vote = 0
     DiscordIntegration = 1
-    DeprecatedFatesClient = 2 # There in case any bots are still using it
+    DeprecatedFatesClient = 2  # There in case any bots are still using it
+
 
 class CommandType(IntEnum):
     """The type of bot command"""
+
     PrefixCommand = 0
     SlashCommandGlobal = 1
     SlashCommandGuild = 2
 
+
 class TargetType(IntEnum):
     """A bot/server/user etc."""
+
     Bot = 0
     Server = 1
     User = 2
@@ -123,14 +151,17 @@ class TargetType(IntEnum):
 
 class PageStyle(IntEnum):
     """Page style for the bot/server page"""
+
     _init_ = "value __doc__"
 
     Tabs = 0, "Legacy tabs style"
 
     SingleScroll = 1, "Single scroll/no tabs style"
 
+
 class UserExperiment(IntEnum):
     """User experiments"""
+
     _init_ = "value __doc__"
 
     Unknown = 0, "Unknown experiment"
@@ -140,16 +171,23 @@ class UserExperiment(IntEnum):
     LynxExperimentRolloutView = 2, "Lynx experiment rollout view. No longer relevant"
 
     BotReport = 3, "Bot reports are supported"
-    
-    ServerAppealCertification = 4, "Ability to use request type of Appeal or Certification in server appeal"
 
-    UserVotePrivacy = 5, "The ability for users to hide their votes from Get Bot Votes and Get Server Votes API"
+    ServerAppealCertification = (
+        4,
+        "Ability to use request type of Appeal or Certification in server appeal",
+    )
+
+    UserVotePrivacy = (
+        5,
+        "The ability for users to hide their votes from Get Bot Votes and Get Server Votes API",
+    )
 
     DevPortal = 6, "The ability to use the developer portal. No longer relevant"
 
 
 class DataAction(Enum):
     """Data actions"""
+
     Request = "req"
 
     Delete = "del"

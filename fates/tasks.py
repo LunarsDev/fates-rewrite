@@ -19,8 +19,9 @@ async def task(task: Awaitable, task_id: str):
 
     if not ret:
         ret = "OK"
-    
+
     mapleshade.cache.set(f"task-{task_id}", ret)
+
 
 async def data_request(user_id: int):
     user = await tables.Users.select().where(tables.Users.user_id == user_id).first()
@@ -33,8 +34,8 @@ async def data_request(user_id: int):
     for fk in fk_keys:
         if fk["foreign_table_name"] == "users":
             related_data[fk["table_name"]] = await tables.Users.raw(
-                f"SELECT * FROM {fk['table_name']} WHERE {fk['column_name']} = {{}}", 
-                user_id
+                f"SELECT * FROM {fk['table_name']} WHERE {fk['column_name']} = {{}}",
+                user_id,
             )
 
     data = {
@@ -42,15 +43,18 @@ async def data_request(user_id: int):
         "owners": owners,
         "owned_bots": [],
         "fk_keys": fk_keys,
-        "related_data": related_data
+        "related_data": related_data,
     }
 
     for bot in owners:
         data["owned_bots"].append(
-            await tables.Bots.select().where(tables.Bots.bot_id == bot["bot_id"]).first()
+            await tables.Bots.select()
+            .where(tables.Bots.bot_id == bot["bot_id"])
+            .first()
         )
-    
+
     return mapleshade.parse_dict(jsonable_encoder(data))
+
 
 async def data_delete(user_id: int):
     """Delete a user's data"""
@@ -68,14 +72,22 @@ async def data_delete(user_id: int):
         await tables.Vanity.delete().where(tables.Vanity.redirect == bot["bot_id"])
 
     # Delete all vote data of a user
-    votes = await tables.BotVoters.select(tables.BotVoters.bot_id).where(tables.BotVoters.user_id == user_id)
+    votes = await tables.BotVoters.select(tables.BotVoters.bot_id).where(
+        tables.BotVoters.user_id == user_id
+    )
     for vote in votes:
-        await tables.Bots.update(votes=tables.Bots.votes - 1).where(tables.Bots.bot_id == vote["bot_id"])
+        await tables.Bots.update(votes=tables.Bots.votes - 1).where(
+            tables.Bots.bot_id == vote["bot_id"]
+        )
 
     await tables.BotVoters.delete().where(tables.BotVoters.user_id == user_id)
 
-    votes = await tables.ServerVoters.select(tables.ServerVoters.guild_id).where(tables.ServerVoters.user_id == user_id)
+    votes = await tables.ServerVoters.select(tables.ServerVoters.guild_id).where(
+        tables.ServerVoters.user_id == user_id
+    )
     for vote in votes:
-        await tables.Servers.update(votes=tables.Servers.votes - 1).where(tables.Servers.guild_id == vote["guild_id"])
+        await tables.Servers.update(votes=tables.Servers.votes - 1).where(
+            tables.Servers.guild_id == vote["guild_id"]
+        )
 
     await tables.ServerVoters.delete().where(tables.ServerVoters.user_id == user_id)

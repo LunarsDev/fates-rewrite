@@ -56,6 +56,10 @@ func Request(req HTTPRequest) ([]byte, error) {
 		}
 	}
 
+	if len(req.Body) > 0 {
+		ui.YellowText("Body:", string(req.Body))
+	}
+
 	if req.Auth != nil {
 		req.Headers["Frostpaw-Auth"] = []string{req.Auth.String()}
 	}

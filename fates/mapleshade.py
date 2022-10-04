@@ -15,6 +15,7 @@ from maplecache import *
 import pytz
 import asyncpg
 
+
 class SilverException(Exception):
     """Base exception for Silverpelt"""
 
@@ -35,7 +36,9 @@ class SilverRespError(SilverException):
 
 class SilverNoData(SilverException):
     """Exception for when there is no data"""
+
     ...
+
 
 class SQLFiles:
     def load_sql(self, fn: str) -> str:
@@ -51,6 +54,7 @@ class SQLFiles:
         self.search_profiles = self.load_sql("search_profiles")
         self.search_packs = self.load_sql("search_packs")
 
+
 class Mapleshade:
     __slots__ = [
         "yaml",
@@ -63,7 +67,7 @@ class Mapleshade:
         "perms",
         "utc",
         "sql",
-        "pool", # Raw SQL pool
+        "pool",  # Raw SQL pool
     ]
 
     def __init__(self):
@@ -74,16 +78,14 @@ class Mapleshade:
 
         with open("config.yaml") as doc:
             self.config: dict[str, Any] = self.yaml.load(doc)
-        
+
         self.perms = {
             "default": models.Permission(index=0, roles=[], name="default"),
         }
 
         for name, perm in self.config["perms"].items():
             self.perms[name] = models.Permission(
-                index=perm["index"],
-                roles=perm["roles"],
-                name=name
+                index=perm["index"], roles=perm["roles"], name=name
             )
 
         # CMark options
@@ -146,23 +148,30 @@ class Mapleshade:
 
         self.utc = pytz.UTC
         self.sql = SQLFiles()
-        self.pool: asyncpg.Pool | None = None # Initially none
+        self.pool: asyncpg.Pool | None = None  # Initially none
 
     def compare_dt(self, dt1: datetime, dt2: datetime):
         """Return True if dt1 is greater than dt2. Handles both naive and aware datetimes"""
-        return self.utc.localize(dt1.replace(tzinfo=None)) > dt2.replace(tzinfo=self.utc)
+        return self.utc.localize(dt1.replace(tzinfo=None)) > dt2.replace(
+            tzinfo=self.utc
+        )
 
     async def guppy(self, user_id: int) -> models.Permission:
         """Guppy: (Get User Permissions Pretty Please You!"""
         try:
-            user_roles: list[str] = [str(v) for v in await self.silverpelt_req(f"roles/{self.config['main_server']}/{user_id}")]
+            user_roles: list[str] = [
+                str(v)
+                for v in await self.silverpelt_req(
+                    f"roles/{self.config['main_server']}/{user_id}"
+                )
+            ]
         except SilverNoData:
             return self.perms["default"]
-        
+
         for perm in self.perms.values():
             if any(role in user_roles for role in perm.roles):
                 return perm
-        
+
         return self.perms["default"]
 
     def parse_dict(self, d: dict | object) -> dict | object:
@@ -180,7 +189,7 @@ class Mapleshade:
             return nd
         else:
             return d
-    
+
     def sanitize(
         self,
         s: str,
@@ -333,10 +342,14 @@ class Mapleshade:
             elif entity.get("guild_id"):
                 # This is a guild
                 try:
-                    guild_data = await tables.Servers.select(
-                        tables.Servers.name_cached,
-                        tables.Servers.avatar_cached,
-                    ).where(tables.Servers.guild_id == entity["guild_id"]).first()
+                    guild_data = (
+                        await tables.Servers.select(
+                            tables.Servers.name_cached,
+                            tables.Servers.avatar_cached,
+                        )
+                        .where(tables.Servers.guild_id == entity["guild_id"])
+                        .first()
+                    )
 
                     entity["user"] = {
                         "id": entity["guild_id"],
@@ -356,7 +369,7 @@ class Mapleshade:
             snippet.append(models.Snippet(**entity))
 
         return snippet
-    
+
     async def to_profile_snippet(self, data: list[dict]) -> models.ProfileSnippet:
         """Converts a dict to a snippet (profiles only)"""
         snippet = []
@@ -369,14 +382,18 @@ class Mapleshade:
             snippet.append(models.ProfileSnippet(**entity))
 
         return snippet
-    
+
     async def resolve_packs(self, data: list[dict]) -> list[models.BotPack]:
         packs = []
         for pack in data:
             resolved_bots = []
 
             for bot in pack["bots"]:
-                description = await tables.Bots.select(tables.Bots.description).where(tables.Bots.bot_id == bot).first()
+                description = (
+                    await tables.Bots.select(tables.Bots.description)
+                    .where(tables.Bots.bot_id == bot)
+                    .first()
+                )
 
                 if description:
                     try:
@@ -390,7 +407,7 @@ class Mapleshade:
                             description=description["description"],
                         )
                     )
-        
+
             try:
                 pack["owner"] = await self.silverpelt_req(f"users/{pack['owner']}")
             except:
@@ -403,8 +420,9 @@ class Mapleshade:
 
     def gen_secret(self, n: int = 32) -> str:
         """Generates a secret"""
-        return bytes(random.choices(string.ascii_letters.encode('ascii'),k=n)).decode('ascii')
-
+        return bytes(random.choices(string.ascii_letters.encode("ascii"), k=n)).decode(
+            "ascii"
+        )
 
     async def login(self, code: str, redirect_url: str) -> models.OauthUser:
         """Logs a user in"""
@@ -421,7 +439,9 @@ class Mapleshade:
             ) as resp:
                 data = await resp.json()
                 if not resp.ok:
-                    raise Exception(f"Failed to get token with status code: {resp.status} [err of {data}]")
+                    raise Exception(
+                        f"Failed to get token with status code: {resp.status} [err of {data}]"
+                    )
 
             async with session.get(
                 "https://discord.com/api/v10/users/@me",
@@ -429,7 +449,9 @@ class Mapleshade:
             ) as resp:
                 duser = await resp.json()
                 if not resp.ok:
-                    raise Exception(f"Failed to get user with status code: {resp.status} [err of {duser}]")
+                    raise Exception(
+                        f"Failed to get user with status code: {resp.status} [err of {duser}]"
+                    )
 
         user = await self.silverpelt_req(
             f"users/{duser['id']}",
@@ -437,16 +459,18 @@ class Mapleshade:
 
         duser["id"] = int(duser["id"])
 
-        list_data = await tables.Users.select(
-            tables.Users.state,
-            tables.Users.api_token,
-            tables.Users.user_css,
-            tables.Users.username,
-            tables.Users.site_lang,
-            tables.Users.experiments
-        ).where(
-            tables.Users.user_id == duser["id"]
-        ).first()
+        list_data = (
+            await tables.Users.select(
+                tables.Users.state,
+                tables.Users.api_token,
+                tables.Users.user_css,
+                tables.Users.username,
+                tables.Users.site_lang,
+                tables.Users.experiments,
+            )
+            .where(tables.Users.user_id == duser["id"])
+            .first()
+        )
 
         if not list_data:
             await tables.Users.insert(
@@ -460,17 +484,18 @@ class Mapleshade:
                 )
             )
 
-            list_data = await tables.Users.select(
-                tables.Users.state,
-                tables.Users.api_token,
-                tables.Users.user_css,
-                tables.Users.username,
-                tables.Users.site_lang,
-                tables.Users.experiments
-            ).where(
-                tables.Users.user_id == duser["id"]
-            ).first()
-
+            list_data = (
+                await tables.Users.select(
+                    tables.Users.state,
+                    tables.Users.api_token,
+                    tables.Users.user_css,
+                    tables.Users.username,
+                    tables.Users.site_lang,
+                    tables.Users.experiments,
+                )
+                .where(tables.Users.user_id == duser["id"])
+                .first()
+            )
 
         return models.OauthUser(
             state=list_data["state"],
@@ -479,16 +504,16 @@ class Mapleshade:
             site_lang=list_data["site_lang"],
             css=list_data["user_css"],
             user_experiments=models.DEFAULT_USER_EXPERIMENTS + list_data["experiments"],
-            permissions=await self.guppy(duser['id'])
+            permissions=await self.guppy(duser["id"]),
         )
-    
+
     def parse_records(self, records: list) -> list[dict]:
         """Parses a list of records"""
         if records:
             return [dict(record) for record in records]
         else:
             return records
-    
+
     async def search(
         self,
         query: models.SearchQuery,
@@ -500,7 +525,7 @@ class Mapleshade:
                 models.BotServerState.Approved,
                 models.BotServerState.Certified,
                 *query.guild_count,
-                *query.votes
+                *query.votes,
             )
         )
 
@@ -513,7 +538,7 @@ class Mapleshade:
                 models.BotServerState.Approved,
                 models.BotServerState.Certified,
                 *query.guild_count,
-                *query.votes
+                *query.votes,
             )
         )
 

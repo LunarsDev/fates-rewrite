@@ -314,7 +314,7 @@ func viewUserView() {
 
 	*/
 
-	ui.GreenText("User", userId, "has the following information:\nUsername:", user.Username+"#"+user.Discriminator, "\nAvatar:", user.Avatar, "\nBot:", user.Bot, "\nSystem:", user.System, "\nStatus:", user.Status, "\nFlags:", user.Flags)
+	ui.GreenText("User", userId, "has the following information:\nUsername:", user.String(), "\nAvatar:", user.Avatar, "\nBot:", user.Bot, "\nSystem:", user.System, "\nStatus:", user.Status, "\nFlags:", user.Flags)
 }
 
 func listPermsView() {
@@ -403,4 +403,43 @@ func dataActionView() {
 	act := api.PerformDataAction(userId, mode)
 
 	ui.GreenText("Action performed and got task ID of", act.TaskID)
+}
+
+func searchView() {
+	query := ui.AskInput("Enter the search query")
+
+	gcFilter := renderers.AskSearchFilter("Guild count")
+	voteFilter := renderers.AskSearchFilter("Vote count")
+
+	api.SetReason("Searching for query")
+
+	res := api.Search(query, gcFilter, voteFilter)
+
+	var outputStr string
+
+	outputStr += ui.BoldTextS("Bots")
+
+	for _, bot := range res.Bots {
+		outputStr += renderers.Snippet(bot)
+	}
+
+	outputStr += ui.BoldTextS("Servers")
+
+	for _, server := range res.Servers {
+		outputStr += renderers.Snippet(server)
+	}
+
+	outputStr += ui.BoldTextS("Profiles")
+
+	for _, profile := range res.Profiles {
+		outputStr += renderers.ProfileSnippet(profile)
+	}
+
+	outputStr += ui.BoldTextS("Packs")
+
+	for _, pack := range res.Packs {
+		outputStr += renderers.BotPack(pack)
+	}
+
+	ui.PageOutput(outputStr)
 }

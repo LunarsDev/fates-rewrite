@@ -52,8 +52,10 @@ async def random_snippet(
                     await mapleshade.to_snippet(
                         await models.augment(
                             tables.Bots.select(*models.BOT_SNIPPET_COLS).where(
-                                (tables.Bots.state == models.BotServerState.Approved) |
-                                (tables.Bots.state != models.BotServerState.Certified),
+                                (tables.Bots.state == models.BotServerState.Approved)
+                                | (
+                                    tables.Bots.state != models.BotServerState.Certified
+                                ),
                             ),
                             "ORDER BY RANDOM() LIMIT 1",
                         )
@@ -75,8 +77,11 @@ async def random_snippet(
                     await mapleshade.to_snippet(
                         await models.augment(
                             tables.Servers.select(*models.SERVER_SNIPPET_COLS).where(
-                                (tables.Servers.state == models.BotServerState.Approved) |
-                                (tables.Servers.state == models.BotServerState.Certified)
+                                (tables.Servers.state == models.BotServerState.Approved)
+                                | (
+                                    tables.Servers.state
+                                    == models.BotServerState.Certified
+                                )
                             ),
                             "ORDER BY RANDOM() LIMIT 1",
                         )
@@ -140,7 +145,7 @@ async def get_index(request: Request, target_type: models.TargetType):
     elif target_type == models.TargetType.Server:
         if cached_index := mapleshade.cache.get("server_index"):
             return cached_index.value()
-            
+
         index = models.Index(
             top_voted=await mapleshade.to_snippet(
                 await tables.Servers.select(*models.SERVER_SNIPPET_COLS)

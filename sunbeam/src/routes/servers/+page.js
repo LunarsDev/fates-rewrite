@@ -28,7 +28,7 @@ export async function load({ parent, fetch }) {
     auth: false
   });
 
-  let metaJson = null
+  let metaJson = null;
 
   if (metadata.ok) {
     metaJson = await metadata.json();

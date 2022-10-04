@@ -108,7 +108,7 @@ export enum TargetType {
   Bot = 0,
   Server = 1,
   User = 2,
-  Pack = 3,
+  Pack = 3
 }
 
 export const enums = {
@@ -161,7 +161,7 @@ export const enums = {
           return TargetType.Server;
         case 'user':
           return TargetType.User;
-        case "pack":
+        case 'pack':
           return TargetType.Pack;
       }
     }

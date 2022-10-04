@@ -14,7 +14,7 @@
   import BotCard from '../cards/BotCard.svelte';
   import BotPack from './BotPack.svelte';
   import { enums, type TargetType } from '$lib/enums/enums';
-    import { info } from '$lib/logger';
+  import { info } from '$lib/logger';
 
   export let type: TargetType = enums.TargetType.Bot;
   let query: string;
@@ -38,8 +38,8 @@
 
   let sTagAction = {
     func: () => searchBot(true),
-    text: "Search",
-  }
+    text: 'Search'
+  };
 
   onMount(() => {
     if (browser) {
@@ -52,12 +52,12 @@
       gc_to = parseInt(url.searchParams.get('gct') || '-1');
 
       let bt = url.searchParams.get('bt') || '';
-      botTags = bt.split(".").filter((x) => x != "");
+      botTags = bt.split('.').filter((x) => x != '');
 
       let st = url.searchParams.get('st') || '';
-      serverTags = st.split(".").filter((x) => x != "");
+      serverTags = st.split('.').filter((x) => x != '');
 
-      info("SearchBar", type, query, gc_from, gc_to, botTags, serverTags);
+      info('SearchBar', type, query, gc_from, gc_to, botTags, serverTags);
 
       if (query || botTags.length > 0 || serverTags.length > 0) {
         searchBot(true);
@@ -80,37 +80,37 @@
     // update location silently to include new query params
     let url = new URL(window.location.href);
 
-    if(query) {
+    if (query) {
       url.searchParams.set('q', query);
     } else {
       url.searchParams.delete('q');
     }
 
-    if(type || type == enums.TargetType.Bot) {
+    if (type || type == enums.TargetType.Bot) {
       url.searchParams.set('t', enums.helpers.targetTypeString(type));
     } else {
       url.searchParams.delete('t');
     }
 
-    if(gc_from) {
+    if (gc_from) {
       url.searchParams.set('gcf', gc_from.toString());
     } else {
       url.searchParams.delete('gcf');
     }
 
-    if(gc_to && gc_to != -1) {
+    if (gc_to && gc_to != -1) {
       url.searchParams.set('gct', gc_to.toString());
     } else {
       url.searchParams.delete('gct');
     }
 
-    if(botTags.length > 0) {
+    if (botTags.length > 0) {
       url.searchParams.set('bt', botTags.join('.'));
     } else {
       url.searchParams.delete('bt');
     }
 
-    if(serverTags.length > 0) {
+    if (serverTags.length > 0) {
       url.searchParams.set('st', serverTags.join('.'));
     } else {
       url.searchParams.delete('st');
@@ -134,11 +134,11 @@
         query: query,
         guild_count: {
           filter_from: gc_from,
-          filter_to: gc_to,
+          filter_to: gc_to
         },
         tags: {
           bot: botTags,
-          server: serverTags,
+          server: serverTags
         }
       },
       fetch: fetch
@@ -206,14 +206,16 @@
       First display is either 'bot', 'server', 'pack' or 'user' and chooses whether you want bots
       first or servers first!
     </Tip>
-    <select on:change={(event) => {
-        if(castToEl(event).value == "#") {
-          return
+    <select
+      on:change={(event) => {
+        if (castToEl(event).value == '#') {
+          return;
         }
 
-        type = enums.helpers.strToTargetType(castToEl(event.target).value || "bot");
+        type = enums.helpers.strToTargetType(castToEl(event.target).value || 'bot');
         searchBot(false);
-    }}>
+      }}
+    >
       <option value="#" disabled>Choose a display order</option>
       <option value="bot" selected={type == enums.TargetType.Bot}>Bots First</option>
       <option value="server" selected={type == enums.TargetType.Server}>Servers First</option>
@@ -227,7 +229,12 @@
   <!--First Display-->
   {#if type == enums.TargetType.Bot}
     <Section title="Bots" icon="fa-solid:search" id="search-res-bots">
-      <Tag tagAction={sTagAction} onclick={botTagsSelect} initialSelected={botTags} tags={meta.bot.tags} />
+      <Tag
+        tagAction={sTagAction}
+        onclick={botTagsSelect}
+        initialSelected={botTags}
+        tags={meta.bot.tags}
+      />
       <CardContainer>
         {#each data.bots as bot}
           <BotCard data={bot} type={enums.TargetType.Bot} rand={false} />
@@ -242,7 +249,12 @@
     </Section>
 
     <Section title="Servers" icon="fa-solid:search" id="search-res-servers">
-      <Tag tagAction={sTagAction} onclick={serverTagsSelect} initialSelected={serverTags} tags={meta.server.tags} />
+      <Tag
+        tagAction={sTagAction}
+        onclick={serverTagsSelect}
+        initialSelected={serverTags}
+        tags={meta.server.tags}
+      />
       <CardContainer>
         {#each data.servers as server}
           <BotCard data={server} type={enums.TargetType.Server} rand={false} />
@@ -265,7 +277,12 @@
     </Section>
 
     <Section title="Bots" icon="fa-solid:search" id="search-res-bots">
-      <Tag tagAction={sTagAction} onclick={botTagsSelect} initialSelected={botTags} tags={meta.bot.tags} />
+      <Tag
+        tagAction={sTagAction}
+        onclick={botTagsSelect}
+        initialSelected={botTags}
+        tags={meta.bot.tags}
+      />
       <CardContainer>
         {#each data.bots as bot}
           <BotCard data={bot} type={enums.TargetType.Bot} rand={false} />
@@ -274,7 +291,12 @@
     </Section>
 
     <Section title="Servers" icon="fa-solid:search" id="search-res-servers">
-      <Tag tagAction={sTagAction} onclick={serverTagsSelect} initialSelected={serverTags} tags={meta.server.tags} />
+      <Tag
+        tagAction={sTagAction}
+        onclick={serverTagsSelect}
+        initialSelected={serverTags}
+        tags={meta.server.tags}
+      />
       <CardContainer>
         {#each data.servers as server}
           <BotCard data={server} type={enums.TargetType.Server} rand={false} />
@@ -291,7 +313,12 @@
     </Section>
   {:else if type == enums.TargetType.Server}
     <Section title="Servers" icon="fa-solid:search" id="search-res-servers">
-      <Tag tagAction={sTagAction} onclick={serverTagsSelect} initialSelected={serverTags} tags={meta.server.tags} />
+      <Tag
+        tagAction={sTagAction}
+        onclick={serverTagsSelect}
+        initialSelected={serverTags}
+        tags={meta.server.tags}
+      />
       <CardContainer>
         {#each data.servers as server}
           <BotCard data={server} type={enums.TargetType.Server} rand={false} />
@@ -308,7 +335,12 @@
     </Section>
 
     <Section title="Bots" icon="fa-solid:search" id="search-res-bots">
-      <Tag tagAction={sTagAction} onclick={botTagsSelect} initialSelected={botTags} tags={meta.bot.tags} />
+      <Tag
+        tagAction={sTagAction}
+        onclick={botTagsSelect}
+        initialSelected={botTags}
+        tags={meta.bot.tags}
+      />
       <CardContainer>
         {#each data.bots as bot}
           <BotCard data={bot} type={enums.TargetType.Bot} rand={false} />
@@ -331,7 +363,12 @@
     </Section>
 
     <Section title="Servers" icon="fa-solid:search" id="search-res-servers">
-      <Tag tagAction={sTagAction} onclick={serverTagsSelect} initialSelected={serverTags} tags={meta.server.tags} />
+      <Tag
+        tagAction={sTagAction}
+        onclick={serverTagsSelect}
+        initialSelected={serverTags}
+        tags={meta.server.tags}
+      />
       <CardContainer>
         {#each data.servers as server}
           <BotCard data={server} type={enums.TargetType.Server} rand={false} />
@@ -346,7 +383,12 @@
     </Section>
 
     <Section title="Bots" icon="fa-solid:search" id="search-res-bots">
-      <Tag tagAction={sTagAction} onclick={botTagsSelect} initialSelected={botTags} tags={meta.bot.tags} />
+      <Tag
+        tagAction={sTagAction}
+        onclick={botTagsSelect}
+        initialSelected={botTags}
+        tags={meta.bot.tags}
+      />
       <CardContainer>
         {#each data.bots as bot}
           <BotCard data={bot} type={enums.TargetType.Bot} rand={false} />
@@ -354,12 +396,20 @@
       </CardContainer>
     </Section>
   {/if}
+{:else if type == enums.TargetType.Bot}
+  <Tag
+    tagAction={sTagAction}
+    onclick={botTagsSelect}
+    initialSelected={botTags}
+    tags={meta.bot.tags}
+  />
 {:else}
-  {#if type == enums.TargetType.Bot}
-    <Tag tagAction={sTagAction} onclick={botTagsSelect} initialSelected={botTags} tags={meta.bot.tags} />
-  {:else}
-    <Tag tagAction={sTagAction} onclick={serverTagsSelect} initialSelected={serverTags} tags={meta.server.tags} />
-  {/if}
+  <Tag
+    tagAction={sTagAction}
+    onclick={serverTagsSelect}
+    initialSelected={serverTags}
+    tags={meta.server.tags}
+  />
 {/if}
 
 <style lang="scss">

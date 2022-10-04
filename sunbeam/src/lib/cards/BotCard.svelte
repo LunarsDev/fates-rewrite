@@ -26,7 +26,10 @@
     {#if (type == enums.TargetType.Bot || type == enums.TargetType.Server) && data.state == enums.BotState.certified}
       <Icon class="bot-card-cert" icon="fa-solid:certificate" inline={false} height="3em" />
     {/if}
-    <a href="/{enums.helpers.targetTypeString(type)}/{data.user.id}" class="bot-card-view-link bot-card-avatar-container">
+    <a
+      href="/{enums.helpers.targetTypeString(type)}/{data.user.id}"
+      class="bot-card-view-link bot-card-avatar-container"
+    >
       <img
         alt="Bot Avatar"
         class="bot-card-avatar"

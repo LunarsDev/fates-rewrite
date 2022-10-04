@@ -93,10 +93,7 @@ async def get_user(id: int):
         print(guild)
         if user := guild.get_member(id):
             return await cache(
-                IDiscordUser(
-                    id=user.id,
-                    username=user.name,
-                    disc=user.discriminator,
+                IDiscordUser(id=user.id,username=user.name,disc=user.discriminator,
                     avatar=user.avatar.url if user.avatar else user.default_avatar.url,
                     bot=user.bot,
                     system=user.system,

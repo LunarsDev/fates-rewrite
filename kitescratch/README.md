@@ -1,3 +1,4 @@
-# Kitescratch
+# Kitescratch Components
 
-Basic CLI for Fates List API to allow better testing of the API before moving it into sunbeam
+- ``kitecli`` -> Custom client implementation for Fates List
+- ``kitehelper`` -> Some helper utilities for Fates List

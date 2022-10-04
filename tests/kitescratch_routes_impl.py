@@ -14,24 +14,24 @@ from fates import decorators
 
 go_files = {}
 
-for f in pathlib.Path().rglob("kitescratch/api/*.go"):
+for f in pathlib.Path().rglob("kitescratch/kitecli/api/*.go"):
     with open(f) as file:
         go_files[f.name.replace(".go", "")] = file.read()
 
-with open("kitescratch/views.go") as file:
+with open("kitescratch/kitecli/views.go") as file:
     go_files["views.go"] = file.read()
 
 for name, route in decorators.routes.items():
     if route.route.tags[0].name == "tests":
         continue
     if route.route.tags[0].name not in go_files.keys():
-        print(f"Missing tag {route.route.tags[0].name} in kitescratch/api")
+        print(f"Missing tag {route.route.tags[0].name} in kitescratch/kitecli/api")
         exit(1)
 
     if name.replace("_", " ").title().replace(" ", "") not in go_files[route.route.tags[0].name]:
-        print(f"Missing route {name} in kitescratch/api/{route.route.tags[0].name}.go")
+        print(f"Missing route {name} in kitescratch/kitecli/api/{route.route.tags[0].name}.go")
         exit(1)
     
     if name.replace("_", " ").title().replace(" ", "") not in go_files["views.go"]:
-        print(f"Missing route {name} in kitescratch/views.go")
+        print(f"Missing route {name} in kitescratch/kitecli/views.go")
         exit(1)

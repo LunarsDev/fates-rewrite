@@ -10,7 +10,7 @@
 ### Frontend
 
 - ``Sunbeam`` - Fates List Frontend
-- ``Kitescratch`` - Internal tooling including a simple CLI for Fates List (mostly for development, but may become a full cli-only replacement for sunbeam)  as well as some helper utilities for developing Fates List
+- ``Kitescratch`` - Internal tooling including a simple CLI (`kitecli`) for Fates List (mostly for development, but may become a full cli-only replacement for sunbeam) as well as some helper functions including our test system (`kitehelper`) for developing Fates List
 
 ## Commits
 

@@ -51,7 +51,12 @@ Then, open ``psql``, then run the following for every csv file in ``seed_data`` 
 \copy FN FROM 'seed_data/FN.csv' DELIMITER ',' CSV HEADER;
 ```
 
-**For developers, ``COPY bots TO '/.../seed_data/bots.csv'  WITH DELIMITER ',' CSV HEADER;`` can be used to export a seed to a csv file**
+Then run ``kitescratch/kitehelper/kitehelper migrate`` to apply any extra migrations (should'nt be needed but doesn't hurt)
+
+### Pro tip on creating seeds
+
+*For developers, ``COPY bots TO '/.../seed_data/bots.csv'  WITH DELIMITER ',' CSV HEADER;`` can be used to export a seed to a csv file*
+
 
 **Note that all seed data has been sanitized for secret fields**
 

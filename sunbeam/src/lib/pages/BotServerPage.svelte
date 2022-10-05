@@ -1,6 +1,6 @@
 <script lang="ts">
   import BristlefrostMeta from '$lib/base/BristlefrostMeta.svelte';
-  import { enums } from '../enums/enums';
+  import { enums, type TargetType } from '../enums/enums';
   import Tab from '$lib/base/TabV2.svelte';
   import Commands from './helpers/Commands.svelte';
   import About from './helpers/About.svelte';
@@ -10,13 +10,13 @@
   import ReviewList from './helpers/ReviewList.svelte';
 
   export let data: any;
-  export let type: string;
+  export let type: TargetType;
 
   let extra_links = data.extra_links as Map<string, string>;
 </script>
 
 <BristlefrostMeta
-  url="https://fateslist.xyz/{type}/{data.user.id}"
+  url="https://fateslist.xyz/{enums.helpers.targetTypeString(type)}/{data.user.id}"
   pageTitle={data.user.username}
   title={data.user.username}
   description={data.description}
@@ -48,10 +48,10 @@
     }}
   />
   <article class="bot-page">
-    <a href="/{type}/{data.user.id}/invite" class="banner-decor bot-username bot-username-link">
+    <a href="/{enums.helpers.targetTypeString(type)}/{data.user.id}/invite" class="banner-decor bot-username bot-username-link">
       <h2 class="white" id="bot-name">
         {data.user.username}
-        {#if type == 'bot'}<span class="prefix">({data.prefix || '/'})</span>{/if}
+        {#if type == enums.TargetType.Bot}<span class="prefix">({data.prefix || '/'})</span>{/if}
       </h2>
     </a>
     <div class="bot-page-content">
@@ -67,7 +67,7 @@
         </section>
         <section id="commands-tab" class="tabs-v2">
           <h2>Commands</h2>
-          {#if type == 'bot'}
+          {#if type == enums.TargetType.Bot}
             <Commands data={data} />
           {:else}
             <span>Servers do not have commands</span>
@@ -75,14 +75,14 @@
         </section>
         <hr />
         <section id="reviews-tab" class="tabs-v2">
-          <ReviewAdd data={data} type={type} />
-          <ReviewList data={data} type={type} />
+          <ReviewAdd data={data} type={enums.helpers.targetTypeString(type)} />
+          <ReviewList data={data} type={enums.helpers.targetTypeString(type)} />
         </section>
         <hr />
         <section id="resources-tab" class="tabs-v2">
           <h2>Some cool resources!</h2>
           <h3>Basics</h3>
-          <a href="/bot/{data.user.id}/invite">Invite</a><br />
+          <a href="/{enums.helpers.targetTypeString(type)}/{data.user.id}/invite">Invite</a><br />
           {#each Object.entries(extra_links) as link}
             {#if !link[0].startsWith('_')}
               <a href={link[1]}>{link[0]}</a><br />

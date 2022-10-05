@@ -3,6 +3,8 @@
   import BotServerPageTabs from '$lib/pages/BotServerPageTabs.svelte';
   import { enums } from '$lib/enums/enums';
   export let data: any;
+
+  console.log(data.type)
 </script>
 
 {#if data.data.page_style == enums.PageStyle.tabs}

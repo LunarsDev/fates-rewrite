@@ -2,8 +2,10 @@
   import Icon from '@iconify/svelte';
   import Button from '$lib/base/Button.svelte';
   import { goto } from '$app/navigation';
+    import { enums, TargetType } from '$lib/enums/enums';
   export let tags;
   export let modWidth = true; // Whether to set width to 90% or not, needed in bot pages to make showing tags look decent
+  export let type: TargetType;
   export let buttonTag = false; // Button tag or not
 
   export let redirectUser = false;
@@ -75,7 +77,11 @@
     }
 
     if (redirectUser) {
-      goto(`/?tags=${tag.id}`);
+      if(type == enums.TargetType.Bot) {
+        goto(`/?bt=${tag.id}`);
+      } else {
+        goto(`/?st=${tag.id}`);
+      }
       return;
     }
 

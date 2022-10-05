@@ -6,7 +6,7 @@
 </script>
 
 {#if data.bot.page_style == enums.PageStyle.tabs}
-  <BotServerPageTabs data={data.bot} type="bot" />
+  <BotServerPageTabs data={data.bot} type={enums.TargetType.Bot} />
 {:else}
-  <BotServerPage data={data.bot} type="bot" />
+  <BotServerPage data={data.bot} type={enums.TargetType.Bot} />
 {/if}

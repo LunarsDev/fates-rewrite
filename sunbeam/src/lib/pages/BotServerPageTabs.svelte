@@ -1,6 +1,6 @@
 <script lang="ts">
   import BristlefrostMeta from '$lib/base/BristlefrostMeta.svelte';
-  import { enums } from '../enums/enums';
+  import { enums, type TargetType } from '../enums/enums';
   import Tab from '$lib/base/Tab.svelte';
   import Warns from './helpers/Warns.svelte';
   import Commands from './helpers/Commands.svelte';
@@ -10,7 +10,7 @@
   import ReviewList from './helpers/ReviewList.svelte';
 
   export let data: any;
-  export let type: string;
+  export let type: TargetType;
 
   let tabs = [
     {
@@ -39,7 +39,7 @@
 </script>
 
 <BristlefrostMeta
-  url="https://fateslist.xyz/{type}/{data.user.id}"
+  url="https://fateslist.xyz/{enums.helpers.targetTypeString(type)}/{data.user.id}"
   pageTitle={data.user.username}
   title={data.user.username}
   description={data.description}
@@ -68,13 +68,13 @@
   />
   <article class="bot-page">
     <a
-      href="/{type}/{data.user.id}/invite"
+      href="/{enums.helpers.targetTypeString(type)}/{data.user.id}/invite"
       class="banner-decor bot-username bot-username-link"
       target="_blank"
     >
       <h2 class="white" id="bot-name">
         {data.user.username}
-        {#if type == 'bot'}<span class="prefix">({data.prefix || '/'})</span>{/if}
+        {#if type == enums.TargetType.Bot}<span class="prefix">({data.prefix || '/'})</span>{/if}
       </h2>
     </a>
     <div class="bot-page-content">
@@ -91,7 +91,7 @@
           </div>
         </section>
         <section id="commands-tab" class="tabcontent tabdesign">
-          {#if type == 'bot'}
+          {#if type == enums.TargetType.Bot}
             <Commands data={data} />
           {:else}
             <span>Servers do not have commands</span>
@@ -107,8 +107,8 @@
           {/each}
         </section>
         <section id="reviews-tab" class="tabcontent tabdesign">
-          <ReviewAdd data={data} type={type} />
-          <ReviewList data={data} type={type} />
+          <ReviewAdd data={data} type={enums.helpers.targetTypeString(type)} />
+          <ReviewList data={data} type={enums.helpers.targetTypeString(type)} />
         </section>
         <section id="about-tab" class="tabcontent tabdesign">
           <!--First main owner is guaranteed to be first in HTML-->

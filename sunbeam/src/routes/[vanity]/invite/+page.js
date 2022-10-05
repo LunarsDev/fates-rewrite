@@ -23,7 +23,7 @@ export async function load({ params, fetch, parent }) {
   if (res.ok) {
     let data = await res.json();
     let id = data.target_id;
-    let type = enums.TargetType[data.target_type];
+    let type = enums.helpers.targetTypeString(data.target_type);
 
     throw redirect(307, `/${type}/${id}/invite`);
   }

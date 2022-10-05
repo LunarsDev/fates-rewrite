@@ -5,7 +5,7 @@
 
   import { nextUrl } from '$lib/config';
 
-  import { enums } from '$lib/enums/enums';
+  import { enums, TargetType } from '$lib/enums/enums';
   import loadstore from '$lib/loadstore';
   import navigationState from '$lib/navigationState';
   import { request, voteHandler } from '$lib/request';
@@ -14,7 +14,7 @@
   import Button from '$lib/base/Button.svelte';
 
   export let data: any;
-  export let type: string;
+  export let type: TargetType;
   export let limited = false;
 
   async function voteBot() {
@@ -25,15 +25,15 @@
     }
     $loadstore = 'Voting...';
     $navigationState = 'loading';
-    let res = await voteHandler(data.user.id, false, type);
+    let res = await voteHandler(data.user.id, false, enums.helpers.targetTypeString(type));
     let jsonDat = await res.json();
     if (res.ok) {
       alert({
         title: 'Successful Vote',
         message: `
-Successfully voted for this ${type}!
+Successfully voted for this ${enums.helpers.targetTypeString(type)}!
 
-<em>Pro Tip</em>: You can vote for ${type} directly on your server using Fates List Helper. Fates List Helper also supports vote reminders as well!
+<em>Pro Tip</em>: You can vote for ${enums.helpers.targetTypeString(type)} directly on your server using Fates List Helper. Fates List Helper also supports vote reminders as well!
 
 You can invite Fates List Helper to your server by <a style="color: blue !important" href="https://discord.com/api/oauth2/authorize?client_id=811073947382579200&permissions=2048&scope=bot%20applications.commands">clicking here</a>!
 
@@ -76,7 +76,7 @@ If you have previously invited Squirrelflight, please remove and add Fates List 
     <span style="margin-left: 3px;"><strong>{data.votes}</strong></span>
   </Button>
   <Button
-    href="/{type}/{data.user.id}/invite"
+    href="/{enums.helpers.targetTypeString(type)}/{data.user.id}/invite"
     class="buttons-all button"
     id="buttons-invite"
     touch
@@ -84,7 +84,7 @@ If you have previously invited Squirrelflight, please remove and add Fates List 
   >
     <span
       ><strong
-        >{#if type == 'server'}Join{:else}Invite{/if}</strong
+        >{#if type == enums.TargetType.Server}Join{:else}Invite{/if}</strong
       ></span
     >
   </Button>
@@ -92,20 +92,20 @@ If you have previously invited Squirrelflight, please remove and add Fates List 
     <Button
       onclick={() => {
         alert({
-          title: `Report this ${type}`,
+          title: `Report this ${enums.helpers.targetTypeString(type)}`,
           message: `
-Oh, we're sorry you are having an issue with this ${type}. 
+Oh, we're sorry you are having an issue with this ${enums.helpers.targetTypeString(type)}. 
         
-Before you report, have you tried contacting the owner of this ${type} if possible?
+Before you report, have you tried contacting the owner of this ${enums.helpers.targetTypeString(type)} if possible?
 
-If you still wish to report, type the reason for reporting this ${type} below. Reports are <em>not</em> automated by Fates List and as such may take time to process.`,
+If you still wish to report, type the reason for reporting this ${enums.helpers.targetTypeString(type)} below. Reports are <em>not</em> automated by Fates List and as such may take time to process.`,
           input: {
             label: 'Reason for reporting and proof',
             placeholder: `Be sure to have proof of why you're reporting!`,
             multiline: true,
             function: async (value) => {
               const res = await request(
-                `${nextUrl}/users/${$page.data.user.id}/${type}s/${data.user.id}/appeal`,
+                `${nextUrl}/users/${$page.data.user.id}/${enums.helpers.targetTypeString(type)}s/${data.user.id}/appeal`,
                 {
                   method: 'POST',
                   fetch: fetch,
@@ -118,7 +118,7 @@ If you still wish to report, type the reason for reporting this ${type} below. R
                 }
               );
               if (res.ok) {
-                alert(`Successfully reported this ${type}`);
+                alert(`Successfully reported this ${enums.helpers.targetTypeString(type)}`);
               } else {
                 const err = await res.json();
                 alert(genError(err));
@@ -135,7 +135,7 @@ If you still wish to report, type the reason for reporting this ${type} below. R
     </Button>
   {/if}
   {#if !limited}
-    {#if type == 'bot'}
+    {#if type == enums.TargetType.Bot}
       <Button
         href="/bot/{data.user.id}/settings"
         id="buttons-settings"
@@ -160,7 +160,7 @@ If you still wish to report, type the reason for reporting this ${type} below. R
 </div>
 {#if extLinks.length > 0 && !limited}
   <div class="links-pane">
-    <Tag buttonTag={true} tags={extLinks} />
+    <Tag type={type} buttonTag={true} tags={extLinks} />
   </div>
 {/if}
 

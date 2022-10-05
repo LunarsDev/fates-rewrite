@@ -231,7 +231,7 @@
     <Section title="Bots" icon="fa-solid:search" id="search-res-bots">
       <Tag
         tagAction={sTagAction}
-        onclick={botTagsSelect}
+        onclick={botTagsSelect} type={enums.TargetType.Bot}
         initialSelected={botTags}
         tags={meta.bot.tags}
       />
@@ -251,7 +251,7 @@
     <Section title="Servers" icon="fa-solid:search" id="search-res-servers">
       <Tag
         tagAction={sTagAction}
-        onclick={serverTagsSelect}
+        onclick={serverTagsSelect} type={enums.TargetType.Server}
         initialSelected={serverTags}
         tags={meta.server.tags}
       />
@@ -279,7 +279,7 @@
     <Section title="Bots" icon="fa-solid:search" id="search-res-bots">
       <Tag
         tagAction={sTagAction}
-        onclick={botTagsSelect}
+        onclick={botTagsSelect} type={enums.TargetType.Bot}
         initialSelected={botTags}
         tags={meta.bot.tags}
       />
@@ -293,7 +293,7 @@
     <Section title="Servers" icon="fa-solid:search" id="search-res-servers">
       <Tag
         tagAction={sTagAction}
-        onclick={serverTagsSelect}
+        onclick={serverTagsSelect} type={enums.TargetType.Server}
         initialSelected={serverTags}
         tags={meta.server.tags}
       />
@@ -315,7 +315,7 @@
     <Section title="Servers" icon="fa-solid:search" id="search-res-servers">
       <Tag
         tagAction={sTagAction}
-        onclick={serverTagsSelect}
+        onclick={serverTagsSelect} type={enums.TargetType.Server}
         initialSelected={serverTags}
         tags={meta.server.tags}
       />
@@ -337,7 +337,7 @@
     <Section title="Bots" icon="fa-solid:search" id="search-res-bots">
       <Tag
         tagAction={sTagAction}
-        onclick={botTagsSelect}
+        onclick={botTagsSelect} type={enums.TargetType.Bot}
         initialSelected={botTags}
         tags={meta.bot.tags}
       />
@@ -365,7 +365,7 @@
     <Section title="Servers" icon="fa-solid:search" id="search-res-servers">
       <Tag
         tagAction={sTagAction}
-        onclick={serverTagsSelect}
+        onclick={serverTagsSelect} type={enums.TargetType.Server}
         initialSelected={serverTags}
         tags={meta.server.tags}
       />
@@ -385,7 +385,7 @@
     <Section title="Bots" icon="fa-solid:search" id="search-res-bots">
       <Tag
         tagAction={sTagAction}
-        onclick={botTagsSelect}
+        onclick={botTagsSelect} type={enums.TargetType.Bot}
         initialSelected={botTags}
         tags={meta.bot.tags}
       />
@@ -399,14 +399,14 @@
 {:else if type == enums.TargetType.Bot}
   <Tag
     tagAction={sTagAction}
-    onclick={botTagsSelect}
+    onclick={botTagsSelect} type={enums.TargetType.Bot}
     initialSelected={botTags}
     tags={meta.bot.tags}
   />
 {:else}
   <Tag
     tagAction={sTagAction}
-    onclick={serverTagsSelect}
+    onclick={serverTagsSelect} type={enums.TargetType.Server}
     initialSelected={serverTags}
     tags={meta.server.tags}
   />

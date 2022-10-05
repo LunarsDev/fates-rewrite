@@ -28,7 +28,7 @@
 <SearchBar type={enums.TargetType.Server} bind:data={searchData} meta={data.meta} />
 
 {#if !searchData}
-  <Tag tags={data.meta.tags} />
+  <Tag type={enums.TargetType.Server} tags={data.meta.tags} />
 
   {#if data.random}
     <RandomCard type={enums.TargetType.Server} randomBot={data.random} />

@@ -23,9 +23,9 @@ export async function load({ params, fetch, parent }) {
   if (res.ok) {
     let data = await res.json();
     let id = data.target_id;
-    let type = enums.TargetType[data.target_type];
+    let type = data.target_type;
 
-    const pageRes = await request(`${api}/${type}/${id}`, {
+    const pageRes = await request(`${api}/${enums.helpers.targetTypeString(type)}s/${id}`, {
       method: 'GET',
       fetch: fetch,
       session: session,

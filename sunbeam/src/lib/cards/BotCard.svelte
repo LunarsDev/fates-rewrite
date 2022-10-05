@@ -20,7 +20,11 @@
 </script>
 
 <section class="bot-card">
-  <div class="bot-card-banner lazy" style="--background: url('{data.banner_card || `${apiUrl}/static/assets/prod/banner.webp?v=2`}');">
+  <div
+    class="bot-card-banner lazy"
+    style="--background: url('{data.banner_card ||
+      `${apiUrl}/static/assets/prod/banner.webp?v=2`}');"
+  >
     {#if (type == enums.TargetType.Bot || type == enums.TargetType.Server) && data.state == enums.BotState.certified}
       <Icon class="bot-card-cert" icon="fa-solid:certificate" inline={false} height="3em" />
     {/if}

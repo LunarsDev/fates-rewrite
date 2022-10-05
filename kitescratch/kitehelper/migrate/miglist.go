@@ -86,4 +86,19 @@ var migs = []migration{
 			}
 		},
 	},
+	{
+		name: "server_tags rename to server_list_tags for consistency",
+		function: func() {
+			if tableExists("server_list_tags") {
+				alrMigrated()
+				return
+			}
+
+			_, err := pgpool.Exec(ctx, "ALTER TABLE server_tags RENAME TO server_list_tags")
+
+			if err != nil {
+				panic(err)
+			}
+		},
+	},
 }

@@ -14,15 +14,13 @@
     data.user = { id: data.id };
   }
 
-  data.banner = data.banner_card || `${apiUrl}/static/assets/prod/banner.webp?v=2`;
-
   if (data.description && data.description.length > 150) {
     data.description = data.description.substring(0, 150) + '...';
   }
 </script>
 
 <section class="bot-card">
-  <div class="bot-card-banner lazy" style="--background: url('{data.banner}');">
+  <div class="bot-card-banner lazy" style="--background: url('{data.banner_card || `${apiUrl}/static/assets/prod/banner.webp?v=2`}');">
     {#if (type == enums.TargetType.Bot || type == enums.TargetType.Server) && data.state == enums.BotState.certified}
       <Icon class="bot-card-cert" icon="fa-solid:certificate" inline={false} height="3em" />
     {/if}

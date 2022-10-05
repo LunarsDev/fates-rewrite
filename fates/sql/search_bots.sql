@@ -6,7 +6,7 @@ AND (bots.FIELD >= $N) -- FROM
 AND (($N+1 = -1) OR (bots.FIELD <= $N+1)) -- TO
 */
 
-SELECT DISTINCT bots.bot_id, bots.created_at, bots.description, bots.banner_card AS banner, bots.state, 
+SELECT DISTINCT bots.bot_id, bots.created_at, bots.description, bots.banner_card, bots.state, 
 bots.votes, bots.flags, bots.guild_count FROM bots 
 INNER JOIN bot_owner ON bots.bot_id = bot_owner.bot_id 
 WHERE (bots.description ilike $1 

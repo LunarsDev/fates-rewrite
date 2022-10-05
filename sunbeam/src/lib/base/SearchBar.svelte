@@ -30,14 +30,16 @@
   // Used by tags
   function botTagsSelect(s: string[]) {
     botTags = s;
+    searchBot();
   }
 
   function serverTagsSelect(s: string[]) {
     serverTags = s;
+    searchBot();
   }
 
   let sTagAction = {
-    func: () => searchBot(true),
+    func: () => searchBot(),
     text: 'Search'
   };
 
@@ -45,7 +47,9 @@
     if (browser) {
       let url = new URL(window.location.href);
 
-      type = enums.helpers.strToTargetType(url.searchParams.get('t') || 'bot');
+      if(url.searchParams.get('t')) {
+        type = enums.helpers.strToTargetType(url.searchParams.get('t') || 'bot');
+      }
 
       query = url.searchParams.get('q') || '';
       gc_from = parseInt(url.searchParams.get('gcf') || '0');
@@ -60,7 +64,7 @@
       info('SearchBar', type, query, gc_from, gc_to, botTags, serverTags);
 
       if (query || botTags.length > 0 || serverTags.length > 0) {
-        searchBot(true);
+        searchBot();
       } else {
         data = null;
       }
@@ -72,15 +76,18 @@
   function keyHandle(event) {
     event.preventDefault();
     if (event.keyCode === 13) {
-      searchBot(true);
+      searchBot();
     }
   }
 
-  async function searchBot(tagsSearch = false) {
+  async function searchBot() {
     // update location silently to include new query params
     let url = new URL(window.location.href);
 
+    let searchDat = new Map()
+
     if (query) {
+      searchDat.set("query", query);
       url.searchParams.set('q', query);
     } else {
       url.searchParams.delete('q');
@@ -93,24 +100,28 @@
     }
 
     if (gc_from) {
+      searchDat.set("gc_from", gc_from);
       url.searchParams.set('gcf', gc_from.toString());
     } else {
       url.searchParams.delete('gcf');
     }
 
     if (gc_to && gc_to != -1) {
+      searchDat.set("gc_to", gc_to);
       url.searchParams.set('gct', gc_to.toString());
     } else {
       url.searchParams.delete('gct');
     }
 
     if (botTags.length > 0) {
+      searchDat.set("botTags", botTags);
       url.searchParams.set('bt', botTags.join('.'));
     } else {
       url.searchParams.delete('bt');
     }
 
     if (serverTags.length > 0) {
+      searchDat.set("serverTags", serverTags);
       url.searchParams.set('st', serverTags.join('.'));
     } else {
       url.searchParams.delete('st');
@@ -118,11 +129,12 @@
 
     window.history.replaceState({}, '', url.href);
 
-    if (!query && !tagsSearch) {
+    if(searchDat.size == 0) {
       data = null;
+      searching = false;
       setTimeout(() => window.llhandler(), 300);
       return;
-    } // Don't search if query is empty
+    }
 
     searching = true;
     let res = await request(`${api}/search`, {
@@ -161,9 +173,10 @@
 <div class="search">
   <input
     type="text"
+    on:keyup={keyHandle}
     on:input={(event) => {
       query = castToEl(event.target).value;
-      searchBot(false);
+      searchBot();
     }}
     id="search-bar"
     class="form-control fform search"
@@ -178,9 +191,10 @@
     <h3>Server Count Filter</h3>
     <FormInput
       formclass="filter-inp filter-inp-left"
+      onkeyup={keyHandle}
       oninput={(event) => {
         gc_from = parseInt(castToEl(event.target).value) || 0;
-        searchBot(false);
+        searchBot();
       }}
       id="gcf"
       name="From:"
@@ -190,9 +204,10 @@
     />
     <FormInput
       formclass="filter-inp filter-inp-right"
+      onkeyup={keyHandle}
       oninput={(event) => {
         gc_to = parseInt(castToEl(event.target).value) || -1;
-        searchBot(false);
+        searchBot();
       }}
       id="gct"
       name="To:"
@@ -213,7 +228,7 @@
         }
 
         type = enums.helpers.strToTargetType(castToEl(event.target).value || 'bot');
-        searchBot(false);
+        searchBot();
       }}
     >
       <option value="#" disabled>Choose a display order</option>

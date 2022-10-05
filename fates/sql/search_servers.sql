@@ -6,9 +6,8 @@ AND (servers.FIELD >= $N) -- FROM
 AND (($N+1 = -1) OR (servers.FIELD <= $N+1)) -- TO
 */
 
-SELECT DISTINCT servers.guild_id, servers.created_at,
-servers.description, servers.banner_card, servers.state,
-servers.votes, servers.guild_count, servers.flags FROM servers
+SELECT DISTINCT servers.guild_id, servers.created_at, servers.description, servers.banner_card, 
+servers.state, servers.votes, servers.guild_count, servers.flags FROM servers
 WHERE (servers.description ilike $1
 OR servers.long_description ilike $1
 OR servers.name_cached ilike $1) 

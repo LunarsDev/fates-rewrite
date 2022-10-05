@@ -47,7 +47,7 @@
     if (browser) {
       let url = new URL(window.location.href);
 
-      if (url.searchParams.get('t')) {
+      if(url.searchParams.get('t')) {
         type = enums.helpers.strToTargetType(url.searchParams.get('t') || 'bot');
       }
 
@@ -84,10 +84,10 @@
     // update location silently to include new query params
     let url = new URL(window.location.href);
 
-    let searchDat = new Map();
+    let searchDat = new Map()
 
     if (query) {
-      searchDat.set('query', query);
+      searchDat.set("query", query);
       url.searchParams.set('q', query);
     } else {
       url.searchParams.delete('q');
@@ -100,28 +100,28 @@
     }
 
     if (gc_from) {
-      searchDat.set('gc_from', gc_from);
+      searchDat.set("gc_from", gc_from);
       url.searchParams.set('gcf', gc_from.toString());
     } else {
       url.searchParams.delete('gcf');
     }
 
     if (gc_to && gc_to != -1) {
-      searchDat.set('gc_to', gc_to);
+      searchDat.set("gc_to", gc_to);
       url.searchParams.set('gct', gc_to.toString());
     } else {
       url.searchParams.delete('gct');
     }
 
     if (botTags.length > 0) {
-      searchDat.set('botTags', botTags);
+      searchDat.set("botTags", botTags);
       url.searchParams.set('bt', botTags.join('.'));
     } else {
       url.searchParams.delete('bt');
     }
 
     if (serverTags.length > 0) {
-      searchDat.set('serverTags', serverTags);
+      searchDat.set("serverTags", serverTags);
       url.searchParams.set('st', serverTags.join('.'));
     } else {
       url.searchParams.delete('st');
@@ -129,7 +129,7 @@
 
     window.history.replaceState({}, '', url.href);
 
-    if (searchDat.size == 0) {
+    if(searchDat.size == 0) {
       data = null;
       searching = false;
       setTimeout(() => window.llhandler(), 300);

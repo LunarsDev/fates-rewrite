@@ -48,7 +48,10 @@
     }}
   />
   <article class="bot-page">
-    <a href="/{enums.helpers.targetTypeString(type)}/{data.user.id}/invite" class="banner-decor bot-username bot-username-link">
+    <a
+      href="/{enums.helpers.targetTypeString(type)}/{data.user.id}/invite"
+      class="banner-decor bot-username bot-username-link"
+    >
       <h2 class="white" id="bot-name">
         {data.user.username}
         {#if type == enums.TargetType.Bot}<span class="prefix">({data.prefix || '/'})</span>{/if}

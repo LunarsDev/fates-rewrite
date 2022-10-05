@@ -4,7 +4,7 @@
   import { enums } from '$lib/enums/enums';
   export let data: any;
 
-  console.log(data.type)
+  console.log(data.type);
 </script>
 
 {#if data.data.page_style == enums.PageStyle.tabs}

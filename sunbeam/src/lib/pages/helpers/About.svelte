@@ -5,7 +5,7 @@
 
   import Icon from '@iconify/svelte';
   import Owner from '$lib/base/Owner.svelte';
-    import { enums, type TargetType } from '$lib/enums/enums';
+  import { enums, type TargetType } from '$lib/enums/enums';
 
   // https://stackoverflow.com/a/46959528
   function title(str: string) {

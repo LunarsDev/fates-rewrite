@@ -113,7 +113,7 @@ export enum TargetType {
 
 export enum SettingsMode {
   Add = 1,
-  Edit = 2,
+  Edit = 2
 }
 
 export const enums = {

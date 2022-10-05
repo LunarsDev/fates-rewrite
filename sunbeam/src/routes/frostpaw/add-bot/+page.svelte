@@ -4,7 +4,7 @@
   import { loginUser } from '$lib/request';
   import { page } from '$app/stores';
   import { apiUrl } from '$lib/config';
-    import { enums } from '$lib/enums/enums';
+  import { enums } from '$lib/enums/enums';
   export let data: any;
 
   let context = data.context;

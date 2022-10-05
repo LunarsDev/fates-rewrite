@@ -557,7 +557,7 @@
         (document.querySelector('#vanity') as HTMLInputElement).value = data.name
           .replaceAll(' ', '')
           .toLowerCase();
-      return true
+      return true;
     }
   }
 
@@ -685,7 +685,7 @@
           message: "This bot doesn't exist on discord or you need to provide a client id"
         });
 
-        saveTxt = "Save"
+        saveTxt = 'Save';
         return;
       }
 
@@ -697,7 +697,7 @@
           type: enums.AlertType.Error,
           message: 'This bot is not public'
         });
-        saveTxt = "Save";
+        saveTxt = 'Save';
         return;
       }
 
@@ -997,86 +997,90 @@
 
   function quickStart() {
     let qs = {
-      "botId": {
-              title: "What's your bot's ID?",
-              id: "quickStart",
-              type: enums.AlertType.Prompt,
-              message: "What's your bot's ID? You can find this in the Developer Portal. Note that older bots have a different Bot and Client ID.",
-              input: {
-                label: "Bot ID",
-                id: "botId",
-                placeholder: "123456789012345678",
-                multiline: false,
-                required: true,
-              },
-              submit: (value) => {
-                  console.log("here")
-                  castAnyToInputEl(document.querySelector("#bot_id")).value = value;
-                  alert(qs["clientId"])
-                }
-      },
-      "clientId": {
-        title: "Client ID",
-        id: "clientId",
+      botId: {
+        title: "What's your bot's ID?",
+        id: 'quickStart',
         type: enums.AlertType.Prompt,
-        message: "Does your bot have a seperate Bot and Client ID [only applies to older bots]. If so, type your bots Client ID here.",
+        message:
+          "What's your bot's ID? You can find this in the Developer Portal. Note that older bots have a different Bot and Client ID.",
         input: {
-          label: "Client ID",
-          id: "clientId",
-          placeholder: "123456789012345678",
+          label: 'Bot ID',
+          id: 'botId',
+          placeholder: '123456789012345678',
           multiline: false,
-          required: false,
+          required: true
+        },
+        submit: (value) => {
+          console.log('here');
+          castAnyToInputEl(document.querySelector('#bot_id')).value = value;
+          alert(qs['clientId']);
+        }
+      },
+      clientId: {
+        title: 'Client ID',
+        id: 'clientId',
+        type: enums.AlertType.Prompt,
+        message:
+          'Does your bot have a seperate Bot and Client ID [only applies to older bots]. If so, type your bots Client ID here.',
+        input: {
+          label: 'Client ID',
+          id: 'clientId',
+          placeholder: '123456789012345678',
+          multiline: false,
+          required: false
         },
         submit: async (value) => {
-            castAnyToInputEl(document.querySelector("#client_id")).value = value;
-            let res = null
-            try {
-              res = await autofillBot()
-            } catch {
-              res = false
-            }
-
-            if(!res) {
-              alert({
-                title: "Error",
-                id: "error",
-                type: enums.AlertType.Error,
-                message: "We couldn't find your bot. Please check your ID and try again.",
-                buttons: [
-                  {
-                    name: "Try Again",
-                    function: () => {
-                      alert(qs["botId"])
-                    }
-                  }
-                ]
-              })
-              return;
-            }
-
-            alert("Your bot has been autofilled. Please check the information and click 'Save' when you're ready!.")
+          castAnyToInputEl(document.querySelector('#client_id')).value = value;
+          let res = null;
+          try {
+            res = await autofillBot();
+          } catch {
+            res = false;
           }
+
+          if (!res) {
+            alert({
+              title: 'Error',
+              id: 'error',
+              type: enums.AlertType.Error,
+              message: "We couldn't find your bot. Please check your ID and try again.",
+              buttons: [
+                {
+                  name: 'Try Again',
+                  function: () => {
+                    alert(qs['botId']);
+                  }
+                }
+              ]
+            });
+            return;
+          }
+
+          alert(
+            "Your bot has been autofilled. Please check the information and click 'Save' when you're ready!."
+          );
+        }
       }
-    }
+    };
 
     alert({
-      title: "Hey there! Welcome to Fates List!",
-      id: "quickStart",
+      title: 'Hey there! Welcome to Fates List!',
+      id: 'quickStart',
       type: enums.AlertType.Prompt,
       message: "Let's get you started with a few quick questions",
       buttons: [
         {
-          name: "Next",
+          name: 'Next',
           function: () => {
-            alert(qs["botId"]);
+            alert(qs['botId']);
           }
         }
       ]
-    })
+    });
   }
 
-  if(browser) {
-    if(mode == enums.SettingsMode.Add) {
+  if (browser) {
+    if (mode == enums.SettingsMode.Add) {
       quickStart();
     }
   }

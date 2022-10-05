@@ -412,7 +412,7 @@ async def get_meta(request: Request):
             features=models.Feature.to_list(await tables.Features.select()),
         ),
         server=models.ServerListMeta(
-            tags=models.Tag.to_list(await tables.ServerTags.select()),
+            tags=models.Tag.to_list(await tables.ServerListTags.select()),
         ),
     )
 

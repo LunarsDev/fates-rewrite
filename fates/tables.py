@@ -733,7 +733,7 @@ class PlatformMap(Table, tablename="platform_map"):
     )
 
 
-class ServerTags(Table, tablename="server_tags"):
+class ServerListTags(Table, tablename="server_list_tags"):
     id = Text(
         default="",
         null=False,

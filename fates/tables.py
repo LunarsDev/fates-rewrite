@@ -30,6 +30,13 @@ class Bots(Table, tablename="bots"):
         index=True,
         secret=False,
     )
+    tags = Array(
+        null=False,
+        default=[],
+        index=True,
+        secret=False,
+        base_column=Text(),
+    )
     extra_links = JSONB(
         nullable=False,
         default={},
@@ -914,35 +921,6 @@ class BotOwner(Table, tablename="bot_owner"):
     )
     main = Boolean(
         default=False,
-        null=False,
-        primary_key=False,
-        unique=False,
-        secret=False,
-    )
-
-
-class BotTags(Table, tablename="bot_tags"):
-    id = Serial(
-        null=False,
-        primary_key=True,
-        unique=False,
-        secret=False,
-    )
-    bot_id = ForeignKey(
-        references=Bots,
-        on_delete=OnDelete.cascade,
-        on_update=OnUpdate.cascade,
-        target_column=None,
-        null=False,
-        primary_key=False,
-        unique=False,
-        secret=False,
-    )
-    tag = ForeignKey(
-        references=BotListTags,
-        on_delete=OnDelete.cascade,
-        on_update=OnUpdate.cascade,
-        target_column=None,
         null=False,
         primary_key=False,
         unique=False,

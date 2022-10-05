@@ -14,13 +14,14 @@ OR bots.long_description ilike $1
 OR bots.username_cached ilike $1 
 OR bot_owner.owner::text ilike $1) 
 AND (bots.state = $2 OR bots.state = $3) 
+AND (cardinality($4::text[]) = 0 OR bots.tags && $4) -- Tags (either empty or &&)
 
 -- Guild Count filter
-AND (bots.guild_count >= $4)
-AND (($5 = -1::bigint) OR (bots.guild_count <= $5))
+AND (bots.guild_count >= $5)
+AND (($6 = -1::bigint) OR (bots.guild_count <= $6))
 
 -- Votes filter
-AND (bots.votes >= $6)
-AND (($7 = -1::bigint) OR (bots.votes <= $7))
+AND (bots.votes >= $7)
+AND (($8 = -1::bigint) OR (bots.votes <= $8))
 
 ORDER BY bots.votes DESC, bots.guild_count DESC LIMIT 6

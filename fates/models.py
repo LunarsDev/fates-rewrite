@@ -534,6 +534,14 @@ class SearchFilter(GenericModel, Generic[DataT]):
         yield self.filter_from
         yield self.filter_to
 
+class SearchTags(BaseModel):
+    """Filter by tag"""
+
+    bot: list[str] = []
+    """Bot tags"""
+
+    server: list[str] = []
+    """Server tags"""
 
 class SearchQuery(BaseModel):
     """A search query"""
@@ -546,6 +554,8 @@ class SearchQuery(BaseModel):
 
     votes: SearchFilter[int] = SearchFilter[int](filter_from=0, filter_to=-1)
     """The vote count filter"""
+
+    tags: SearchTags = SearchTags()
 
 
 class SearchResponse(BaseModel):

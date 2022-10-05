@@ -12,13 +12,14 @@ WHERE (servers.description ilike $1
 OR servers.long_description ilike $1
 OR servers.name_cached ilike $1) 
 AND (servers.state = $2 OR servers.state = $3)
+AND (cardinality($4::text[]) = 0 OR servers.tags && $4) -- Tags
 
 -- Guild Count filter
-AND (servers.guild_count >= $4)
-AND (($5 = -1::bigint) OR (servers.guild_count <= $5))
+AND (servers.guild_count >= $5)
+AND (($6 = -1::bigint) OR (servers.guild_count <= $6))
 
 -- Votes filter
-AND (servers.votes >= $6)
-AND (($7 = -1::bigint) OR (servers.votes <= $7))
+AND (servers.votes >= $7)
+AND (($8 = -1::bigint) OR (servers.votes <= $8))
 
 ORDER BY servers.votes DESC, servers.guild_count DESC LIMIT 6

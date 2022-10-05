@@ -27,6 +27,10 @@
 1. Build the container: ``docker build -t fates .``
 2. Run the container: ``docker run -dp 8000:6666 -e PGHOST="host.docker.internal" -e PGUSRR="frostpaw" --add-host host.docker.internal:host-gateway fates`` (replacing ``frostpaw`` of course)
 
+## Migrations
+
+Use ``kitehelper migrate`` to run any migrations that have taken place between api-v3 and rewrite (after following [DB Changes](#db-changes)).
+
 ## Running
 
 1. Run ``uvicorn silverpelt.app:app --port 3030`` to start silverpelt

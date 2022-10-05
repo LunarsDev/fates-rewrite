@@ -256,14 +256,11 @@ class Mapleshade:
 
         # Tags
         tags = []
-        bot_tags = await tables.BotTags.select(tables.BotTags.tag).where(
-            tables.BotTags.bot_id == bot_id
-        )
 
-        for tag in bot_tags:
+        for tag in bot["tags"]:
             tag_data = (
                 await tables.BotListTags.select()
-                .where(tables.BotListTags.id == tag["tag"])
+                .where(tables.BotListTags.id == tag)
                 .first()
             )
             tags.append(tag_data)
@@ -524,6 +521,7 @@ class Mapleshade:
                 f"%{query.query}%",
                 models.BotServerState.Approved,
                 models.BotServerState.Certified,
+                query.tags.bot,
                 *query.guild_count,
                 *query.votes,
             )
@@ -537,6 +535,7 @@ class Mapleshade:
                 f"%{query.query}%",
                 models.BotServerState.Approved,
                 models.BotServerState.Certified,
+                query.tags.server,
                 *query.guild_count,
                 *query.votes,
             )

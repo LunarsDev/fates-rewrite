@@ -2,6 +2,7 @@ package main
 
 import (
 	"fmt"
+	"kitehelper/migrate"
 	"kitehelper/sveltekit"
 	"kitehelper/tests"
 	"os"
@@ -20,6 +21,10 @@ var cmds = map[string]command{
 	"test": {
 		Func: tests.Tester,
 		Help: "Run tests [Set NO_INTERACTION environment variable to disable all input interaction]",
+	},
+	"migrate": {
+		Func: migrate.Migrate,
+		Help: "Run custom migrations",
 	},
 }
 

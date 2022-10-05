@@ -16,3 +16,5 @@ build
 **/*.kitescratch
 backend_assets
 .vscode/settings.json
+
+**/piccolo_migrations

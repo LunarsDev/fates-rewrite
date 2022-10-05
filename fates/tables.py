@@ -581,56 +581,6 @@ class Features(Table, tablename="features"):
         secret=False,
     )
 
-
-class FrostpawClient(Table, tablename="frostpaw_clients"):
-    id = Text(
-        primary_key=True, default=lambda: secrets.token_urlsafe().replace(".", "")
-    )
-
-    name = Text(
-        null=False,
-    )
-
-    domain = Text(
-        null=False,
-    )
-
-    privacy_policy = Text(
-        null=False,
-    )
-
-    secret = Text(null=False, default=secrets.token_urlsafe)
-
-    owner_id = ForeignKey(
-        references=Users,
-        on_delete=OnDelete.cascade,
-        target_column="user_id",
-        on_update=OnUpdate.cascade,
-        null=False,
-    )
-
-    verified = Boolean(
-        default=False,
-        null=False,
-    )
-
-
-class UserConnection(Table, tablename="user_connections"):
-    user_id = ForeignKey(
-        references=Users,
-        on_delete=OnDelete.cascade,
-        on_update=OnUpdate.cascade,
-        null=True,
-        primary_key=True,
-    )
-
-    client_id = Text(null=False)
-
-    refresh_token = Text(null=False)
-
-    expires_on = Timestamptz(null=False, default=TimestamptzNow())
-
-
 class LeaveOfAbsence(Table, tablename="leave_of_absence"):
     id = Serial(
         null=False,
@@ -832,7 +782,7 @@ class BotCommands(Table, tablename="bot_commands"):
     name = Text(
         default="",
         null=False,
-        primary_key=True,
+        primary_key=False,
         unique=True,
         index=True,
         secret=False,
@@ -1543,7 +1493,7 @@ class ReviewVotes(Table, tablename="review_votes"):
         on_update=OnUpdate.cascade,
         target_column=None,
         null=False,
-        primary_key=True,
+        primary_key=False,
         unique=False,
         secret=False,
     )

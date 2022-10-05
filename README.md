@@ -29,7 +29,7 @@
 
 ## Migrations
 
-Use ``kitehelper migrate`` to run any migrations that have taken place between api-v3 and rewrite (after following [DB Changes](#db-changes)).
+Use ``kitehelper migrate`` to run any migrations that have taken place between api-v3 and rewrite.
 
 ## Running
 
@@ -39,22 +39,27 @@ Use ``kitehelper migrate`` to run any migrations that have taken place between a
 
 ## Database Seeding
 
-Firstly apply piccolo migrations.
+Create a database named ``fateslist``
 
-Then, pen ``psql``, then run the following:
+Firstly apply piccolo migrations (``piccolo migrations new fates --auto`` and ``piccolo migrations forwards fates``).
+
+Then, open ``psql``, then run the following for every csv file in ``seed_data`` replacing FN with the file name:
 
 ```sql
 \c fateslist
 
-\copy bots FROM 'seed_data/seed.csv' DELIMITER ',' CSV;
+\copy FN FROM 'seed_data/FN.csv' DELIMITER ',' CSV HEADER;
 ```
+
+**For developers, ``COPY bots TO '/.../seed_data/bots.csv'  WITH DELIMITER ',' CSV HEADER;`` can be used to export a seed to a csv file**
+
+**Note that all seed data has been sanitized for secret fields**
 
 ## DB Changes
 
-**Sept 12th 2022** 
+See ``kitescratch/kitehelper/migrate/miglist.go`` for a list of migrations that have happened to the database.
 
-- ``bot_library`` renamed to ``library`` (``ALTER TABLE bots RENAME COLUMN bot_library TO library``)
-- Added vanity.id (``alter table vanity add column id SERIAL NOT NULL``)
+A raw (possible unmigrated) schema can be found in ``seed_data``.
 
 ## Developer Docs
 

@@ -20,6 +20,13 @@
 
 - Python 3.10+
 
+## Running in Docker
+
+**This section is still a work in progress and experimental anyways**
+
+1. Build the container: ``docker build -t fates .``
+2. Run the container: ``docker run -dp 8000:6666 -e PGHOST="host.docker.internal" -e PGUSRR="frostpaw" --add-host host.docker.internal:host-gateway fates`` (replacing ``frostpaw`` of course)
+
 ## Running
 
 1. Run ``uvicorn silverpelt.app:app --port 3030`` to start silverpelt

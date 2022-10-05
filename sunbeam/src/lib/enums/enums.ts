@@ -111,8 +111,14 @@ export enum TargetType {
   Pack = 3
 }
 
+export enum SettingsMode {
+  Add = 1,
+  Edit = 2,
+}
+
 export const enums = {
   BotState: BotState,
+  SettingsMode: SettingsMode,
   UserState: UserState,
   UserBotAction: UserBotAction,
   CommandType: CommandType,

@@ -16,6 +16,11 @@ interface AlertInputInterface {
   validate?: (value) => string;
 }
 
+interface AlertButton {
+  name: string;
+  function: () => void;
+}
+
 interface Alert {
   title: string;
   type?: AlertType;
@@ -26,7 +31,7 @@ interface Alert {
   close?: () => void;
   submit?: (value) => void;
   inputs?: AlertInputInterface[];
-  buttons: any[];
+  buttons?: AlertButton[];
 }
 
 type AlertStore = Alert;

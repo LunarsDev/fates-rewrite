@@ -4,6 +4,7 @@
   import { loginUser } from '$lib/request';
   import { page } from '$app/stores';
   import { apiUrl } from '$lib/config';
+    import { enums } from '$lib/enums/enums';
   export let data: any;
 
   let context = data.context;
@@ -27,7 +28,7 @@
 </script>
 
 {#if $page.data.token}
-  <BotSettings mode="add" data={data} context={context} />
+  <BotSettings mode={enums.SettingsMode.Add} data={data} context={context} />
 {:else}
   <p>Logging you in, please wait...</p>
 {/if}

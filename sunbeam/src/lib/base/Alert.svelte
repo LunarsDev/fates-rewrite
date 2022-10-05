@@ -244,30 +244,13 @@
   };
 
   const submitInput = () => {
-    logger.info('AlertBox', 'Clicked submit');
+    logger.info('AlertBox', 'Clicked submit', inputs, submit);
     errTgt = null;
 
     if (inputs && inputs.length > 0 && submit) {
       logger.info('AlertBox', 'Found input');
       const inp = new SubmittedInput(editor, inputs);
       const valid = inp.validate();
-
-      inputs.forEach(async (input) => {
-        switch (input.type) {
-          case enums.AlertInputType.File:
-            let element = document.getElementById(
-              `inp-${inp.getIndex(input.id)}`
-            ) as HTMLInputElement;
-
-            alert('Files cannot be uploaded at this time');
-            break;
-
-          default:
-            return;
-            break;
-        }
-      });
-
       logger.info('AlertBox', `Got validator ${valid}`);
 
       if (valid) {

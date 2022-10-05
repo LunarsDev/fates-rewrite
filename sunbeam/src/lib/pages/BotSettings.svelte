@@ -3,7 +3,7 @@
   import Tip from '$lib/base/Tip.svelte';
   import SelectOptionMulti from '$lib/base/SelectOptionMulti.svelte';
   import SelectOption from '$lib/base/SelectOption.svelte';
-  import { enums } from '$lib/enums/enums';
+  import { enums, SettingsMode } from '$lib/enums/enums';
   import Icon from '@iconify/svelte';
   import Button from '$lib/base/Button.svelte';
   import { page } from '$app/stores';
@@ -33,12 +33,12 @@
   let popUpMsg = 'Errors will appear here (just in case you have popups disabled)';
 
   export let data: any;
-  export let mode: string;
+  export let mode: SettingsMode;
   export let context: any;
 
   let user = data.user;
 
-  if (mode == 'edit') {
+  if (mode == enums.SettingsMode.Edit) {
     // Make some basic attributes
     data.bot_id = data.user.id;
   } else {
@@ -49,12 +49,12 @@
   let defaultTabButton = 'basics-tab-button';
   let token = 'Click "Show" to see your bot\'s token';
   let tokenShown = false;
-  let saveTxt = mode;
+  let saveTxt = 'Save';
 
   let tags;
   let features;
 
-  if (mode == 'edit') {
+  if (mode == enums.SettingsMode.Edit) {
     tabs = [
       {
         name: 'About',
@@ -402,10 +402,6 @@
   }
 
   async function preview() {
-    /* if(charsTyped % 4 == 0) {
-            await previewInput()
-        }
-        charsTyped++ */
     previewInput();
   }
 
@@ -432,25 +428,9 @@
     );
   }
 
-  if (mode == 'edit') {
-    setTimeout(previewInput, 1000);
-  }
+  setTimeout(previewInput, 1000);
 
   async function createCommand() {
-    /*
-            pub cmd_type: CommandType, DONE
-            pub groups: Vec<String>, DONE
-            pub name: String, DONE
-            pub vote_locked: bool, DONE
-            pub description: String, DONE
-            pub args: Vec<String>, DONE
-            pub examples: Vec<String>, DONE
-            pub premium_only: bool, DONE
-            pub notes: Vec<String>, DONE
-            pub doc_link: String, DONE
-            pub id: Option<String>, SKIP  
-            pub nsfw: bool, DONE
-        */
     let json = {
       name: (document.querySelector('#command-name') as HTMLInputElement).value,
       cmd_type: parseInt((document.querySelector('#command-type') as HTMLInputElement).value),
@@ -577,6 +557,7 @@
         (document.querySelector('#vanity') as HTMLInputElement).value = data.name
           .replaceAll(' ', '')
           .toLowerCase();
+      return true
     }
   }
 
@@ -589,7 +570,7 @@
   }
 
   async function updateBot() {
-    saveTxt = `${mode}ing`;
+    saveTxt = `Please wait...`;
     $loadstore = 'Adding...';
     $navigationState = 'loading';
     let bot = {};
@@ -621,7 +602,7 @@
       });
 
       // Fix known broken things
-      if (mode == 'add') {
+      if (mode == enums.SettingsMode.Add) {
         let botIdEl = document.querySelector('#bot_id') as HTMLInputElement;
         if (!botIdEl) {
           alert({
@@ -704,7 +685,7 @@
           message: "This bot doesn't exist on discord or you need to provide a client id"
         });
 
-        saveTxt = mode;
+        saveTxt = "Save"
         return;
       }
 
@@ -716,7 +697,7 @@
           type: enums.AlertType.Error,
           message: 'This bot is not public'
         });
-        saveTxt = mode;
+        saveTxt = "Save";
         return;
       }
 
@@ -785,7 +766,7 @@
       let method = 'PATCH';
       let mod = 'editted successfully';
 
-      if (mode != 'edit') {
+      if (mode == enums.SettingsMode.Add) {
         method = 'POST';
         mod = 'added to our queue';
       }
@@ -983,7 +964,7 @@
   let selectedTags = [];
   let selectedFeatures = [];
 
-  if (mode == 'edit') {
+  if (mode == enums.SettingsMode.Edit) {
     data.tags.forEach((tag) => {
       selectedTags.push({
         value: tag.id,
@@ -1013,6 +994,92 @@
   function castAnyToInputEl(el: any): HTMLInputElement {
     return el;
   }
+
+  function quickStart() {
+    let qs = {
+      "botId": {
+              title: "What's your bot's ID?",
+              id: "quickStart",
+              type: enums.AlertType.Prompt,
+              message: "What's your bot's ID? You can find this in the Developer Portal. Note that older bots have a different Bot and Client ID.",
+              input: {
+                label: "Bot ID",
+                id: "botId",
+                placeholder: "123456789012345678",
+                multiline: false,
+                required: true,
+              },
+              submit: (value) => {
+                  console.log("here")
+                  castAnyToInputEl(document.querySelector("#bot_id")).value = value;
+                  alert(qs["clientId"])
+                }
+      },
+      "clientId": {
+        title: "Client ID",
+        id: "clientId",
+        type: enums.AlertType.Prompt,
+        message: "Does your bot have a seperate Bot and Client ID [only applies to older bots]. If so, type your bots Client ID here.",
+        input: {
+          label: "Client ID",
+          id: "clientId",
+          placeholder: "123456789012345678",
+          multiline: false,
+          required: false,
+        },
+        submit: async (value) => {
+            castAnyToInputEl(document.querySelector("#client_id")).value = value;
+            let res = null
+            try {
+              res = await autofillBot()
+            } catch {
+              res = false
+            }
+
+            if(!res) {
+              alert({
+                title: "Error",
+                id: "error",
+                type: enums.AlertType.Error,
+                message: "We couldn't find your bot. Please check your ID and try again.",
+                buttons: [
+                  {
+                    name: "Try Again",
+                    function: () => {
+                      alert(qs["botId"])
+                    }
+                  }
+                ]
+              })
+              return;
+            }
+
+            alert("Your bot has been autofilled. Please check the information and click 'Save' when you're ready!.")
+          }
+      }
+    }
+
+    alert({
+      title: "Hey there! Welcome to Fates List!",
+      id: "quickStart",
+      type: enums.AlertType.Prompt,
+      message: "Let's get you started with a few quick questions",
+      buttons: [
+        {
+          name: "Next",
+          function: () => {
+            alert(qs["botId"]);
+          }
+        }
+      ]
+    })
+  }
+
+  if(browser) {
+    if(mode == enums.SettingsMode.Add) {
+      quickStart();
+    }
+  }
 </script>
 
 <img
@@ -1027,10 +1094,10 @@
 />
 <h2 class="white user-username" id="user-name">{user.username}</h2>
 <h2 id="bot-settings">
-  {#if mode == 'add'}Welcome!{:else}Bot Settings{/if}
+  {#if mode == enums.SettingsMode.Add}Welcome!{:else}Bot Settings{/if}
 </h2>
 <Tab tabs={tabs} defaultTabButton={defaultTabButton}>
-  {#if mode == 'edit'}
+  {#if mode == enums.SettingsMode.Edit}
     <section id="about-tab" class="tabcontent tabdesign">
       <h2>Bot Information</h2>
       <section class="grid grid-cols-3 gap-4">
@@ -1272,7 +1339,7 @@
     </section>
   {/if}
   <section id="basics-tab" class="tabcontent tabdesign">
-    {#if mode != 'edit'}
+    {#if mode != enums.SettingsMode.Edit}
       <FormInput
         name="Bot ID (https://discord.dev)"
         id="bot_id"
@@ -1312,7 +1379,7 @@
           <small class="value">{owner.user.id}</small><br />
           <span>
             <a class="links-act" href={'#'} on:click={() => deleteOwner(owner.user.id)}>Delete</a>
-            {#if mode == 'edit'}
+            {#if mode == enums.SettingsMode.Edit}
               <a class="links-act" href={'#'} on:click={() => transferBot(owner.user.id)}
                 >Transfer</a
               >

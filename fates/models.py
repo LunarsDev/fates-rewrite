@@ -534,6 +534,7 @@ class SearchFilter(GenericModel, Generic[DataT]):
         yield self.filter_from
         yield self.filter_to
 
+
 class SearchTags(BaseModel):
     """Filter by tag"""
 
@@ -542,6 +543,7 @@ class SearchTags(BaseModel):
 
     server: list[str] = []
     """Server tags"""
+
 
 class SearchQuery(BaseModel):
     """A search query"""

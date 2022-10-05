@@ -581,6 +581,7 @@ class Features(Table, tablename="features"):
         secret=False,
     )
 
+
 class LeaveOfAbsence(Table, tablename="leave_of_absence"):
     id = Serial(
         null=False,

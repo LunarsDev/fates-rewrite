@@ -7,9 +7,11 @@ import inspect
 import piccolo
 from fastapi import FastAPI, HTTPException, Request
 from fastapi.responses import ORJSONResponse, HTMLResponse
+from fastapi.exceptions import RequestValidationError
 from fastapi.routing import Mount
 from piccolo_admin.endpoints import create_admin
 from piccolo.engine import engine_finder
+from fastapi.encoders import jsonable_encoder
 
 from fates.mapleshade import Mapleshade
 
@@ -158,6 +160,18 @@ async def unicorn_exception_handler(_: Request, exc: models.ResponseRaise):
         content=exc.response.dict(),
     )
 
+@app.exception_handler(RequestValidationError)
+async def validation_exception_handler(_: Request, exc: RequestValidationError):
+    return ORJSONResponse(
+        status_code=400,
+        content=models.Response(
+            done=False,
+            reason=str(exc),
+            data=jsonable_encoder({"errors": exc.errors(), "body": exc.body}),
+            code=models.ResponseCode.INVALID_DATA,
+            errors=exc.errors(),
+        ).dict(),
+    )
 
 @app.middleware("http")
 async def cors(request: Request, call_next):

@@ -520,6 +520,9 @@ class Response(BaseModel):
     reason: Optional[str] = None
     """The reason for the request failing (if any)"""
 
+    data: Optional[dict] = None
+    """Extra data (if any)"""
+
     def error(self, status_code: int):
         raise ResponseRaise(self, status_code)
 

@@ -53,4 +53,10 @@ print("For this lint to succeed, the following response codes must be added to m
 for lint_code in string_codes:
     print(lint_code.upper().replace(".", "_") + " = '" + lint_code + "'")
 
+print("\n\nOr alternatively, add the following keys to strings.ts:")
+
+for lint_code in rc_values:
+    if lint_code not in string_codes:
+        print("=>",lint_code)
+
 exit(1)

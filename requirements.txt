@@ -8,7 +8,6 @@ cmarkgfm
 msgpack
 aioredis
 maplecache
-aenum # enums.py...
 discord.py
 aiohttp # Just in case...
 uvicorn[standard]

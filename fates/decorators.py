@@ -264,7 +264,7 @@ def route(route: Route):
                 404: {"model": models.Response},
                 400: {"model": models.Response},
                 409: {"description": "Not Implemented", "model": models.Response},
-                500: {"model": models.Response},
+                500: {"model": models.Response, "description": "Internal Server Error"},
             },
         )(custom_route)
 

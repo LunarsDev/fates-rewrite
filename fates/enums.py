@@ -1,82 +1,143 @@
-from aenum import IntEnum, StrEnum as Enum
-
+from enum import IntEnum, Enum
 
 class WidgetFormat(Enum):
     """Widget format"""
 
-    _init_ = "value __doc__"
+    JSON = "json"
 
-    json = "json", "Raw JSON format"
+    HTML = "html"
 
-    html = "html", "HTML format"
+    PNG = "png"
 
-    png = "png", "PNG image format. May produce better results than WEBP"
+    WEBP = "webp"
 
-    webp = "webp", "WebP image format"
-
+    @staticmethod
+    def docs():
+        return {
+            "JSON": {
+                "description": "Raw JSON format",
+            },
+            "HTML": {
+                "description": "HTML format",
+            },
+            "PNG": {
+                "description": "PNG image format. May produce better results than WEBP",
+            },
+            "WEBP": {
+                "description": "WebP image format",
+            },
+        }
 
 class BotServerFlag(IntEnum):
     """Flags that apply to both bots and servers"""
 
-    _init_ = "value __doc__"
+    Unlocked = 0
 
-    Unlocked = 0, "Bot or server is unlocked and can be freely editted"
+    EditLocked = 1
 
-    EditLocked = (
-        1,
-        "Bot or server is locked and cannot be editted but can be unlocked by the owner",
-    )
+    StaffLocked = 2
 
-    StaffLocked = (
-        2,
-        "Bot or server is locked by staff and can only be unlocked by staff",
-    )
+    StatsLocked = 3
 
-    StatsLocked = 3, "Bot or server stats are locked due to abuse"
+    VoteLocked = 4
 
-    VoteLocked = 4, "Bot or server is locked from voting due to abuse"
+    System = 5
 
-    System = 5, "Bot or server is a system bot or server"
+    WhitelistOnly = 6
 
-    WhitelistOnly = (
-        6,
-        "Server is a whitelist only server (it cannot be joined without being whitelisted by staff on said server)",
-    )
+    KeepBannerDecor = 7
 
-    KeepBannerDecor = (
-        7,
-        "Bot or server banner should keep special fallback banner styles",
-    )
+    NSFW = 8
 
-    NSFW = 8, "Bot or server is NSFW"
+    LoginRequired = 9
 
-    LoginRequired = 9, "Server requires the user to be logged in to join"
+    @staticmethod
+    def docs():
+        return {
+            "Unlocked": {
+                "description": "Bot or server is unlocked and can be freely editted",
+            },
+            "EditLocked": {
+                "description": "Bot or server is locked and cannot be editted but can be unlocked by the owner",
+            },
+            "StaffLocked": {
+                "description": "Bot or server is locked and cannot be editted but can be unlocked by staff (only)",
+            },
+            "StatsLocked": {
+                "description": "Bot or server stats are locked due to abuse",
+            },
+            "VoteLocked": {
+                "description": "Bot or server is locked from voting due to abuse",
+            },
+            "System": {
+                "description": "Bot or server is a system bot or server",
+            },
+            "WhitelistOnly": {
+                "description": "Server is a whitelist only server (it cannot be joined without being whitelisted by staff on said server)",
+            },
+            "KeepBannerDecor": {
+                "description": "Bot or server banner should keep special fallback banner styles",
+            },
+            "NSFW": {
+                "description": "Bot or server is NSFW",
+            },
+            "LoginRequired": {
+                "description": "Server requires the user to be logged in to join",
+            },
+        }
 
 
 class UserFlag(IntEnum):
     """Flags that apply to users"""
 
-    _init_ = "value __doc__"
+    Unknown = 0
 
-    Unknown = 0, "Unknown flag"
+    VotesPrivate = 1
 
-    VotesPrivate = 1, "User's votes are private"
+    Staff = 2
 
-    Staff = 2, "User is a staff member"
+    AvidVoter = 3
 
-    AvidVoter = 3, "User is an avid voter"
+    @staticmethod
+    def docs():
+        return {
+            "Unknown": {
+                "description": "Unknown flag",
+            },
+            "VotesPrivate": {
+                "description": "User's votes are private",
+            },
+            "Staff": {
+                "description": "User is a staff member",
+            },
+            "AvidVoter": {
+                "description": "User is an avid voter",
+            },
+        }
 
 
 class UserState(IntEnum):
     """User states"""
 
-    _init_ = "value __doc__"
+    Normal = 0
 
-    Normal = 0, "User is normal (not banned)"
+    GlobalBan = 1
 
-    GlobalBan = 1, "User is globally banned from the list (apart from data actions)"
-
-    ProfileEditBan = 2, "User is banned from editing their profile due to abuse"
+    ProfileEditBan = 2
+    
+    @staticmethod
+    def docs():
+        return {
+            "Normal": {
+                "description": "User is normal (not banned)",
+            },
+            "GlobalBan": {
+                "description": "User is globally banned from the list (apart from data actions)",
+            },
+            "ProfileEditBan": {
+                "description": "User is banned from editing their profile due to abuse",
+            },
+        }
 
 
 class BotServerState(IntEnum):
@@ -115,14 +176,20 @@ class UserBotAction(IntEnum):
 class LongDescriptionType(IntEnum):
     """The type of long description. This is used to determine how the long description should be processed/rendered"""
 
-    _init_ = "value __doc__"
+    Html = 0
 
-    Html = 0, "Raw HTML. No markdown processing is applied"
-
-    MarkdownServerSide = (
-        1,
-        "Markdown. Markdown is processed server side using the ``cmarkgfm`` library.",
-    )
+    MarkdownServerSide = 1
+    
+    @staticmethod
+    def docs():
+        return {
+            "Html": {
+                "description": "Raw HTML. No markdown processing is applied",
+            },
+            "MarkdownServerSide": {
+                "description": "Markdown supported. Markdown is processed server side using the ``cmarkgfm`` library.",
+            },
+        }
 
 
 class WebhookType(IntEnum):
@@ -153,37 +220,64 @@ class TargetType(IntEnum):
 class PageStyle(IntEnum):
     """Page style for the bot/server page"""
 
-    _init_ = "value __doc__"
+    Tabs = 0
 
-    Tabs = 0, "Legacy tabs style"
+    SingleScroll = 1
 
-    SingleScroll = 1, "Single scroll/no tabs style"
+    @staticmethod
+    def docs():
+        return {
+            "Tabs": {
+                "description": "Legacy tabs style",
+            },
+            "SingleScroll": {
+                "description": "Single scroll/no tabs style",
+            },
+        }
 
 
 class UserExperiment(IntEnum):
     """User experiments"""
 
-    _init_ = "value __doc__"
+    Unknown = 0
 
-    Unknown = 0, "Unknown experiment"
+    GetRoleSelector = 1
 
-    GetRoleSelector = 1, "We switched to native roles. This experiment FAILED"
+    LynxExperimentRolloutView = 2
 
-    LynxExperimentRolloutView = 2, "Lynx experiment rollout view. No longer relevant"
+    BotReport = 3
 
-    BotReport = 3, "Bot reports are supported"
+    ServerAppealCertification = 4
 
-    ServerAppealCertification = (
-        4,
-        "Ability to use request type of Appeal or Certification in server appeal",
-    )
+    UserVotePrivacy = 5
 
-    UserVotePrivacy = (
-        5,
-        "The ability for users to hide their votes from Get Bot Votes and Get Server Votes API",
-    )
+    DevPortal = 6
 
-    DevPortal = 6, "The ability to use the developer portal. No longer relevant"
+    @staticmethod
+    def docs():
+        return {
+            "Unknown": {
+                "description": "Unknown experiment",
+            },
+            "GetRoleSelector": {
+                "description": "We switched to native roles. This experiment FAILED",
+            },
+            "LynxExperimentRolloutView": {
+                "description": "Lynx experiment rollout view. No longer relevant",
+            },
+            "BotReport": {
+                "description": "Bot reports are supported",
+            },
+            "ServerAppealCertification": {
+                "description": "Ability to use request type of Appeal or Certification in server appeal",
+            },
+            "UserVotePrivacy": {
+                "description": "The ability for users to hide their votes from Get Bot Votes and Get Server Votes API",
+            },
+            "DevPortal": {
+                "description": "The ability to use the developer portal. No longer relevant",
+            },
+        }
 
 
 class DataAction(Enum):

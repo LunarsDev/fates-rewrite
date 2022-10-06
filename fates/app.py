@@ -59,41 +59,45 @@ def document_enums():
             continue
 
         v = enums.__dict__[key]
-        if isinstance(v, enum.EnumMeta):
-            props = list(v)
-            try:
-                fields = v._init_
-            except AttributeError:
-                fields = []
-            md[key] = {}
-            md[key]["doc"] = "\n"
-            md[key]["table"] = "| Name | Value |"
-            nl = "\n| :--- | :--- |"
-            keys = []
-            for ext in fields:
-                if ext == "value":
-                    continue
-                if ext == "__doc__":
-                    md[key]["table"] += " Description |"
-                else:
-                    md[key]["table"] += f" {ext.strip('_').replace('_', ' ').title()} |"
-                nl += " :--- |"
-                keys.append(ext)
-            md[key]["table"] += f"{nl}\n"
 
-            if v.__doc__ and v.__doc__ != "An enumeration.":
-                md[key]["doc"] = "\n" + v.__doc__ + "\n\n"
+        if not issubclass(v, enum.IntEnum) and not issubclass(v, enum.Enum):
+            raise TypeError(f"Expected enum, got {type(v)} instead ({key})")
 
-            for prop in props:
-                md[key]["table"] += f"| {prop.name} | {prop.value} |"
-                for prop_key in keys:
-                    tmp = getattr(prop, prop_key)
-                    try:
-                        tmp = str(tmp) + f" ({tmp.value})"
-                    except AttributeError:
-                        tmp = str(tmp)
-                    md[key]["table"] += f" {tmp} |"
-                md[key]["table"] += "\n"
+        props = list(v)
+        try:
+            fields = v.docs()
+
+            if not fields:
+                fields = {p.name: {} for p in props}
+
+        except AttributeError:
+            fields = {p.name: {} for p in props}
+        md[key] = {}
+        md[key]["doc"] = "\n"
+        md[key]["table"] = "| Name | Value |"
+        nl = "\n| :--- | :--- |"
+        keys = []
+        for ext in fields[list(fields.keys())[0]].keys():
+            md[key]["table"] += f" {ext.strip('_').replace('_', ' ').title()} |"
+            nl += " :--- |"
+            keys.append(ext)
+        md[key]["table"] += f"{nl}\n"
+
+        if v.__doc__ and v.__doc__ != "An enumeration.":
+            md[key]["doc"] = "\n" + v.__doc__ + "\n\n"
+
+        for prop in props:
+            md[key]["table"] += f"| {prop.name} | {prop.value} |"
+
+
+            documented_prop = fields.get(prop.name, {})
+
+            for prop_key in keys:
+                tmp = documented_prop.get(prop_key, "")
+                if not tmp:
+                    raise ValueError(f"Missing {prop_key} for {prop.name} in {key}")
+                md[key]["table"] += f" {tmp} |"
+            md[key]["table"] += "\n"
 
     md = dict(sorted(md.items()))
 

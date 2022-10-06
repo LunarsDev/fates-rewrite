@@ -21,6 +21,21 @@ var testList = testset{
 			customTest: "strings-ts-enums-sync.py",
 		},
 		{
+			name:       "route_no_httpexception.py",
+			cmd:        []string{"python3"},
+			customTest: "route_no_httpexception.py",
+		},
+		{
+			name:       "enums_no_pydantic.py",
+			cmd:        []string{"python3"},
+			customTest: "enums_no_pydantic.py",
+		},
+		{
+			name:       "blacklisted_imports.py",
+			cmd:        []string{"python3"},
+			customTest: "blacklisted_imports.py",
+		},
+		{
 			name: "sunbeam (format)",
 			cmd:  []string{"npm", "run", "format"},
 			cwd:  "sunbeam",

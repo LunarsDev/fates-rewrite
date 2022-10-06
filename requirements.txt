@@ -1,14 +1,16 @@
 ruamel.yaml
 fastapi[all]
 pydantic # Just in case
-piccolo-admin # this already pulls in piccolo ORM as well
+piccolo # Our tests need this and its a good idea to keep all the dependencies in one place
+piccolo-admin #!alias-for=piccolo_admin
+asyncpg # Our tests need this and its a good idea to keep all the dependencies in one place
 orjson
 bleach
 cmarkgfm
 msgpack
 aioredis
 maplecache
-discord.py
+discord.py #!alias-for=discord
 aiohttp # Just in case...
 uvicorn[standard]
 pytz

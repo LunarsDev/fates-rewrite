@@ -36,13 +36,20 @@ lint_dict: dict[str, dict[str, str]] = json.loads(''.join(lint_lines))
 
 string_codes = [v for v in list(lint_dict.keys()) if lint_dict[v].get("__ignorable") != "true"]
 
-rc_values = [v.value for v in list(models.ResponseCode)]
+rc_values: list[str] = [v.value for v in list(models.ResponseCode)]
+rc_keys: list[str] = [v.name for v in list(models.ResponseCode)]
+
 
 for lint_code in string_codes:
     if lint_code.lower() != lint_code:
         raise Exception(f"Lint code {lint_code} is not lowercase")
 
 if rc_values == string_codes:
+    # Ensure rc_values is properly formatted
+    for k, v in enumerate(rc_values):
+        if v.upper().replace(".", "_") != rc_keys[k]:
+            raise Exception(f"Lint code [{rc_keys[k]} = {v}] is not properly formatted")
+
     # We are golden, exit early
     exit(0)
 
@@ -53,7 +60,7 @@ print("For this lint to succeed, the following response codes must be added to m
 for lint_code in string_codes:
     print(lint_code.upper().replace(".", "_") + " = '" + lint_code + "'")
 
-print("\n\nOr alternatively, add the following keys to strings.ts:")
+print("\n\nOr, add the following keys to strings.ts:")
 
 for lint_code in rc_values:
     if lint_code not in string_codes:

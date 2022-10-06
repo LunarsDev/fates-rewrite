@@ -507,7 +507,6 @@ class ResponseCode(Enum):
     INVALID_ICON_FOR_PACK = "invalid_icon_for_pack"
     INVALID_BANNER_FOR_PACK = "invalid_banner_for_pack"
 
-
 class Response(BaseModel):
     """A API Response"""
 

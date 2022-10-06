@@ -89,7 +89,6 @@ def document_enums():
         for prop in props:
             md[key]["table"] += f"| {prop.name} | {prop.value} |"
 
-
             documented_prop = fields.get(prop.name, {})
 
             for prop_key in keys:

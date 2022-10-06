@@ -1,5 +1,6 @@
 from enum import IntEnum, Enum
 
+
 class WidgetFormat(Enum):
     """Widget format"""
 
@@ -27,6 +28,7 @@ class WidgetFormat(Enum):
                 "description": "WebP image format",
             },
         }
+
 
 class BotServerFlag(IntEnum):
     """Flags that apply to both bots and servers"""
@@ -124,7 +126,7 @@ class UserState(IntEnum):
     GlobalBan = 1
 
     ProfileEditBan = 2
-    
+
     @staticmethod
     def docs():
         return {
@@ -179,7 +181,7 @@ class LongDescriptionType(IntEnum):
     Html = 0
 
     MarkdownServerSide = 1
-    
+
     @staticmethod
     def docs():
         return {

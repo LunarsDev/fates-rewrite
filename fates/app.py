@@ -64,7 +64,7 @@ def document_enums():
             raise TypeError(f"Expected enum, got {type(v)} instead ({key})")
 
         props = list(v)
-        
+
         try:
             fields = v.docs()
 

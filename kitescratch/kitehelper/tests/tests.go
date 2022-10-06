@@ -122,6 +122,10 @@ func (ts testset) Run() {
 
 		outp, cmdErr := cmd.CombinedOutput()
 
+		if os.Getenv("DEBUG") == "1" {
+			fmt.Println(string(outp))
+		}
+
 		outputs = append(outputs, string(outp))
 
 		// Cleanup
@@ -147,6 +151,7 @@ func (ts testset) Run() {
 				lines = lines[len(lines)-10:]
 			}
 
+			statusBoldErr("Showing last 10 lines of output:")
 			for _, line := range lines {
 				fmt.Println(line)
 			}

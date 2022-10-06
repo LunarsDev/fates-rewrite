@@ -5,7 +5,6 @@ from fates import tables
 from fates import enums
 from fates.enums import TargetType
 from .models import AuthData, Response, ResponseCode
-from fastapi.exceptions import HTTPException
 import secrets
 
 frostpaw_auth = APIKeyHeader(

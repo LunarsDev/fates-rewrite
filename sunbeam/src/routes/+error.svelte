@@ -4,7 +4,7 @@
 
   if (!$page.error) {
     $page.error = {
-      message: 'Not Found'
+      message: 'not_found'
     };
   }
 </script>

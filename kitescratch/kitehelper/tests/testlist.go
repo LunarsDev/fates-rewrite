@@ -16,6 +16,11 @@ var testList = testset{
 			customTest: "kitescratch_impl.py",
 		},
 		{
+			name:       "strings-ts-enums-sync.py",
+			cmd:        []string{"python3"},
+			customTest: "strings-ts-enums-sync.py",
+		},
+		{
 			name: "sunbeam (format)",
 			cmd:  []string{"npm", "run", "format"},
 			cwd:  "sunbeam",

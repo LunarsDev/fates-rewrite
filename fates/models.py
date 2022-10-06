@@ -210,8 +210,6 @@ class Feature(BaseModel, Entity):
     description: str
     """Feature description"""
 
-    # kitescratch-end
-
     @staticmethod
     def to(feature: dict) -> "Feature":
         """Returns all features for a bot"""
@@ -231,8 +229,6 @@ class Owner(BaseModel):
 
     main: bool
     """Whether the owner is the main owner"""
-
-    # kitescratch-end
 
 
 class Bot(BotBase):  # type: ignore[misc, valid-type]
@@ -276,8 +272,6 @@ class Bot(BotBase):  # type: ignore[misc, valid-type]
 
     commands: list[BotCommands]
     """The bot's commands"""
-
-    # kitescratch-end
 
 
 class User(UserBase):  # type: ignore[valid-type, misc]
@@ -450,10 +444,68 @@ class ResponseCode(Enum):
 
     OK = "ok"
     AUTH_FAIL = "auth_fail"
+    FORBIDDEN = "forbidden"
     NOT_FOUND = "not_found"
     UNKNOWN = "unknown"
     INVALID_DATA = "invalid_data"
-    FORBIDDEN = "forbidden"
+    LOGIN_REQUIRED = "login_required"
+    PRIVATE_SERVER = "private_server"
+    SERVER_BLACKLISTED = "server_blacklisted"
+    SERVER_STAFF_REVIEW = "server_staff_review"
+    SERVER_BANNED = "server_banned"
+    SERVER_NO_CHANNELS = "server_no_channels"
+    INTERNAL_ERROR = "internal_error"
+    BOT_ALREADY_EXISTS = "bot_already_exists"
+    PREFIX_TOO_LONG = "prefix_too_long"
+    NO_VANITY = "no_vanity"
+    VANITY_TAKEN = "vanity_taken"
+    INVALID_INVITE_PERMS = "invalid_invite_perms"
+    INVALID_INVITE = "invalid_invite"
+    INVALID_DESCRIPTION = "invalid_description"
+    INVALID_LONG_DESCRIPTION = "invalid_long_description"
+    BOT_NOT_FOUND = "bot_not_found"
+    NO_TAGS = "no_tags"
+    TOO_MANY_TAGS = "too_many_tags"
+    TOO_MANY_FEATURES = "too_many_features"
+    EDIT_LOCKED = "edit_locked"
+    TOO_MANY_OWNERS = "too_many_owners"
+    CLIENT_ID_NEEDED = "client_id_needed"
+    INVALID_CLIENT_ID = "invalid_client_id"
+    PRIVATE_BOT = "private_bot"
+    INVALID_OWNERS = "invalid_owners"
+    EXTRA_LINK_VAL_LENGTH_ERR = "extra_link_val_length_err"
+    EXTRA_LINK_KEY_LENGTH_ERR = "extra_link_key_length_err"
+    EXTRA_LINK_NOT_HTTP = "extra_link_not_http"
+    TOO_MANY_RENDERABLE_EXTRA_LINKS = "too_many_renderable_extra_links"
+    TOO_MANY_EXTRA_LINKS = "too_many_extra_links"
+    INVALID_BANNER_PAGE = "invalid_banner_page"
+    INVALID_BANNER_CARD = "invalid_banner_card"
+    ANTI_ABUSE_ERROR = "anti_abuse_error"
+    NOT_MAIN_OWNER = "not_main_owner"
+    INVALID_FLAG = "invalid_flag"
+    VOTED_RECENTLY = "voted_recently"
+    SYSTEM_BOT_VOTE = "system_bot_vote"
+    VOTE_AUTOROLE_ERROR = "vote_autorole_error"
+    NOT_IMPLEMENTED = "not_implemented"
+    COMMAND_LENGTH_ERR = "command_length_err"
+    STAR_RATING_ERR = "star_rating_err"
+    INVALID_REVIEW_TEXT = "invalid_review_text"
+    TOO_MANY_REVIEWS = "too_many_reviews"
+    INVALID_PARENT_REVIEW = "invalid_parent_review"
+    REVIEW_ALR_VOTED = "review_alr_voted"
+    INVALID_APPEAL_TEXT = "invalid_appeal_text"
+    BOT_NOT_APPROVED = "bot_not_approved"
+    CERT_NO_BANNER_CARD = "cert_no_banner_card"
+    CERT_NO_BANNER_PAGE = "cert_no_banner_page"
+    TOO_FEW_GUILDS = "too_few_guilds"
+    TOO_FEW_MEMBERS = "too_few_members"
+    BAD_STATS = "bad_stats"
+    TOO_MANY_SUBSCRIPTIONS = "too_many_subscriptions"
+    TOO_MANY_BOTS_FOR_PACK = "too_many_bots_for_pack"
+    INVALID_BOT_ID_FOR_PACK = "invalid_bot_id_for_pack"
+    TOO_FEW_BOTS_FOR_PACK = "too_few_bots_for_pack"
+    INVALID_ICON_FOR_PACK = "invalid_icon_for_pack"
+    INVALID_BANNER_FOR_PACK = "invalid_banner_for_pack"
 
 
 class Response(BaseModel):

@@ -4,6 +4,7 @@ on: [push]
 
 env:
   NO_INTERACTION: "true"
+  TEST_DEBUG: "1"
 
 jobs:
   build:

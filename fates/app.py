@@ -64,6 +64,7 @@ def document_enums():
             raise TypeError(f"Expected enum, got {type(v)} instead ({key})")
 
         props = list(v)
+        
         try:
             fields = v.docs()
 
@@ -72,15 +73,19 @@ def document_enums():
 
         except AttributeError:
             fields = {p.name: {} for p in props}
+
         md[key] = {}
         md[key]["doc"] = "\n"
         md[key]["table"] = "| Name | Value |"
         nl = "\n| :--- | :--- |"
+
         keys = []
+
         for ext in fields[list(fields.keys())[0]].keys():
             md[key]["table"] += f" {ext.strip('_').replace('_', ' ').title()} |"
             nl += " :--- |"
             keys.append(ext)
+
         md[key]["table"] += f"{nl}\n"
 
         if v.__doc__ and v.__doc__ != "An enumeration.":
@@ -95,12 +100,15 @@ def document_enums():
                 tmp = documented_prop.get(prop_key, "")
                 if not tmp:
                     raise ValueError(f"Missing {prop_key} for {prop.name} in {key}")
+
                 md[key]["table"] += f" {tmp} |"
+
             md[key]["table"] += "\n"
 
     md = dict(sorted(md.items()))
 
     md_out = []
+
     for key in md.keys():
         md_out.append(f'### {key}\n{md[key]["doc"]}{md[key]["table"]}')
 

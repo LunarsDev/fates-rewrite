@@ -53,9 +53,7 @@ Then, open ``psql``, then run the following for every csv file in ``seed_data`` 
 
 Then run ``kitehelper migrate`` to apply any extra migrations (should'nt be needed but doesn't hurt)
 
-### Pro tip on creating seeds
-
-*For developers, ``COPY bots TO '/.../seed_data/bots.csv'  WITH DELIMITER ',' CSV HEADER;`` can be used to export a seed to a csv file*
+*If you are making a change to ``fates/tables.py`` do ``COPY FN TO '/.../seed_data/FN.csv'  WITH DELIMITER ',' CSV HEADER;`` for every table you edit and add a migration if required to ``kitehelper``*
 
 
 **Note that all seed data has been sanitized for secret fields**

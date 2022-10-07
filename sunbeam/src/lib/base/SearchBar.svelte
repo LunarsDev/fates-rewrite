@@ -15,8 +15,8 @@
   import BotPack from './BotPack.svelte';
   import { enums, type TargetType } from '$lib/enums/enums';
   import { info } from '$lib/logger';
-    import Button from './Button.svelte';
-    import { goto } from '$app/navigation';
+  import Button from './Button.svelte';
+  import { goto } from '$app/navigation';
 
   export let type: TargetType = enums.TargetType.Bot;
   let query: string;
@@ -24,8 +24,8 @@
   let gc_to = -1;
   let vc_from = 0;
   let vc_to = -1;
-  let bot_op = "and"
-  let server_op = "and"
+  let bot_op = 'and';
+  let server_op = 'and';
   export let data: any = null;
 
   export let meta;
@@ -63,11 +63,11 @@
       vc_from = parseInt(url.searchParams.get('vcf') || '0');
       vc_to = parseInt(url.searchParams.get('vct') || '-1');
 
-      if(url.searchParams.get('bot_op') == "and" || url.searchParams.get('bot_op') == "or") {
+      if (url.searchParams.get('bot_op') == 'and' || url.searchParams.get('bot_op') == 'or') {
         bot_op = url.searchParams.get('bot_op');
       }
 
-      if(url.searchParams.get('server_op') == "and" || url.searchParams.get('server_op') == "or") {
+      if (url.searchParams.get('server_op') == 'and' || url.searchParams.get('server_op') == 'or') {
         server_op = url.searchParams.get('server_op');
       }
 
@@ -142,14 +142,14 @@
     } else {
       url.searchParams.delete('vct');
     }
-    
-    if(bot_op) {
+
+    if (bot_op) {
       url.searchParams.set('bot_op', bot_op);
     } else {
       url.searchParams.delete('bot_op');
     }
 
-    if(server_op) {
+    if (server_op) {
       url.searchParams.set('server_op', server_op);
     } else {
       url.searchParams.delete('server_op');
@@ -178,16 +178,16 @@
       return;
     }
 
-    let bopStr = "&&"
+    let bopStr = '&&';
 
-    if(bot_op == "and") {
-      bopStr = "@>"
+    if (bot_op == 'and') {
+      bopStr = '@>';
     }
 
-    let sopStr = "&&"
+    let sopStr = '&&';
 
-    if(server_op == "and") {
-      sopStr = "@>"
+    if (server_op == 'and') {
+      sopStr = '@>';
     }
 
     searching = true;
@@ -308,54 +308,63 @@
     <h3>Tag Operation Modes</h3>
 
     <label for="btm">Bot Tag Mode</label>
-    <select name="btm" on:change={(e) => {
-      bot_op = castToEl(e.target).value;
-      searchBot();
-    }}>
+    <select
+      name="btm"
+      on:change={(e) => {
+        bot_op = castToEl(e.target).value;
+        searchBot();
+      }}
+    >
       <option value="and" selected={bot_op == 'and'}>AND</option>
       <option value="or" selected={bot_op == 'or'}>OR</option>
     </select>
 
     <label for="stm">Server Tag Mode</label>
-    <select name="stm" on:change={(e) => {
-      server_op = castToEl(e.target).value;
-      searchBot();
-    }}>
-      <option value="and" selected={server_op == 'and'}>AND</option>
-      <option value="or" selected={server_op == 'or'}>OR</option>
-
-    <h3>Display Order</h3>
-    <Tip>
-      First display is either 'bot', 'server', 'pack' or 'user' and chooses whether you want bots
-      first or servers first!
-    </Tip>
     <select
-      on:change={(event) => {
-        if (castToEl(event).value == '#') {
-          return;
-        }
-
-        type = enums.helpers.strToTargetType(castToEl(event.target).value || 'bot');
+      name="stm"
+      on:change={(e) => {
+        server_op = castToEl(e.target).value;
         searchBot();
       }}
     >
-      <option value="#" disabled>Choose a display order</option>
-      <option value="bot" selected={type == enums.TargetType.Bot}>Bots First</option>
-      <option value="server" selected={type == enums.TargetType.Server}>Servers First</option>
-      <option value="pack" selected={type == enums.TargetType.Pack}>Packs First</option>
-      <option value="user" selected={type == enums.TargetType.User}>Users First</option>
+      <option value="and" selected={server_op == 'and'}>AND</option>
+      <option value="or" selected={server_op == 'or'}>OR</option>
+
+      <h3>Display Order</h3>
+      <Tip>
+        First display is either 'bot', 'server', 'pack' or 'user' and chooses whether you want bots
+        first or servers first!
+      </Tip>
+      <select
+        on:change={(event) => {
+          if (castToEl(event).value == '#') {
+            return;
+          }
+
+          type = enums.helpers.strToTargetType(castToEl(event.target).value || 'bot');
+          searchBot();
+        }}
+      >
+        <option value="#" disabled>Choose a display order</option>
+        <option value="bot" selected={type == enums.TargetType.Bot}>Bots First</option>
+        <option value="server" selected={type == enums.TargetType.Server}>Servers First</option>
+        <option value="pack" selected={type == enums.TargetType.Pack}>Packs First</option>
+        <option value="user" selected={type == enums.TargetType.User}>Users First</option>
+      </select>
     </select>
   </details>
 </div>
 
 {#if data}
-  <Button onclick={() => {
-    query = '';
-    botTags = [];
-    serverTags = [];
-    searchBot()
-    goto("/")
-  }}>Leave Search</Button>
+  <Button
+    onclick={() => {
+      query = '';
+      botTags = [];
+      serverTags = [];
+      searchBot();
+      goto('/');
+    }}>Leave Search</Button
+  >
   <!--First Display-->
   {#if type == enums.TargetType.Bot}
     <Section title="Bots" icon="fa-solid:search" id="search-res-bots">

@@ -606,7 +606,7 @@ class SearchTags(BaseModel):
     server_op: Literal["@>", "&&"] = "@>"
     """Server tag operator: @> = all, && = any"""
 
-    
+
 class SearchQuery(BaseModel):
     """A search query"""
 

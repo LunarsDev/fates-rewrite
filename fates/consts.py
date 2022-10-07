@@ -1,3 +1,9 @@
 from fates import models
 
 DEFAULT_EXC = {404: models.ResponseCode.NOT_FOUND}
+RESTRICTED_VANITY = (
+    "api",
+    "docs",
+    "add-bot",
+    "admin",
+)

@@ -72,6 +72,14 @@ func mainMenu() {
 						return nil
 					},
 				},
+				{
+					Char: "ADD",
+					Text: "Add Bot",
+					Handler: func() error {
+						addBotView()
+						return nil
+					},
+				},
 			}
 		}
 

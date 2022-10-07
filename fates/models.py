@@ -1,4 +1,5 @@
 import datetime
+from turtle import st
 from typing import Any, Optional, Generic, TypeVar
 import uuid
 
@@ -628,3 +629,16 @@ class SearchResponse(BaseModel):
     """The profiles that matched the search query"""
 
     packs: list[BotPack]
+
+
+class BotAddTicket(BaseModel):
+    """Bot add ticket response"""
+
+    ticket: str
+    """The ticket ID"""
+
+    bot_id: str
+    """The bot ID we found"""
+
+    data: dict[str, Any]
+    """The bot data we found"""

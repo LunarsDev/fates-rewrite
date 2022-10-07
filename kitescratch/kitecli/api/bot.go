@@ -42,3 +42,17 @@ func GetBotSecrets(botId string) types.BotSecrets {
 
 	return secrets
 }
+
+func VerifyClientId(clientId string) types.BotAddTicket {
+	var ticket types.BotAddTicket
+
+	requests.RequestToStruct(requests.HTTPRequest{
+		Method:                     "POST",
+		Url:                        "/bots/add/verify-client-id?client_id=" + clientId,
+		Reason:                     Reason,
+		StructMarshalErrorContinue: true,
+		Auth:                       state.GlobalState.Auth,
+	}, &ticket)
+
+	return ticket
+}

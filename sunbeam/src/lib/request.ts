@@ -307,3 +307,15 @@ export async function subNotifs(user_id: string, token: string) {
     return;
   }
 }
+
+export function getMsOptions(entityList) {
+  const options = [];
+
+  entityList.forEach((entity) => {
+    options.push({
+      value: entity.id,
+      label: entity.name
+    });
+  });
+  return options;
+}

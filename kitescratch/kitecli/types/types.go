@@ -368,3 +368,9 @@ func (f SearchFilter) Map() map[string]any {
 		"filter_to":   f.To,
 	}
 }
+
+type BotAddTicket struct {
+	Ticket string         `json:"ticket"`
+	BotID  string         `json:"bot_id"`
+	Data   map[string]any `json:"data"`
+}

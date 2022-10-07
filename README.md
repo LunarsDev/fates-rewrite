@@ -39,24 +39,19 @@ Use ``kitehelper migrate`` to run any migrations that have taken place between a
 
 ## Database Seeding
 
+Note that all seed data has been sanitized for secret fields
+
 Create a database named ``fateslist``
 
-Firstly apply piccolo migrations (``piccolo migrations new fates --auto`` and ``piccolo migrations forwards fates``).
+Run ``pg_restore -d fateslist < seed_data/testdb``
 
-Then, open ``psql``, then run the following for every csv file in ``seed_data`` replacing FN with the file name:
+Then run ``kitehelper migrate`` to apply any extra migrations (shouldn't be needed but doesn't hurt)
 
-```sql
-\c fateslist
+If you are making a change to ``fates/tables.py`` do ``pg_dump -d fateslist -Fc > seed_data/testdb`` *locally* for every table you edit and add a migration if required to ``kitehelper``. **Make sure that you reset all secret fields (webhook, api_token, webhook_secret to ``uuid_generate_v4()`` or an empty string for ``webhook`` before doing so.**
 
-\copy FN FROM 'seed_data/FN.csv' DELIMITER ',' CSV HEADER;
-```
+*Then add yourself as a owner of any bot if you wish to test such functionality: (e.g) ``insert into bot_owner (bot_id, owner) VALUES (721279531939397673, 728871946456137770);``*
 
-Then run ``kitehelper migrate`` to apply any extra migrations (should'nt be needed but doesn't hurt)
-
-*If you are making a change to ``fates/tables.py`` do ``COPY FN TO '/.../seed_data/FN.csv'  WITH DELIMITER ',' CSV HEADER;`` for every table you edit and add a migration if required to ``kitehelper``*
-
-
-**Note that all seed data has been sanitized for secret fields**
+**Note that usage of the seed data must be strictly for testing the site and not for any other purpose.**
 
 ## DB Changes
 

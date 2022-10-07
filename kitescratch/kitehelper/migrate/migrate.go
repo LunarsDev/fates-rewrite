@@ -11,6 +11,7 @@ import (
 var (
 	pgpool *pgxpool.Pool
 	ctx    = context.Background()
+	//discordSess *discordgo.Session
 
 	statusBoldBlue   = color.New(color.Bold, color.FgBlue).PrintlnFunc()
 	statusGood       = color.New(color.Bold, color.FgCyan).PrintlnFunc()
@@ -55,6 +56,16 @@ func Migrate(progname string, args []string) {
 	if err != nil {
 		panic(err)
 	}
+
+	/*if os.Getenv("DISCORD_TOKEN") == "" {
+		panic("DISCORD_TOKEN not set. Please set it to a discord token to allow some migration steps to run.")
+	}
+
+	discordSess, err = discordgo.New("Bot " + os.Getenv("DISCORD_TOKEN"))
+
+	if err != nil {
+		panic(err)
+	}*/
 
 	for i, mig := range migs {
 		statusBoldBlue("Running migration:", mig.name, "["+strconv.Itoa(i+1)+"/"+strconv.Itoa(len(migs))+"]")

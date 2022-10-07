@@ -443,3 +443,18 @@ func searchView() {
 
 	ui.PageOutput(outputStr)
 }
+
+func addBotView() {
+	clientId := ui.AskInput("Enter the client ID of the bot you wish to add to the list")
+
+	api.SetReason("Verifying client id to add bot to list")
+
+	ticket := api.VerifyClientId(clientId)
+
+	if ticket.Ticket == "" {
+		ui.RedText("Invalid client ID")
+		return
+	}
+
+	ui.GreenText("Client ID is valid, got ticket", ticket.Ticket, "and data", ticket.Data)
+}

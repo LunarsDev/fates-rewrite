@@ -2,7 +2,7 @@
 from datetime import datetime
 import random
 import string
-from typing import Any, Optional
+from typing import Any, Optional, Tuple
 from fates import tables, models
 from ruamel.yaml import YAML
 import orjson
@@ -569,3 +569,23 @@ class Mapleshade:
             profiles=profiles,
             packs=packs,
         )
+
+    async def verify_client_id(self, client_id: int) -> Tuple[int, dict[str, Any]]:
+        """Verifies the client id returning the bot id"""
+        async with aiohttp.ClientSession() as sess:
+            async with sess.get(
+                f"https://japi.rest/discord/v1/application/{client_id}",
+                headers={"Authorization": self.config["secrets"]["japi_key"]},
+            ) as resp:
+                data = await resp.json()
+                if not resp.ok:
+                    raise Exception(
+                        f"Failed to get bot with this ID: status code: {resp.status} [err of {data}]"
+                    )
+
+                if data["data"]["application"]["bot_public"]:
+                    return int(data["data"]["bot"]["id"]), data
+                else:
+                    raise Exception(
+                        "Bot is not public. Please make your bot public to be able to add it to the site."
+                    )

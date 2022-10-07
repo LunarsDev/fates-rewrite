@@ -54,7 +54,7 @@ async def random_snippet(
                             tables.Bots.select(*models.BOT_SNIPPET_COLS).where(
                                 (tables.Bots.state == models.BotServerState.Approved)
                                 | (
-                                    tables.Bots.state != models.BotServerState.Certified
+                                    tables.Bots.state == models.BotServerState.Certified
                                 ),
                             ),
                             "ORDER BY RANDOM() LIMIT 1",
@@ -171,6 +171,60 @@ async def get_index(request: Request, target_type: models.TargetType):
 
     else:
         models.Response.not_implemented()  # TODO: Implement this
+
+
+@route(
+    Route(
+        app=app,
+        mapleshade=mapleshade,
+        url="/bots/add/verify-client-id",
+        response_model=models.BotAddTicket,
+        method=Method.post,
+        tags=[tags.bot],
+        ratelimit=Ratelimit(num=10, interval=1, name="verify_bot_ids"),
+    )
+)
+async def verify_client_id(
+    request: Request, client_id: int, auth: models.AuthData = Depends(auth)
+):
+    """
+    Verifies that the client id is valid.
+
+    This can also be used to update the client id for a bot.
+
+    Returns a ticket after verification that is used to continue adding the bot.
+    """
+    nop(request)
+
+    if auth.auth_type != models.TargetType.User:
+        models.Response(
+            done=False, reason="User-only endpoint", code=models.ResponseCode.FORBIDDEN
+        ).error(401)
+
+    try:
+        bot_id, data = await mapleshade.verify_client_id(client_id)
+    except Exception as exc:
+        return models.Response(
+            done=False, reason=str(exc), code=models.ResponseCode.BOT_NOT_FOUND
+        ).error(400)
+
+    # Check if bot is already in the database
+    if await tables.Bots.exists().where(tables.Bots.bot_id == bot_id):
+        # Bot already exists, update client id while we're erroring out
+        await tables.Bots.update(client_id=client_id).where(
+            tables.Bots.bot_id == bot_id
+        )
+
+        models.Response(
+            done=False,
+            code=models.ResponseCode.BOT_ALREADY_EXISTS,
+        ).error(400)
+
+    ticket = mapleshade.gen_secret(128)
+
+    mapleshade.cache.set(f"bot_add_ticket_{ticket}", bot_id, expiry=60 * 60 * 2)
+
+    return models.BotAddTicket(ticket=ticket, bot_id=bot_id, data=data)
 
 
 @route(

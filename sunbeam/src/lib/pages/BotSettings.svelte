@@ -7,7 +7,7 @@
   import Icon from '@iconify/svelte';
   import Button from '$lib/base/Button.svelte';
   import { page } from '$app/stores';
-  import { voteHandler } from '$lib/request';
+  import { getMsOptions, voteHandler } from '$lib/request';
   import loadstore from '$lib/loadstore';
   import navigationState from '$lib/navigationState';
   import inputstore from '$lib/inputstore';
@@ -23,6 +23,7 @@
   import AuditLogs from '$lib/base/AuditLogs.svelte';
   import { genError } from '$lib/strings';
   import * as logger from '$lib/logger';
+  import MultiSelectInput from '$lib/base/MultiSelectInput.svelte';
 
   function title(str: string) {
     return str.replaceAll('_', ' ').replace(/(^|\s)\S/g, function (t) {
@@ -941,23 +942,9 @@
     extraOwners = extraOwners; // Rerender
   }
 
-  let tagOptions: Option[] = [];
+  let tagOptions: Option[] = getMsOptions(context.tags);
 
-  context.tags.forEach((tag) => {
-    tagOptions.push({
-      value: tag.id,
-      label: tag.name
-    });
-  });
-
-  let featureOptions: Option[] = [];
-
-  context.features.forEach((feature) => {
-    featureOptions.push({
-      value: feature.id,
-      label: feature.name
-    });
-  });
+  let featureOptions: Option[] = getMsOptions(context.features);
 
   logger.info('tagOpts', tagOptions);
 
@@ -965,19 +952,10 @@
   let selectedFeatures = [];
 
   if (mode == enums.SettingsMode.Edit) {
-    data.tags.forEach((tag) => {
-      selectedTags.push({
-        value: tag.id,
-        label: tag.name
-      });
-    });
+    selectedTags = getMsOptions(data.tags);
+    selectedFeatures = getMsOptions(data.features);
 
-    data.features.forEach((feature) => {
-      selectedFeatures.push({
-        value: feature.id,
-        label: feature.name
-      });
-    });
+    logger.info('selectedTags', selectedTags);
   }
 
   function generateSecret(length) {
@@ -1448,23 +1426,12 @@
       data={data.description}
       required={true}
     />
-    <label for="tags">Tags <RedStar /></label>
-    <MultiSelect
-      options={tagOptions}
-      id="tags"
-      bind:selected={selectedTags}
-      --sms-li-active-bg="#4f4242"
-      --sms-options-bg="black"
-      --sms-selected-bg="#423838"
-    />
-    <label for="features">Features</label>
-    <MultiSelect
+    <MultiSelectInput title="Tags" options={tagOptions} bind:selected={selectedTags} id="tags" />
+    <MultiSelectInput
+      title="Features"
       options={featureOptions}
-      id="features"
       bind:selected={selectedFeatures}
-      --sms-li-active-bg="#4f4242"
-      --sms-options-bg="black"
-      --sms-selected-bg="#423838"
+      id="features"
     />
     <label for="site-lang">Long Description Type</label>
     <select name="long_description_type" id="long_description_type">

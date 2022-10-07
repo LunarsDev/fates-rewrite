@@ -13,14 +13,15 @@ import (
 )
 
 type HTTPRequest struct {
-	Method      string
-	Url         string
-	Data        any // A struct to send as JSON
-	Body        []byte
-	Headers     http.Header // Any custom headers
-	Auth        *auth.Auth
-	ErrorOnFail bool
-	Reason      string
+	Method                     string
+	Url                        string
+	Data                       any // A struct to send as JSON
+	Body                       []byte
+	Headers                    http.Header // Any custom headers
+	Auth                       *auth.Auth
+	ErrorOnFail                bool
+	StructMarshalErrorContinue bool // Whether ReturnStruct should panic on errors, set to true to not error
+	Reason                     string
 }
 
 func (req HTTPRequest) String() string {
@@ -105,6 +106,12 @@ func Request(req HTTPRequest) ([]byte, error) {
 
 func RequestToStruct(req HTTPRequest, output any) {
 	data, err := Request(req)
+
+	if err != nil && req.StructMarshalErrorContinue {
+		ui.RedText(err)
+		return
+	}
+
 	if err != nil {
 		ui.FatalText(err)
 	}

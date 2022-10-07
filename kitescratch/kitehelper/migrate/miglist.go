@@ -101,4 +101,19 @@ var migs = []migration{
 			}
 		},
 	},
+	{
+		name: "vanity.id",
+		function: func() {
+			if colExists("vanity", "id") {
+				alrMigrated()
+				return
+			}
+
+			_, err := pgpool.Exec(ctx, "ALTER TABLE vanity ADD COLUMN id SERIAL PRIMARY KEY")
+
+			if err != nil {
+				panic(err)
+			}
+		},
+	},
 }

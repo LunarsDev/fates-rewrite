@@ -156,9 +156,9 @@ export const translations: TranslationData = {
    "it": "La tua descrizione lunga deve essere di almeno 200 caratteri"
   },
  "bot_not_found": {
-   "en": "According to Discord's API and our cache, your bot does not exist. Please try again after 2 hours.",
-   "fr": "Selon l'API de Discord et notre cache, votre bot n'existe pas. Veuillez réessayer après 2 heures.",
-   "it": "In base all'API di Discord e al nostro cache, il tuo bot non esiste. Riprova dopo 2 ore."
+   "en": "According to the Fates List API, your bot does not exist. Please try again after 2 hours.",
+   "fr": "Selon l'API de Fates List, votre bot n'existe pas. Veuillez réessayer après 2 heures.",
+   "it": "In base all'API di Fates List, il tuo bot non esiste. Riprova dopo 2 ore."
   },
  "no_tags": {
    "en": "You must select tags for your bot",
@@ -370,5 +370,10 @@ export function getIntlReason(key: string): (lang: string, s: string) => string 
 export function genError(json): string {
   const reason = getIntlReason(json['code']);
 
-  return getIntlString(json['code']) + '<br/><br/>' + (reason('en', json['reason']) || '');
+  return (
+    getIntlString(json['code']) +
+    '<br/><br/><br/><span>Context:<br/><br/>' +
+    (reason('en', json['reason']) || json['reason'] || 'No context available...') +
+    '</span>'
+  );
 }

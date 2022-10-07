@@ -160,6 +160,7 @@ async def unicorn_exception_handler(_: Request, exc: models.ResponseRaise):
         content=exc.response.dict(),
     )
 
+
 @app.exception_handler(RequestValidationError)
 async def validation_exception_handler(_: Request, exc: RequestValidationError):
     return ORJSONResponse(
@@ -172,6 +173,7 @@ async def validation_exception_handler(_: Request, exc: RequestValidationError):
             errors=exc.errors(),
         ).dict(),
     )
+
 
 @app.middleware("http")
 async def cors(request: Request, call_next):

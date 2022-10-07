@@ -106,11 +106,13 @@ func GetTask(taskId string) any {
 }
 
 type SearchData struct {
-	Query      string
-	GuildCount types.SearchFilter
-	Votes      types.SearchFilter
-	BotTags    []string
-	ServerTags []string
+	Query       string
+	GuildCount  types.SearchFilter
+	Votes       types.SearchFilter
+	BotTags     []string
+	ServerTags  []string
+	BotTagOp    string
+	ServerTagOp string
 }
 
 func Search(data SearchData) types.SearchResponse {
@@ -118,9 +120,11 @@ func Search(data SearchData) types.SearchResponse {
 		"query":       data.Query,
 		"guild_count": data.GuildCount.Map(),
 		"votes":       data.Votes.Map(),
-		"tags": map[string][]string{
-			"bot":    data.BotTags,
-			"server": data.ServerTags,
+		"tags": map[string]any{
+			"bot":       data.BotTags,
+			"server":    data.ServerTags,
+			"bot_op":    data.BotTagOp,
+			"server_op": data.ServerTagOp,
 		},
 	}
 

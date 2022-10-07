@@ -426,6 +426,32 @@ func searchView() {
 		serverTagList = strings.Split(serverTags, ",")
 	}
 
+	botOp := ui.AskInput("Enter bot tag operator (and/or)")
+
+	if botOp != "and" && botOp != "or" {
+		ui.RedText("Invalid operator")
+		return
+	}
+
+	serverOp := ui.AskInput("Enter server tag operator (and/or)")
+
+	if serverOp != "and" && serverOp != "or" {
+		ui.RedText("Invalid operator")
+		return
+	}
+
+	if botOp == "and" {
+		botOp = "@>"
+	} else {
+		botOp = "&&"
+	}
+
+	if serverOp == "and" {
+		serverOp = "@>"
+	} else {
+		serverOp = "&&"
+	}
+
 	api.SetReason("Searching for query")
 
 	res := api.Search(api.SearchData{
@@ -434,6 +460,7 @@ func searchView() {
 		Votes:      voteFilter,
 		BotTags:    tags,
 		ServerTags: serverTagList,
+		BotTagOp:   botOp,
 	})
 
 	var outputStr string

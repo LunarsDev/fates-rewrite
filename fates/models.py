@@ -649,3 +649,8 @@ class BotAddTicket(BaseModel):
 
     data: dict[str, Any]
     """The bot data we found"""
+
+
+class PreviewData(BaseModel):
+    type: LongDescriptionType
+    content: str

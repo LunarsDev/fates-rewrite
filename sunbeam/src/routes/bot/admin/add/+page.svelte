@@ -9,7 +9,9 @@
   import { api } from '$lib/config';
   import { genError } from '$lib/strings';
   import Icon from '@iconify/svelte';
-  import type { ListMeta } from '$lib/enums/enums';
+  import { enums, type ListMeta } from '$lib/enums/enums';
+  import RedStar from '$lib/base/RedStar.svelte';
+  import PreviewBox from '$lib/base/PreviewBox.svelte';
   export let data: ListMeta;
 
   if (!$page.data.token) {
@@ -28,13 +30,13 @@
 
   let botId: string;
   let clientId: string;
+  let prefix: string;
+  let description: string;
 
-  let verifyData: any;
-
+  // Internal vars
+  let verifyData;
   let verifyTicket: string;
-
   let verifiedBotClientSide: boolean;
-
   let nextButtonText = 'Next';
 
   // Verify that Bot ID and Client ID are set correctly (which is typically a huge cause of concern and pain)
@@ -69,6 +71,10 @@
       alert(genError(json));
     }
   }
+
+  let previewHtml = '';
+  let longDescType = enums.LongDescriptionType.Markdown;
+  let longDesc = '<h3>Start typing to generate a preview!</h3>';
 </script>
 
 {#if $page.data.token}
@@ -104,7 +110,6 @@
     <div class="spacer" />
     {#if verifiedBotClientSide}
       <h3>Great! Next let's get some basic information about {verifyData.data.bot.username}</h3>
-
       <MultiSelectInput title="Tags" id="tags" options={tagOptions} bind:selected={selectedTags} />
       <MultiSelectInput
         title="Features"
@@ -112,6 +117,29 @@
         options={featureOptions}
         bind:selected={selectedFeatures}
       />
+      <label for="bot-prefix">Bot Prefix</label>
+      <input
+        id="bot-prefix"
+        name="bot-prefix"
+        class="fform"
+        bind:value={prefix}
+        placeholder="Bot Prefix. Leave blank for 'slash command' bots."
+        type="text"
+      />
+      <label for="bot-description">Description <RedStar /></label>
+      <input
+        id="bot-description"
+        name="bot-description"
+        class="fform"
+        bind:value={description}
+        placeholder="Bot Description"
+        type="text"
+      />
+      <PreviewBox bind:textAreaVal={longDesc} bind:longDescType bind:value={previewHtml} />
+
+      <div id="preview-tab" class="prose prose-zinc dark:prose-invert">
+        {@html previewHtml}
+      </div>
     {/if}
   </div>
 {:else}

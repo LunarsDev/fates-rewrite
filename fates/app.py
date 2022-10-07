@@ -213,6 +213,6 @@ async def docs():
 
 
 # Load all routes
-from fates import routes
+from fates import routes, ws
 
-nop(routes)
+nop(routes, ws)

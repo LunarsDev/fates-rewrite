@@ -123,6 +123,11 @@ export enum UserStatus {
   UserStatusOffline = 3
 }
 
+export enum LongDescriptionType {
+  HTML = 0,
+  Markdown = 1
+}
+
 export const enums = {
   BotState: BotState,
   SettingsMode: SettingsMode,
@@ -137,10 +142,7 @@ export const enums = {
   UserFlags: UserFlags,
   UserExperiments: UserExperiments,
   UserStatus: UserStatus,
-  LongDescType: {
-    html: 0,
-    markdown_server: 1
-  },
+  LongDescriptionType: LongDescriptionType,
   TargetType: TargetType,
   helpers: {
     flagCheck: function (flags: number[] | number, allFlags: number[]) {

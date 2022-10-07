@@ -21,6 +21,7 @@
   import { genError } from '$lib/strings';
   import * as logger from '$lib/logger';
   import MultiSelectInput from '$lib/base/MultiSelectInput.svelte';
+  import PreviewBox from '$lib/base/PreviewBox.svelte';
 
   function title(str: string) {
     return str.replaceAll('_', ' ').replace(/(^|\s)\S/g, function (t) {
@@ -355,78 +356,6 @@
     });
   }
 
-  let previewHtml = '<h3>Start typing to generate a preview!</h3>';
-
-  let wsUp = false;
-  let previewWs: WebSocket = null;
-
-  function setupWs() {
-    if (!browser) {
-      return;
-    }
-    previewWs = new WebSocket('wss://api.fateslist.xyz/ws/_preview');
-    previewWs.onmessage = (e) => {
-      let json = JSON.parse(e.data);
-      if (json.preview === undefined || !json.preview) return;
-      let css = (document.querySelector('#css') as HTMLInputElement).value;
-      previewHtml =
-        '<' +
-        'style' +
-        '>' +
-        css.replaceAll('long-description', 'preview-tab') +
-        '</' +
-        'style' +
-        '>' +
-        json.preview.replaceAll('long-description', 'preview-tab');
-    };
-
-    previewWs.onopen = () => {
-      setInterval(() => {
-        previewWs.send('PING');
-      }, 20 * 1000);
-    };
-
-    previewWs.onclose = () => {
-      logger.info('Settings', 'PreviewWs closed');
-      wsUp = false;
-    };
-
-    wsUp = true;
-  }
-
-  async function preview() {
-    previewInput();
-  }
-
-  async function previewInput() {
-    if (!browser) {
-      return;
-    }
-
-    if (!wsUp) {
-      setupWs();
-    }
-    if (previewWs.readyState != WebSocket.OPEN) {
-      setTimeout(previewInput, 500);
-      return;
-    }
-    let css = (document.querySelector('#css') as HTMLInputElement).value;
-    previewWs.send(
-      JSON.stringify({
-        long_description_type: parseInt(
-          (document.querySelector('#long_description_type') as HTMLSelectElement).value
-        ),
-        text:
-          (document.querySelector('#long_description') as HTMLInputElement).value +
-          '<sty' +
-          `le>${css}</sty` +
-          'le>'
-      })
-    );
-  }
-
-  setTimeout(previewInput, 1000);
-
   async function createCommand() {
     let json = {
       name: (document.querySelector('#command-name') as HTMLInputElement).value,
@@ -737,6 +666,10 @@
 
       // Add owners
       bot['owners'] = extraOwners;
+
+      // Long description + LDType handling
+      bot['long_description'] = longDesc;
+      bot['long_description_type'] = longDescType;
 
       // Add extra fields
       bot['created_at'] = '1970-01-01T00:00:00Z';
@@ -1058,6 +991,10 @@
       quickStart();
     }
   }
+
+  let previewHtml = 'Type something to see a preview!';
+  let longDescType = data.long_description_type;
+  let longDesc = data.long_description;
 </script>
 
 <img
@@ -1429,23 +1366,9 @@
       bind:selected={selectedFeatures}
       id="features"
     />
-    <label for="site-lang">Long Description Type</label>
-    <select name="long_description_type" id="long_description_type">
-      <SelectOption value="1" masterValue={data.long_description_type}
-        >Markdown (pulldown-cmark)</SelectOption
-      >
-      <SelectOption value="0" masterValue={data.long_description_type}>HTML</SelectOption>
-    </select>
-    <br />
-    <FormInput
-      name="Long Description"
-      id="long_description"
-      placeholder="Write over 300 characters for your long description. Trying to put a placeholder to bypass this limit will get your bot denied or banned if found out!"
-      data={data.long_description_raw}
-      required={true}
-      textarea={true}
-      oninput={() => preview()}
-    />
+
+    <PreviewBox bind:textAreaVal={longDesc} bind:longDescType bind:value={previewHtml} />
+
     <div id="preview-tab" class="prose prose-zinc dark:prose-invert">
       {@html previewHtml}
     </div>

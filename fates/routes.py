@@ -7,7 +7,7 @@ from fates.auth import auth
 from fates.decorators import Ratelimit, SharedRatelimit, route, Route, Method, nop
 from . import tables
 from . import tags
-from fastapi import BackgroundTasks, Request, Depends
+from fastapi import Request, Depends
 from piccolo.columns.combination import WhereRaw
 
 from fates.mapleshade import SilverNoData

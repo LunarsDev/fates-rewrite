@@ -7,8 +7,10 @@
   import Section from '$lib/base/Section.svelte';
   import Intl from '$lib/base/Intl.svelte';
   import RandomCard from '$lib/base/RandomCard.svelte';
-  import { enums } from '$lib/enums/enums';
-  export let data: { index: any; random: any; meta: any };
+  import { enums, type Index, type ListMeta, type Snippet } from '$lib/enums/enums';
+
+  // TODO: We dont have types for this yet
+  export let data: { index: Index; random: Snippet; meta: ListMeta };
 
   let searchData: any = null;
 </script>

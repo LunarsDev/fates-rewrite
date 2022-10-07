@@ -9,7 +9,8 @@
   import { api } from '$lib/config';
   import { genError } from '$lib/strings';
   import Icon from '@iconify/svelte';
-  export let data: any;
+  import type { ListMeta } from '$lib/enums/enums';
+  export let data: ListMeta;
 
   if (!$page.data.token) {
     if (browser) {

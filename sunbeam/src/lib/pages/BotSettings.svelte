@@ -1,7 +1,6 @@
 <script lang="ts">
   import Tab from '$lib/base/Tab.svelte';
   import Tip from '$lib/base/Tip.svelte';
-  import SelectOptionMulti from '$lib/base/SelectOptionMulti.svelte';
   import SelectOption from '$lib/base/SelectOption.svelte';
   import { enums, SettingsMode } from '$lib/enums/enums';
   import Icon from '@iconify/svelte';
@@ -13,13 +12,11 @@
   import inputstore from '$lib/inputstore';
   import RedStar from '$lib/base/RedStar.svelte';
   import FormInput from '$lib/base/FormInput.svelte';
-  import MultiSelect from 'svelte-multiselect';
   import type { Option } from 'svelte-multiselect';
   import { apiUrl, nextUrl } from '$lib/config';
   import Checkbox from '$lib/base/Checkbox.svelte';
   import Owner from '$lib/base/Owner.svelte';
   import { browser } from '$app/environment';
-  import alertstore from '$lib/alertstore';
   import AuditLogs from '$lib/base/AuditLogs.svelte';
   import { genError } from '$lib/strings';
   import * as logger from '$lib/logger';
@@ -33,9 +30,9 @@
 
   let popUpMsg = 'Errors will appear here (just in case you have popups disabled)';
 
-  export let data: any;
+  export let data;
   export let mode: SettingsMode;
-  export let context: any;
+  export let context;
 
   let user = data.user;
 
@@ -51,9 +48,6 @@
   let token = 'Click "Show" to see your bot\'s token';
   let tokenShown = false;
   let saveTxt = 'Save';
-
-  let tags;
-  let features;
 
   if (mode == enums.SettingsMode.Edit) {
     tabs = [
@@ -363,8 +357,6 @@
 
   let previewHtml = '<h3>Start typing to generate a preview!</h3>';
 
-  let charsTyped = 0;
-
   let wsUp = false;
   let previewWs: WebSocket = null;
 
@@ -424,7 +416,11 @@
         long_description_type: parseInt(
           (document.querySelector('#long_description_type') as HTMLSelectElement).value
         ),
-        text: (document.querySelector('#long_description') as HTMLInputElement).value
+        text:
+          (document.querySelector('#long_description') as HTMLInputElement).value +
+          '<sty' +
+          `le>${css}</sty` +
+          'le>'
       })
     );
   }
@@ -1541,10 +1537,10 @@
           data={extLink.value}
           shouldUpdateInputStore={false}
           oninput={(e) => {
-            logger.debug('Settings', 'New extLink input', e.target.value);
+            logger.debug('Settings', 'New extLink input', castAnyToInputEl(e.target).value);
             let index = extLinks.findIndex((el) => el.id == extLink.id);
             if (index != -1) {
-              extLinks[index].value = e.target.value;
+              extLinks[index].value = castAnyToInputEl(e.target).value;
             }
             logger.info('Settings', 'New extLinks is', extLinks);
           }}

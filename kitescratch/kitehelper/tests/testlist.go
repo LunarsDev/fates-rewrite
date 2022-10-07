@@ -41,10 +41,9 @@ var testList = testset{
 			cwd:  "sunbeam",
 		},
 		{
-			name:         "sunbeam (lint)",
-			cmd:          []string{"npm", "run", "lint-fix"},
-			cwd:          "sunbeam",
-			ignoreErrors: "Still initial stages of the rewrite",
+			name: "sunbeam (lint)",
+			cmd:  []string{"npm", "run", "lint-fix"},
+			cwd:  "sunbeam",
 		},
 		{
 			name: "fates (black)",

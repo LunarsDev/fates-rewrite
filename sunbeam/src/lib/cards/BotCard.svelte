@@ -83,7 +83,9 @@
         ariaLabel="View"
         href="/{enums.helpers.targetTypeString(type)}/{data.user.id}"
         class="bot-card-actions-link button"
-        onclick={() => {}}>View</Button
+        onclick={() => {
+          // do nothing.
+        }}>View</Button
       >
       {#if type != enums.TargetType.User}
         <Button
@@ -91,7 +93,9 @@
           href="/{enums.helpers.targetTypeString(type)}/{data.user.id}/invite"
           class="bot-card-actions-link button"
           target="_blank"
-          onclick={() => {}}
+          onclick={() => {
+            // do nothing in onclick other than href.
+          }}
           >{#if type == enums.TargetType.Server}Join{:else}Invite{/if}</Button
         >
       {:else if $page.data.token && data.user.id == $page.data.user.id}
@@ -99,13 +103,17 @@
           id="bot-card-action-settings-{data.user.id}"
           ariaLabel="Settings"
           href="/{enums.helpers.targetTypeString(type)}/{data.user.id}/settings"
-          onclick={() => {}}
+          onclick={() => {
+            // do nothing.
+          }}
           class="bot-card-actions-link profile-settings-btn button">Settings</Button
         >
       {:else}
         <Button
           id="bot-card-action-settings-{data.user.id}"
-          onclick={() => {}}
+          onclick={() => {
+            // do nothing.
+          }}
           ariaLabel="Settings"
           ariaDisabled={true}
           class="bot-card-actions-link disabled-profile-btn">Settings</Button

@@ -1,6 +1,5 @@
 <script lang="ts">
   import { page } from '$app/stores';
-  import alertstore from '$lib/alertstore';
   import Tag from '$lib/base/Tag.svelte';
 
   import { nextUrl } from '$lib/config';
@@ -13,16 +12,11 @@
   import Icon from '@iconify/svelte';
   import Button from '$lib/base/Button.svelte';
 
-  export let data: any;
+  export let data;
   export let type: TargetType;
   export let limited = false;
 
   async function voteBot() {
-    let token = $page.data.token;
-    let userID = '';
-    if (token) {
-      userID = $page.data.user.id;
-    }
     $loadstore = 'Voting...';
     $navigationState = 'loading';
     let res = await voteHandler(data.user.id, false, enums.helpers.targetTypeString(type));
@@ -82,7 +76,9 @@ If you have previously invited Squirrelflight, please remove and add Fates List 
     class="buttons-all button"
     id="buttons-invite"
     touch
-    onclick={() => {}}
+    onclick={() => {
+      // do nothing.
+    }}
   >
     <span
       ><strong
@@ -149,13 +145,17 @@ If you still wish to report, type the reason for reporting this ${enums.helpers.
         id="buttons-settings"
         class="buttons-all auxillary button"
         touch
-        onclick={() => {}}
+        onclick={() => {
+          // do nothing.
+        }}
       >
         <span><strong>Settings</strong></span>
       </Button>
     {:else}
       <Button
-        onclick={() => {}}
+        onclick={() => {
+          // do nothing.
+        }}
         class="buttons-all disabled auxillary"
         id="buttons-settings"
         touch

@@ -33,7 +33,7 @@
         logger.info('Nav', 'No lazy load images found');
         return;
       }
-      var imageObserver = new IntersectionObserver(function (entries, observer) {
+      var imageObserver = new IntersectionObserver(function (entries, _) {
         entries.forEach(function (entry) {
           if (entry.isIntersecting) {
             var image = entry.target;
@@ -50,7 +50,7 @@
       var lazyloadThrottleTimeout;
       lazyloadImages = document.querySelectorAll('.lazy');
 
-      function lazyload() {
+      let lazyload = function () {
         if (lazyloadThrottleTimeout) {
           clearTimeout(lazyloadThrottleTimeout);
         }
@@ -69,7 +69,7 @@
             window.removeEventListener('orientationChange', lazyload);
           }
         }, 20);
-      }
+      };
 
       document.addEventListener('scroll', lazyload);
       window.addEventListener('resize', lazyload);
@@ -77,17 +77,17 @@
     }
   }
 
-  if (browser) {
-    function docReady(fn) {
-      // see if DOM is already available
-      if (document.readyState === 'complete' || document.readyState === 'interactive') {
-        // call on next available tick
-        setTimeout(fn, 1);
-      } else {
-        document.addEventListener('DOMContentLoaded', fn);
-      }
+  function docReady(fn) {
+    // see if DOM is already available
+    if (document.readyState === 'complete' || document.readyState === 'interactive') {
+      // call on next available tick
+      setTimeout(fn, 1);
+    } else {
+      document.addEventListener('DOMContentLoaded', fn);
     }
+  }
 
+  if (browser) {
     docReady(llhandler);
     window.llhandler = llhandler;
   }

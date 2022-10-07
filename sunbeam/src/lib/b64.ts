@@ -4,7 +4,7 @@
  *  http://www.webtoolkit.info/
  *
  **/
-var Base64 = {
+export const Base64 = {
   // private property
   _keyStr: 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/=',
 
@@ -49,6 +49,7 @@ var Base64 = {
     let enc1, enc2, enc3, enc4;
     let i = 0;
 
+    // eslint-disable-next-line no-useless-escape
     input = input.replace(/[^A-Za-z0-9\+\/\=]/g, '');
 
     while (i < input.length) {

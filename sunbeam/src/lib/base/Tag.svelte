@@ -10,7 +10,9 @@
 
   export let redirectUser = false;
 
-  export let onclick = (s: string[]) => {};
+  export let onclick = (s: string[]) => {
+    // do nothing.
+  };
 
   interface TagAction {
     func: () => void;

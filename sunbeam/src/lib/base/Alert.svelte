@@ -2,7 +2,6 @@
   import quillstore from '$lib/quillstore';
   import * as logger from '$lib/logger';
   import TextEditor from '$lib/base/TextEditor.svelte';
-  import { page } from '$app/stores';
   import { AlertType, enums } from '$lib/enums/enums';
 
   export let show: boolean;
@@ -25,7 +24,8 @@
   };
 
   class SubmittedInput {
-    inputs: any;
+    // eslint-disable-next-line ParseError
+    inputs;
     defaultIndex: number; // Default index to use in toSingleLine
     indexMap: Map<String, number>; // Map of input id to index
     values: Map<number, string>; // Map of index to value (for number/boolean etc only)

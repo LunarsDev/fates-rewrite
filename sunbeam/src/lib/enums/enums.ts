@@ -116,6 +116,13 @@ export enum SettingsMode {
   Edit = 2
 }
 
+export enum UserStatus {
+  UserStatusOnline = 0,
+  UserStatusIdle = 1,
+  UserStatusDnd = 2,
+  UserStatusOffline = 3
+}
+
 export const enums = {
   BotState: BotState,
   SettingsMode: SettingsMode,
@@ -129,6 +136,7 @@ export const enums = {
   Flags: Flag,
   UserFlags: UserFlags,
   UserExperiments: UserExperiments,
+  UserStatus: UserStatus,
   LongDescType: {
     html: 0,
     markdown_server: 1
@@ -173,3 +181,60 @@ export const enums = {
     }
   }
 };
+
+// Interfaces
+
+export interface DiscordUser {
+  id: string;
+  username: string;
+  disc: string;
+  avatar: string;
+  bot: boolean;
+  system: boolean;
+  status: UserStatus;
+  flags: number;
+}
+
+export interface Snippet {
+  user: DiscordUser;
+  votes: number;
+  description: string;
+  flags: Flag[];
+  banner_card: string;
+  state: BotState;
+  guild_count: number;
+}
+
+export interface Index {
+  new: Snippet[];
+  top_voted: Snippet[];
+  certified: Snippet[];
+}
+
+export interface Tag {
+  id: string;
+  name: string;
+  iconify_data: string;
+  owner_guild: string;
+}
+
+export interface Feature {
+  id: string;
+  name: string;
+  viewed_as: string;
+  description: string;
+}
+
+export interface BotMeta {
+  tags: Tag[];
+  features: Feature[];
+}
+
+export interface ServerMeta {
+  tags: Tag[];
+}
+
+export interface ListMeta {
+  bot: BotMeta;
+  server: ServerMeta;
+}

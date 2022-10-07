@@ -1,5 +1,4 @@
 <script lang="ts">
-  import { browser } from '$app/environment';
   import inputstore from '$lib/inputstore';
   import RedStar from '$lib/base/RedStar.svelte';
   export let required = false;
@@ -11,9 +10,16 @@
   export let data: any = '';
   export let textarea = false;
   export let shouldUpdateInputStore = true;
-  export let onchange: any = () => {};
-  export let oninput: any = () => {};
-  export let onkeyup: any = () => {};
+  export let onchange = (_: Event) => {
+    // do nothing.
+  };
+  export let oninput = (_: Event) => {
+    // do nothing.
+  };
+  export let onkeyup = (_: Event) => {
+    // do nothing.
+  };
+
   if (!data) {
     data = '';
   }

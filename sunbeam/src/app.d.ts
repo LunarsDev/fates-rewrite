@@ -26,10 +26,6 @@ interface UserFnInterface {
 
 declare global {
   namespace App {
-    interface Locals {}
-
-    interface Platform {}
-
     interface Permission {
       index: number;
       roles: string[];
@@ -51,14 +47,14 @@ declare global {
     interface Error {
       message: string;
     }
-
-    interface Stuff {}
   }
 
   namespace globalThis {
     interface Window {
       user: () => UserFnInterface;
-      llhandler: () => any;
+      llhandler: () => void;
+
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
       QuillMarkdown: any;
     }
   }

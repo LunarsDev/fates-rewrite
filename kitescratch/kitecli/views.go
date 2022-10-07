@@ -410,10 +410,31 @@ func searchView() {
 
 	gcFilter := renderers.AskSearchFilter("Guild count")
 	voteFilter := renderers.AskSearchFilter("Vote count")
+	botTags := ui.AskInput("Enter bot tags (comma separated, leave blank for none)")
+
+	var tags []string
+
+	if botTags != "" {
+		tags = strings.Split(botTags, ",")
+	}
+
+	serverTags := ui.AskInput("Enter server tags (comma separated, leave blank for none)")
+
+	var serverTagList []string
+
+	if serverTags != "" {
+		serverTagList = strings.Split(serverTags, ",")
+	}
 
 	api.SetReason("Searching for query")
 
-	res := api.Search(query, gcFilter, voteFilter)
+	res := api.Search(api.SearchData{
+		Query:      query,
+		GuildCount: gcFilter,
+		Votes:      voteFilter,
+		BotTags:    tags,
+		ServerTags: serverTagList,
+	})
 
 	var outputStr string
 

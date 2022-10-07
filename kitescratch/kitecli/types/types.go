@@ -334,22 +334,6 @@ type BotSecrets struct {
 	WebhookSecret string `json:"webhook_secret"`
 }
 
-/*
-class SearchResponse(BaseModel):
-
-	"""A search response"""
-
-	bots: list[Snippet]
-	"""The bots that matched the search query"""
-
-	servers: list[Snippet]
-	"""The servers that matched the search query"""
-
-	profiles: list[ProfileSnippet]
-	"""The profiles that matched the search query"""
-
-	packs: list[BotPack]
-*/
 type SearchResponse struct {
 	Bots     []Snippet        `json:"bots"`
 	Servers  []Snippet        `json:"servers"`

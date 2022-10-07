@@ -1,6 +1,6 @@
 import datetime
 from turtle import st
-from typing import Any, Optional, Generic, TypeVar
+from typing import Any, Literal, Optional, Generic, TypeVar
 import uuid
 
 from .tables import BotCommands, Bots, Users, UserBotLogs, Servers
@@ -600,7 +600,13 @@ class SearchTags(BaseModel):
     server: list[str] = []
     """Server tags"""
 
+    bot_op: Literal["@>", "&&"] = "@>"
+    """Bot tag operator: @> = all, && = any"""
 
+    server_op: Literal["@>", "&&"] = "@>"
+    """Server tag operator: @> = all, && = any"""
+
+    
 class SearchQuery(BaseModel):
     """A search query"""
 
@@ -614,6 +620,7 @@ class SearchQuery(BaseModel):
     """The vote count filter"""
 
     tags: SearchTags = SearchTags()
+    """The tags filter"""
 
 
 class SearchResponse(BaseModel):

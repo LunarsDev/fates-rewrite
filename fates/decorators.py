@@ -1,8 +1,7 @@
 import datetime
 from functools import wraps
 import traceback
-from typing import Awaitable, Any, Optional, Protocol, Type, TypeVar
-import typing
+from typing import Awaitable, Any, Literal, Optional, Protocol, Type, TypeVar, get_origin
 from fastapi import FastAPI, Request, HTTPException
 from fastapi.responses import ORJSONResponse
 from fastapi.params import Depends as DependsType
@@ -98,7 +97,9 @@ class __RouteData:
         fields = {}
 
         for field in bm.__fields__.values():
-            if issubclass(field.type_, BaseModel):
+            if get_origin(field.type_) is Literal: # If it is a literal
+                fields[field.name] = "text"
+            elif issubclass(field.type_, BaseModel):
                 fields[field.name] = {"_nested": True} | self.extract_bm(
                     field.annotation
                 )
@@ -252,7 +253,7 @@ def route(route: Route):
 
             return res
 
-        if route.response_model == typing.Any:
+        if route.response_model == Any:
             route.response_model = None
 
         rmap[route.method](

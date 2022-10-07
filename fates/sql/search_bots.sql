@@ -14,7 +14,7 @@ OR bots.long_description ilike $1
 OR bots.username_cached ilike $1 
 OR bot_owner.owner::text ilike $1) 
 AND (bots.state = $2 OR bots.state = $3) 
-AND (cardinality($4::text[]) = 0 OR bots.tags && $4) -- Tags (either empty or &&)
+AND (cardinality($4::text[]) = 0 OR bots.tags {op} $4) -- Tags (either empty or do all tags in $4 exist in bots.tags)
 
 -- Guild Count filter
 AND (bots.guild_count >= $5)

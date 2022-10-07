@@ -15,11 +15,17 @@
   import BotPack from './BotPack.svelte';
   import { enums, type TargetType } from '$lib/enums/enums';
   import { info } from '$lib/logger';
+    import Button from './Button.svelte';
+    import { goto } from '$app/navigation';
 
   export let type: TargetType = enums.TargetType.Bot;
   let query: string;
-  let gc_from = 1;
+  let gc_from = 0;
   let gc_to = -1;
+  let vc_from = 0;
+  let vc_to = -1;
+  let bot_op = "and"
+  let server_op = "and"
   export let data: any = null;
 
   export let meta;
@@ -54,6 +60,16 @@
       query = url.searchParams.get('q') || '';
       gc_from = parseInt(url.searchParams.get('gcf') || '0');
       gc_to = parseInt(url.searchParams.get('gct') || '-1');
+      vc_from = parseInt(url.searchParams.get('vcf') || '0');
+      vc_to = parseInt(url.searchParams.get('vct') || '-1');
+
+      if(url.searchParams.get('bot_op') == "and" || url.searchParams.get('bot_op') == "or") {
+        bot_op = url.searchParams.get('bot_op');
+      }
+
+      if(url.searchParams.get('server_op') == "and" || url.searchParams.get('server_op') == "or") {
+        server_op = url.searchParams.get('server_op');
+      }
 
       let bt = url.searchParams.get('bt') || '';
       botTags = bt.split('.').filter((x) => x != '');
@@ -61,7 +77,7 @@
       let st = url.searchParams.get('st') || '';
       serverTags = st.split('.').filter((x) => x != '');
 
-      info('SearchBar', type, query, gc_from, gc_to, botTags, serverTags);
+      info('SearchBar', type, query, gc_from, gc_to, vc_from, vc_to, botTags, serverTags);
 
       if (query || botTags.length > 0 || serverTags.length > 0) {
         searchBot();
@@ -113,6 +129,32 @@
       url.searchParams.delete('gct');
     }
 
+    if (vc_from) {
+      searchDat.set('vc_from', vc_from);
+      url.searchParams.set('vcf', vc_from.toString());
+    } else {
+      url.searchParams.delete('vcf');
+    }
+
+    if (vc_to && vc_to != -1) {
+      searchDat.set('vc_to', vc_to);
+      url.searchParams.set('vct', vc_to.toString());
+    } else {
+      url.searchParams.delete('vct');
+    }
+    
+    if(bot_op) {
+      url.searchParams.set('bot_op', bot_op);
+    } else {
+      url.searchParams.delete('bot_op');
+    }
+
+    if(server_op) {
+      url.searchParams.set('server_op', server_op);
+    } else {
+      url.searchParams.delete('server_op');
+    }
+
     if (botTags.length > 0) {
       searchDat.set('botTags', botTags);
       url.searchParams.set('bt', botTags.join('.'));
@@ -136,6 +178,18 @@
       return;
     }
 
+    let bopStr = "&&"
+
+    if(bot_op == "and") {
+      bopStr = "@>"
+    }
+
+    let sopStr = "&&"
+
+    if(server_op == "and") {
+      sopStr = "@>"
+    }
+
     searching = true;
     let res = await request(`${api}/search`, {
       method: 'POST',
@@ -148,9 +202,15 @@
           filter_from: gc_from,
           filter_to: gc_to
         },
+        votes: {
+          filter_from: vc_from,
+          filter_to: vc_to
+        },
         tags: {
           bot: botTags,
-          server: serverTags
+          server: serverTags,
+          bot_op: bopStr,
+          server_op: sopStr
         }
       },
       fetch: fetch
@@ -216,6 +276,54 @@
       data={gc_to}
     />
 
+    <h3>Votes Filter</h3>
+    <FormInput
+      formclass="filter-inp filter-inp-left"
+      onkeyup={keyHandle}
+      oninput={(event) => {
+        vc_from = parseInt(castToEl(event.target).value) || 0;
+        searchBot();
+      }}
+      id="vcf"
+      name="From:"
+      placeholder="From..."
+      type="number"
+      data={vc_from}
+    />
+
+    <FormInput
+      formclass="filter-inp filter-inp-right"
+      onkeyup={keyHandle}
+      oninput={(event) => {
+        vc_to = parseInt(castToEl(event.target).value) || -1;
+        searchBot();
+      }}
+      id="vct"
+      name="To:"
+      placeholder="To... (-1 means no limit)"
+      type="number"
+      data={vc_to}
+    />
+
+    <h3>Tag Operation Modes</h3>
+
+    <label for="btm">Bot Tag Mode</label>
+    <select name="btm" on:change={(e) => {
+      bot_op = castToEl(e.target).value;
+      searchBot();
+    }}>
+      <option value="and" selected={bot_op == 'and'}>AND</option>
+      <option value="or" selected={bot_op == 'or'}>OR</option>
+    </select>
+
+    <label for="stm">Server Tag Mode</label>
+    <select name="stm" on:change={(e) => {
+      server_op = castToEl(e.target).value;
+      searchBot();
+    }}>
+      <option value="and" selected={server_op == 'and'}>AND</option>
+      <option value="or" selected={server_op == 'or'}>OR</option>
+
     <h3>Display Order</h3>
     <Tip>
       First display is either 'bot', 'server', 'pack' or 'user' and chooses whether you want bots
@@ -241,6 +349,13 @@
 </div>
 
 {#if data}
+  <Button onclick={() => {
+    query = '';
+    botTags = [];
+    serverTags = [];
+    searchBot()
+    goto("/")
+  }}>Leave Search</Button>
   <!--First Display-->
   {#if type == enums.TargetType.Bot}
     <Section title="Bots" icon="fa-solid:search" id="search-res-bots">

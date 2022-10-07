@@ -164,7 +164,7 @@ async def unicorn_exception_handler(_: Request, exc: models.ResponseRaise):
 @app.exception_handler(RequestValidationError)
 async def validation_exception_handler(_: Request, exc: RequestValidationError):
     return ORJSONResponse(
-        status_code=429,
+        status_code=422,
         content=models.Response(
             done=False,
             reason=str(exc),

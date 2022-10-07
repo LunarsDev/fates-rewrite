@@ -517,7 +517,7 @@ class Mapleshade:
     ):
         record_bots = self.parse_records(
             await self.pool.fetch(
-                self.sql.search_bots,
+                self.sql.search_bots.replace("{op}", query.tags.bot_op),
                 f"%{query.query}%",
                 models.BotServerState.Approved,
                 models.BotServerState.Certified,
@@ -531,7 +531,7 @@ class Mapleshade:
 
         record_servers = self.parse_records(
             await self.pool.fetch(
-                self.sql.search_servers,
+                self.sql.search_servers.replace("{op}", query.tags.server_op),
                 f"%{query.query}%",
                 models.BotServerState.Approved,
                 models.BotServerState.Certified,

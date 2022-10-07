@@ -12,7 +12,7 @@ WHERE (servers.description ilike $1
 OR servers.long_description ilike $1
 OR servers.name_cached ilike $1) 
 AND (servers.state = $2 OR servers.state = $3)
-AND (cardinality($4::text[]) = 0 OR servers.tags && $4) -- Tags
+AND (cardinality($4::text[]) = 0 OR servers.tags {op} $4) -- Tags
 
 -- Guild Count filter
 AND (servers.guild_count >= $5)

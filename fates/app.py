@@ -143,6 +143,7 @@ app = FastAPI(
 
 @app.exception_handler(404)
 async def not_found(_: Request, exc: HTTPException):
+    """Handle 404 with a normalised error response"""
     return ORJSONResponse(
         models.Response(
             done=False,
@@ -154,7 +155,8 @@ async def not_found(_: Request, exc: HTTPException):
 
 
 @app.exception_handler(models.ResponseRaise)
-async def unicorn_exception_handler(_: Request, exc: models.ResponseRaise):
+async def response_raise_handler(_: Request, exc: models.ResponseRaise):
+    """Handles ResponseRaise exceptions"""
     return ORJSONResponse(
         status_code=exc.status_code,
         content=exc.response.dict(),
@@ -163,6 +165,7 @@ async def unicorn_exception_handler(_: Request, exc: models.ResponseRaise):
 
 @app.exception_handler(RequestValidationError)
 async def validation_exception_handler(_: Request, exc: RequestValidationError):
+    """Handles validation error handling for normalizing errors"""
     return ORJSONResponse(
         status_code=422,
         content=models.Response(
@@ -177,6 +180,7 @@ async def validation_exception_handler(_: Request, exc: RequestValidationError):
 
 @app.middleware("http")
 async def cors(request: Request, call_next):
+    """Add CORS headers to all responses."""
     response = await call_next(request)
     response.headers["Access-Control-Allow-Origin"] = "*"
     response.headers["Access-Control-Allow-Methods"] = "GET, POST, PUT, DELETE, OPTIONS"
@@ -192,6 +196,12 @@ async def cors(request: Request, call_next):
 
 @app.on_event("startup")
 async def open_database_connection_pool():
+    """
+    Opens the database connection pool and saves the pool in mapleshade for use in the rest of the app
+
+    TODO: look into a better way to do this
+    """
+
     engine = engine_finder()
     # asyncio.create_task(bot.start(secrets["token"]))
     # await bot.load_extension("jishaku")
@@ -202,6 +212,7 @@ async def open_database_connection_pool():
 
 @app.on_event("shutdown")
 async def close_database_connection_pool():
+    """Closes the database connection pool"""
     engine = engine_finder()
     await engine.close_connnection_pool()
 
@@ -209,6 +220,7 @@ async def close_database_connection_pool():
 # This is the only exception to not using @route
 @app.get("/docs", include_in_schema=False)
 async def docs():
+    """Returns the docs HTML"""
     return HTMLResponse(docs_page)
 
 

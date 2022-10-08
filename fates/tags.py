@@ -4,6 +4,8 @@ from pydantic import BaseModel
 
 
 class Tag(BaseModel):
+    """A tag for a route (used for OpenAPI)"""
+
     name: str
     """The internal name of tag"""
 

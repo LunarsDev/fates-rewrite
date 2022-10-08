@@ -7,6 +7,7 @@ import traceback
 
 async def task(task: Awaitable, task_id: str):
     """Creates a task"""
+
     print(f"Starting task {task_id}")
 
     mapleshade.cache.set(f"task-{task_id}", "running")
@@ -24,6 +25,8 @@ async def task(task: Awaitable, task_id: str):
 
 
 async def data_request(user_id: int):
+    """Request a user's data as per GDPR"""
+
     user = await tables.Users.select().where(tables.Users.user_id == user_id).first()
     owners = await tables.BotOwner.select().where(tables.BotOwner.owner == user_id)
 
@@ -58,6 +61,7 @@ async def data_request(user_id: int):
 
 async def data_delete(user_id: int):
     """Delete a user's data"""
+
     # TODO: Handle bot/server votes checks of lynx
     # TODO: Also handle global ban and other ban cases
     await tables.Users.delete().where(tables.Users.user_id == user_id)

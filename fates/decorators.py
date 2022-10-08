@@ -27,6 +27,8 @@ from fates.tags import Tag
 
 
 class Method(IntEnum):
+    """HTTP Methods for requests"""
+
     get = 0
     post = 1
     put = 2
@@ -36,6 +38,8 @@ class Method(IntEnum):
 
 
 class Ratelimit(BaseModel):
+    """Ratelimit for a route. Not yet enforced or used"""
+
     num: int
     """Number of requests"""
 
@@ -47,6 +51,8 @@ class Ratelimit(BaseModel):
 
 
 class SharedRatelimit:
+    """Shared ratelimit for a set of routes. Not yet enforced or used"""
+
     _shared_rls = {
         "core": Ratelimit(
             num=200,  # Avoid ratelimiting core endpoints as far as possible
@@ -57,10 +63,13 @@ class SharedRatelimit:
 
     @staticmethod
     def new(name: str) -> "Ratelimit":
+        """Finds and returns a new shared ratelimit"""
         return SharedRatelimit._shared_rls[name]
 
 
 class Route(BaseModel):
+    """Route model for the API"""
+
     app: FastAPI
     mapleshade: Mapleshade
     url: str
@@ -73,10 +82,13 @@ class Route(BaseModel):
     ] = None  # Either None, a target type or true (for all)
 
     class Config:
+        """Pydantic config"""
+
         arbitrary_types_allowed = True
 
     @validator("tags")
     def tag_length(cls, v):
+        """Ensures that tags are not too long"""
         if len(v) > 1:
             raise ValueError("A route can only have 1 tags")
         return v
@@ -90,6 +102,7 @@ class __RouteData:
         self.route: Route = route
 
     def get_tio_type(self, v: Any) -> str:
+        """Gets the type for tryitout"""
         tio_types = {
             str: "text",
             int: "number",
@@ -190,7 +203,11 @@ routes = {}
 
 
 def route(route: Route):
+    """Decorator for routes"""
+
     def rw(func: Awaitable):
+        """Route wrapper"""
+
         if not func.__doc__:
             raise ValueError("Function must have a docstring")
 
@@ -224,7 +241,9 @@ def route(route: Route):
             raise ValueError("Function must take request")
 
         @wraps(func)
-        async def custom_route(request: Request, *args, **kwargs):
+        async def custom_route(
+            request: Request, *args, **kwargs
+        ):  # --ignore-docstrings
             try:
                 res = await func(request, *args, **kwargs)
             except HTTPException as e:

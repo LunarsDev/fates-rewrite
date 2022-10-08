@@ -41,6 +41,8 @@ class SilverNoData(SilverException):
 
 
 class SQLFiles:
+    """SQL file data storage"""
+
     def load_sql(self, fn: str) -> str:
         """Load SQL from a file"""
         with open(f"fates/sql/{fn}.sql") as doc:
@@ -56,6 +58,8 @@ class SQLFiles:
 
 
 class Mapleshade:
+    """Common primitives for the Fates List backend"""
+
     __slots__ = [
         "yaml",
         "config",
@@ -381,6 +385,7 @@ class Mapleshade:
         return snippet
 
     async def resolve_packs(self, data: list[dict]) -> list[models.BotPack]:
+        """Resolves a list of bot packs"""
         packs = []
         for pack in data:
             resolved_bots = []
@@ -514,7 +519,9 @@ class Mapleshade:
     async def search(
         self,
         query: models.SearchQuery,
-    ):
+    ) -> models.SearchResponse:
+        """Searches for a SearchQuery and returns a SearchResults"""
+
         record_bots = self.parse_records(
             await self.pool.fetch(
                 self.sql.search_bots.replace("{op}", query.tags.bot_op),

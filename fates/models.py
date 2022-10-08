@@ -64,6 +64,8 @@ async def augment(c: Select, aug: str):
 
 
 class UserBotLog(UserBotLogsBase):  # type: ignore[valid-type, misc]
+    """A user bot log derived from the UserBotLogs table"""
+
     bot_id: str
     user_id: str
 
@@ -83,13 +85,16 @@ class Entity:
 
     @staticmethod
     def to(_: dict) -> "Entity":
+        """Converts a dict to an entity"""
         pass
 
     @classmethod
     def to_list(cls, obj: list[dict]) -> list["Entity"]:
+        """Converts a list of dicts to a list of entities"""
         return [cls.to(e) for e in obj if e]
 
     def __eq__(self, other):
+        """Checks if two entities are equal based on ID"""
         if getattr(other, "id", None):
             return self.id == getattr(other, "id", None)
         return self.id == other
@@ -141,32 +146,40 @@ class Permission(BaseModel):
     name: str
 
     def __eq__(self, other: "Permission") -> bool:
+        """Check if two permissions are equal based on their index"""
+
         if not isinstance(other, Permission):
             return False
         return self.index == other.index
 
     def __lt__(self, other: "Permission") -> bool:
+        """Check if a permission is less than another based on their index"""
         if not isinstance(other, Permission):
             return False
         return self.index < other.index
 
     def __gt__(self, other: "Permission") -> bool:
+        """Check if a permission is greater than another based on their index"""
         if not isinstance(other, Permission):
             return False
         return self.index > other.index
 
     def __le__(self, other: "Permission") -> bool:
+        """Check if a permission is less than or equal to another based on their index"""
         if not isinstance(other, Permission):
             return False
         return self.index <= other.index
 
     def __ge__(self, other: "Permission") -> bool:
+        """Check if a permission is greater than or equal to another based on their index"""
         if not isinstance(other, Permission):
             return False
         return self.index >= other.index
 
 
 class PermissionList(BaseModel):
+    """A list of permissions for a staff member on the list"""
+
     perms: dict[str, Permission]
 
 
@@ -525,10 +538,12 @@ class Response(BaseModel):
     """Extra data (if any)"""
 
     def error(self, status_code: int):
+        """Raises a error response which is then caught by the exception handler"""
         raise ResponseRaise(self, status_code)
 
     @staticmethod
     def not_implemented():
+        """Raises a not implemented response"""
         Response(
             done=False,
             code=ResponseCode.UNKNOWN,
@@ -548,8 +563,13 @@ class ResponseRaise(Exception):
 
 # Test model
 class NestedModel(BaseModel):
+    """A nested model"""
+
     test: str
+    """A test field"""
+
     perms: Permission
+    """A permission field"""
 
 
 class TaskResponse(BaseModel):
@@ -587,6 +607,7 @@ class SearchFilter(GenericModel, Generic[DataT]):
     """The value to filter to"""
 
     def __iter__(self):
+        """Yields the filter which can then be unpacked using * notation"""
         yield self.filter_from
         yield self.filter_to
 
@@ -652,5 +673,10 @@ class BotAddTicket(BaseModel):
 
 
 class PreviewData(BaseModel):
+    """Preview data for websocket"""
+
     type: LongDescriptionType
+    """The type of long description"""
+
     content: str
+    """The content of the long description"""

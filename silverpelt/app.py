@@ -12,9 +12,12 @@ from silverpelt.types.types import IDiscordUser, Status, check_snow
 
 # We use messagepack for serialization
 class MsgpackResponse(JSONResponse):
+    """We use messagepack for serialization"""
+
     media_type = "application/x-msgpack"
 
     def render(self, content: Any) -> bytes:
+        """Renders the content"""
         return msgpack.packb(content)
 
 
@@ -24,6 +27,7 @@ bot = discord.Client(intents=discord.Intents(guilds=True, members=True, presence
 
 @bot.event
 async def on_ready():
+    """When the bot is ready, inform the user via the console"""
     print("Connected to discord successfully!")
 
 
@@ -45,11 +49,13 @@ async def cache(value: Any, *, key: str, expiry: int = 8 * 60 * 60) -> Any:
 
 @app.on_event("startup")
 async def start_bot():
+    """Starts the bot"""
     asyncio.create_task(bot.start(config["secrets"]["token"]))
 
 
 @app.get("/@me")
 async def about_me():
+    """Returns information about the bot itself"""
     await bot.wait_until_ready()
 
     return IDiscordUser(
@@ -131,6 +137,7 @@ async def get_user(id: int):
 
 @app.get("/roles/{gid}/{uid}")
 async def get_guild_member_roles(gid: int, uid: int):
+    """Get a user's roles from a guild"""
     guild = bot.get_guild(gid)
     if not guild:
         return None

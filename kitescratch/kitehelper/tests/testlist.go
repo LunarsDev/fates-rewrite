@@ -36,6 +36,11 @@ var testList = testset{
 			customTest: "blacklisted_imports.py",
 		},
 		{
+			name:       "docstring_ensure.py",
+			cmd:        []string{"python3"},
+			customTest: "docstring_ensure.py",
+		},
+		{
 			name: "sunbeam (format)",
 			cmd:  []string{"npm", "run", "format"},
 			cwd:  "sunbeam",

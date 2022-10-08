@@ -14,6 +14,7 @@ class WidgetFormat(Enum):
 
     @staticmethod
     def docs():
+        """Returns the docs for the enum"""
         return {
             "JSON": {
                 "description": "Raw JSON format",
@@ -55,6 +56,7 @@ class BotServerFlag(IntEnum):
 
     @staticmethod
     def docs():
+        """Returns the docs for the enum"""
         return {
             "Unlocked": {
                 "description": "Bot or server is unlocked and can be freely editted",
@@ -102,6 +104,7 @@ class UserFlag(IntEnum):
 
     @staticmethod
     def docs():
+        """Returns the docs for the enum"""
         return {
             "Unknown": {
                 "description": "Unknown flag",
@@ -129,6 +132,7 @@ class UserState(IntEnum):
 
     @staticmethod
     def docs():
+        """Returns the docs for the enum"""
         return {
             "Normal": {
                 "description": "User is normal (not banned)",
@@ -184,6 +188,7 @@ class LongDescriptionType(IntEnum):
 
     @staticmethod
     def docs():
+        """Returns the docs for the enum"""
         return {
             "Html": {
                 "description": "Raw HTML. No markdown processing is applied",
@@ -228,6 +233,7 @@ class PageStyle(IntEnum):
 
     @staticmethod
     def docs():
+        """Returns the docs for the enum"""
         return {
             "Tabs": {
                 "description": "Legacy tabs style",
@@ -257,6 +263,7 @@ class UserExperiment(IntEnum):
 
     @staticmethod
     def docs():
+        """Returns the docs for the enum"""
         return {
             "Unknown": {
                 "description": "Unknown experiment",

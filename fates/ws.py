@@ -7,12 +7,17 @@ from fates.app import app, mapleshade
 
 
 class ConnectionManager:
+    """
+    Represents a connection manager which handles connections of a client and disconnecting unresponsive clients
+    """
+
     def __init__(self):
         self.ws: list[WebSocket] = []
 
         asyncio.create_task(self._check_ping())
 
     async def _check_ping(self):
+        """Checks the ping of all websockets, and disconnects them if they are unresponsive"""
         while True:
             for ws in self.ws:
                 try:
@@ -23,10 +28,12 @@ class ConnectionManager:
             await asyncio.sleep(5)
 
     async def connect(self, ws: WebSocket):
+        """Connects a websocket and adds it to the connection manager list thus adding it to PING checks"""
         await ws.accept()
         self.ws.append(ws)
 
     async def disconnect(self, ws: WebSocket, reason: str = "Unknown"):
+        """Disconnects a websocket and removes it from the connection manager list thus removing it from PING checks"""
         try:
             self.ws.remove(ws)
             await ws.close(4000, reason)
@@ -39,6 +46,8 @@ manager = ConnectionManager()
 
 @app.websocket("/ws/preview")
 async def preview(ws: WebSocket):
+    """Preview websocket for live previewing in the site"""
+
     await manager.connect(ws)
 
     try:

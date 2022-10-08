@@ -18,3 +18,6 @@ backend_assets
 .vscode/settings.json
 
 **/piccolo_migrations
+**/piccolo_migrations/**
+**/piccolo_migrations/__init__.py
+**/piccolo_migrations/*

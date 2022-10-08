@@ -29,6 +29,7 @@ async def auth(
     header: str = Depends(frostpaw_auth),
     compat: str = Depends(compat_header),
 ):
+    """Dependency for authorization of a user/bot/server"""
     if compat:
         auth_data = (
             await tables.Bots.select(tables.Bots.bot_id)

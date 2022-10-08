@@ -3,6 +3,8 @@ from pydantic import BaseModel
 
 
 class Status(enum.IntEnum):
+    """Represents a users status"""
+
     online = 0
     idle = 1
     dnd = 2
@@ -10,6 +12,7 @@ class Status(enum.IntEnum):
 
     @classmethod
     def new(cls, v):
+        """Returns a new status enum based on the value"""
         # https://www.reddit.com/r/Python/comments/ur9t92/python_310_match_statements_are_86_faster_than_if/
         match v:
             case "online":

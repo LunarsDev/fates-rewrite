@@ -126,6 +126,14 @@
         placeholder="Bot Prefix. Leave blank for 'slash command' bots."
         type="text"
       />
+      <Tip>
+        Custom Invite Links are supported<br /><br />
+
+        Support for P:PERM_NUMBER was removed. You can use the URL generator in Discord Developer
+        Portal instead.<br /><br />
+      </Tip>
+      <label for="invite">Bot Invite</label>
+      <input name="invite" id="invite" placeholder="https://..." />
       <label for="bot-description">Description <RedStar /></label>
       <input
         id="bot-description"

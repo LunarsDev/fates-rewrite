@@ -1,5 +1,13 @@
 package migrate
 
+import (
+	"fmt"
+	"strconv"
+	"strings"
+
+	"github.com/jackc/pgtype"
+)
+
 // Contains the list of migrations
 
 var migs = []migration{
@@ -113,6 +121,48 @@ var migs = []migration{
 
 			if err != nil {
 				panic(err)
+			}
+		},
+	},
+	{
+		name: "Update invites using P: syntax to fully resolved oauth2 urls",
+		function: func() {
+			bots, err := pgpool.Query(ctx, "select bot_id, client_id, invite from bots")
+
+			if err != nil {
+				panic(err)
+			}
+
+			defer bots.Close()
+
+			for bots.Next() {
+				var botID int
+				var clientID pgtype.Int8
+				var invite string
+
+				err = bots.Scan(&botID, &clientID, &invite)
+
+				if err != nil {
+					panic(err)
+				}
+
+				var id = botID
+
+				if clientID.Status == pgtype.Present && clientID.Int != 0 && clientID.Int != int64(botID) {
+					fmt.Println("Bot", botID, "has a client id of", clientID.Int)
+					id = int(clientID.Int)
+				}
+
+				if strings.HasPrefix(invite, "P:") {
+					invite = "https://discord.com/oauth2/authorize?client_id=" + strconv.Itoa(id) + "&scope=bot%20applications.commands&permissions=" + strings.TrimPrefix(invite, "P:")
+					fmt.Println(invite, botID)
+				}
+
+				_, err = pgpool.Exec(ctx, "update bots set invite = $1 where bot_id = $2", invite, botID)
+
+				if err != nil {
+					panic(err)
+				}
 			}
 		},
 	},

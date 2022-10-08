@@ -1343,15 +1343,12 @@
       required={true}
     />
     <Tip>
-      You can use P:PERM_NUMBER (or just leave this blank) if the Bot ID and Client ID are the same
-      (almost always true except for old bots)
+      Custom Invite Links are supported<br /><br />
+
+      Support for P:PERM_NUMBER was removed. You can use the URL generator in Discord Developer
+      Portal instead.<br /><br />
     </Tip>
-    <FormInput
-      name="Invite URL (Leave blank for automatic)"
-      id="invite"
-      placeholder="https://discord.com/api/oauth2/..."
-      data={data.invite}
-    />
+    <FormInput name="Bot Invite" id="invite" placeholder="https://..." data={data.invite} />
     <FormInput
       name="Short Description"
       id="description"

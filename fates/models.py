@@ -10,7 +10,7 @@ from .tables import (
     UserBotLogs,
     Servers,
     Features,
-    Vanity as VanityTable
+    Vanity as VanityTable,
 )
 from piccolo.utils.pydantic import create_pydantic_model
 from piccolo.query import Select

@@ -32,6 +32,7 @@
   let clientId: string;
   let prefix: string;
   let description: string;
+  let vanity: string;
 
   // Internal vars
   let verifyData;
@@ -124,6 +125,15 @@
         class="fform"
         bind:value={prefix}
         placeholder="Bot Prefix. Leave blank for 'slash command' bots."
+        type="text"
+      />
+      <label for="bot-vanity">Vanity <RedStar /></label>
+      <input
+        id="bot-vanity"
+        name="bot-vanity"
+        class="fform"
+        bind:value={vanity}
+        placeholder="mybot, fateslist etc. Prefix with _ to disable"
         type="text"
       />
       <Tip>

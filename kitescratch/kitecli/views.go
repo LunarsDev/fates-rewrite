@@ -505,4 +505,56 @@ func addBotView() {
 	}
 
 	ui.GreenText("Client ID is valid, got ticket", ticket.Ticket, "and data", ticket.Data)
+
+	// Get bot data
+	var fin types.BotAddFinalize = types.BotAddFinalize{
+		Ticket: ticket.Ticket,
+	}
+
+	prefix := ui.AskInput("Enter the bot's prefix")
+
+	fin.Prefix = prefix
+
+	invite := ui.AskInput("Enter the bot's invite")
+
+	fin.Invite = invite
+
+	vanity := ui.AskInput("Enter the bot's vanity URL (prefix with _ to make it private)")
+
+	fin.Vanity = vanity
+
+	description := ui.AskInput("Enter the bot's description")
+
+	fin.Description = description
+
+	longDescType := ui.AskInput("Enter the bot's long description type (html/markdown)")
+
+	if longDescType == "html" {
+		fin.LongDescriptionType = types.LongDescriptionTypeHTML
+	} else if longDescType == "markdown" {
+		fin.LongDescriptionType = types.LongDescriptionTypeMarkdown
+	} else {
+		ui.RedText("Invalid long description type")
+		return
+	}
+
+	longDesc := ui.AskInput("Enter the bot's long description")
+
+	fin.LongDescription = longDesc
+
+	tags := ui.AskInput("Enter the bot's tags (comma separated)")
+
+	fin.Tags = strings.Split(strings.ReplaceAll(tags, " ", ""), ",")
+
+	features := ui.AskInput("Enter the bot's features (comma separated)")
+
+	fin.Features = strings.Split(strings.ReplaceAll(features, " ", ""), ",")
+
+	res := api.FinalizeBotAdd(fin)
+
+	if res.Done {
+		ui.GreenText("Bot added successfully")
+	} else {
+		ui.RedText("Bot add failed:", res.Reason)
+	}
 }

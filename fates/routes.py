@@ -181,7 +181,7 @@ async def get_index(request: Request, target_type: models.TargetType):
         response_model=models.BotAddTicket,
         method=Method.post,
         tags=[tags.bot],
-        ratelimit=Ratelimit(num=10, interval=1, name="verify_bot_ids"),
+        ratelimit=SharedRatelimit.new("bot_add"),
     )
 )
 async def verify_client_id(
@@ -197,9 +197,7 @@ async def verify_client_id(
     nop(request)
 
     if auth.auth_type != models.TargetType.User:
-        models.Response(
-            done=False, reason="User-only endpoint", code=models.ResponseCode.FORBIDDEN
-        ).error(401)
+        models.Response.invalid_auth_type(models.TargetType.User)
 
     try:
         bot_id, data = await mapleshade.verify_client_id(client_id)
@@ -222,13 +220,73 @@ async def verify_client_id(
 
     ticket = mapleshade.gen_secret(128)
 
-    mapleshade.cache.set(f"bot_add_ticket_{ticket}", {
-        "bot_id": bot_id,
-        "client_id": client_id,
-        "guild_count": data["data"]["bot"]["approximate_guild_count"],
-    }, expiry=60 * 15)
+    mapleshade.cache.set(
+        f"bot_add_ticket_{ticket}",
+        {
+            "bot_id": bot_id,
+            "client_id": client_id,
+            "guild_count": data["data"]["bot"]["approximate_guild_count"],
+        },
+        expiry=60 * 15,
+    )
 
     return models.BotAddTicket(ticket=ticket, bot_id=bot_id, data=data)
+
+
+@route(
+    Route(
+        app=app,
+        mapleshade=mapleshade,
+        url="/bots/add/finalize",
+        response_model=models.Response,
+        method=Method.post,
+        tags=[tags.bot],
+        ratelimit=SharedRatelimit.new("bot_add"),
+    )
+)
+async def finalize_bot_add(
+    request: Request, data: models.BotAddFinalize, auth: models.AuthData = Depends(auth)
+):
+    """Finalizes the bot add process and adds the bot to the list."""
+    nop(request)
+    if auth.auth_type != models.TargetType.User:
+        models.Response.invalid_auth_type(models.TargetType.User)
+
+    await data.db_validate(mapleshade)
+
+    if not (ticket_data := mapleshade.cache.get(f"bot_add_ticket_{data.ticket}")):
+        models.Response(
+            done=False,
+            code=models.ResponseCode.NOT_FOUND,
+            reason="Ticket not found. Try reverifying the client id.",
+        ).error(400)
+
+    ticket_json = ticket_data.value()
+
+    # Create the bot
+    await tables.Bots.insert(
+        tables.Bots(
+            bot_id=ticket_json["bot_id"],
+            client_id=ticket_json["client_id"],
+            guild_count=ticket_json["guild_count"],
+            tags=data.tags,
+            description=data.description,
+            long_description=data.long_description,
+            long_description_type=data.long_description_type,
+            vanity=data.vanity,
+            invite=data.invite,
+            prefix=data.prefix,
+        )
+    )
+
+    await tables.Vanity.insert(
+        tables.Vanity(
+            vanity_url=data.vanity,
+            redirect=ticket_json["bot_id"]
+        )
+    )
+
+    models.Response.ok()
 
 
 @route(
@@ -327,9 +385,7 @@ async def get_bot_secrets(
     Returns the secrets of a bot (``api_token``, ``webhook`` and ``webhook_secret`` as of now)
     """
     if auth.auth_type != models.TargetType.User:
-        models.Response(
-            done=False, reason="User-only endpoint", code=models.ResponseCode.FORBIDDEN
-        ).error(401)
+        models.Response.invalid_auth_type(models.TargetType.User)
 
     nop(request)
 
@@ -714,9 +770,7 @@ async def perform_data_action(
     - ``mode`` -> The mode to perform the action in (del/req)
     - ``user_id`` -> The user ID to perform the action on"""
     if auth.auth_type != models.TargetType.User:
-        models.Response(
-            done=False, reason="User-only endpoint", code=models.ResponseCode.FORBIDDEN
-        ).error(401)
+        models.Response.invalid_auth_type(models.TargetType.User)
 
     nop(request, mode)
 

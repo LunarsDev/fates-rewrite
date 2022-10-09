@@ -1,17 +1,22 @@
 import datetime
-from turtle import st
 from typing import Any, Literal, Optional, Generic, TypeVar
 import uuid
 
-from .tables import BotCommands, Bots, Users, UserBotLogs, Servers
+from .tables import (
+    BotCommands,
+    BotListTags,
+    Bots,
+    Users,
+    UserBotLogs,
+    Servers,
+    Features,
+)
 from piccolo.utils.pydantic import create_pydantic_model
 from piccolo.query import Select
-from pydantic import BaseModel
+from pydantic import BaseModel, validator
 from pydantic.generics import GenericModel
 import silverpelt.types.types as silver_types
 from fates.enums import *
-
-from fates import tables
 
 # Add models here
 BotBase = create_pydantic_model(
@@ -60,7 +65,7 @@ DEFAULT_USER_EXPERIMENTS = [
 
 async def augment(c: Select, aug: str):
     """Augment a SQL select with custom SQL"""
-    return await tables.Bots.raw(str(c) + aug)
+    return await Bots.raw(str(c) + aug)
 
 
 class UserBotLog(UserBotLogsBase):  # type: ignore[valid-type, misc]
@@ -125,7 +130,7 @@ class BotPack(BaseModel):
     icon: str
     """The pack's icon"""
 
-    banner: Optional[str] = None
+    banner: str | None = None
     """The pack's banner"""
 
     resolved_bots: list[ResolvedPackBot]
@@ -195,7 +200,7 @@ class Tag(BaseModel, Entity):
     name: str
     """The tag name"""
 
-    owner_guild: Optional[str]
+    owner_guild: str | None = None
     """The guild ID of the tags owner (server only)"""
 
     @staticmethod
@@ -257,7 +262,7 @@ class Bot(BotBase):  # type: ignore[misc, valid-type]
     # These fields have the wrong type set for API response, change them
     bot_id: str
 
-    verifier: Optional[str]
+    verifier: str | None = None
     """The reviewer who has approved/denied the bot"""
 
     extra_links: dict
@@ -314,7 +319,7 @@ class Snippet(BaseModel):
     flags: list[BotServerFlag]
     """The bot's/server's flags"""
 
-    banner_card: Optional[str]
+    banner_card: str | None = None
     """The bot's/server's banner_card"""
 
     state: BotServerState
@@ -334,7 +339,7 @@ class ProfileSnippet(BaseModel):
     user: silver_types.DiscordUser
     """The user's user object"""
 
-    banner: Optional[str] = None
+    banner: str | None = None
     """The user's banner"""
 
     description: str
@@ -385,10 +390,10 @@ class BotSecrets(BaseModel):
     api_token: str
     """The bot's API token"""
 
-    webhook: Optional[str] = None
+    webhook: str | None = None
     """The bot's webhook"""
 
-    webhook_secret: Optional[str] = None
+    webhook_secret: str | None = None
     """The bot's webhook secret"""
 
 
@@ -427,7 +432,7 @@ class OauthUser(BaseModel):
     site_lang: str
     """The user's site language"""
 
-    css: Optional[str] = None
+    css: str | None = None
     """The user's CSS"""
 
     user_experiments: list[UserExperiment]
@@ -531,11 +536,16 @@ class Response(BaseModel):
     code: Optional[ResponseCode] = ResponseCode.OK
     """The response code (can be used for programatic error handling)"""
 
-    reason: Optional[str] = None
+    reason: str | None = None
     """The reason for the request failing (if any)"""
 
     data: Optional[dict] = None
     """Extra data (if any)"""
+
+    @staticmethod
+    def ok():
+        """Returns a successful response"""
+        return Response(done=True, code=ResponseCode.OK)
 
     def error(self, status_code: int):
         """Raises a error response which is then caught by the exception handler"""
@@ -551,6 +561,34 @@ class Response(BaseModel):
         ).error(
             409
         )  # Conflict
+
+    @staticmethod
+    def invalid_auth_type(target_type: TargetType):
+        """Raises an invalid auth type response"""
+        if target_type == TargetType.Bot:
+            Response(
+                done=False,
+                code=ResponseCode.AUTH_FAIL,
+                reason="Bot-only endpoint",
+            ).error(401)
+        elif target_type == TargetType.User:
+            Response(
+                done=False,
+                code=ResponseCode.AUTH_FAIL,
+                reason="User-only endpoint",
+            ).error(401)
+        elif target_type == TargetType.Server:
+            Response(
+                done=False,
+                code=ResponseCode.AUTH_FAIL,
+                reason="Server-only endpoint",
+            ).error(401)
+        else:
+            Response(
+                done=False,
+                code=ResponseCode.AUTH_FAIL,
+                reason="Target type cannot be authenticated",
+            ).error(401)
 
 
 class ResponseRaise(Exception):
@@ -672,6 +710,130 @@ class BotAddTicket(BaseModel):
     """The bot data we found"""
 
 
+class BotUpdate(BaseModel):
+    """Bot update data (common set of validation for add/edit bot) [For edit bot, inherit from both BotUpdate and Bot]"""
+
+    tags: list[str]
+    """The tags to of the bot"""
+
+    features: list[str]
+    """The features to of the bot"""
+
+    prefix: str | None = None
+    """The prefix of the bot"""
+
+    description: str
+    """The description of the bot"""
+
+    long_description_type: LongDescriptionType
+    """The long description type"""
+
+    long_description: str
+    """The long description of the bot"""
+
+    invite: str | None = None
+    """The invite of the bot. Set to none for autogenerated invite"""
+
+    vanity: str
+
+    @validator("prefix")
+    def validate_prefix(cls, v):
+        """Ensure prefix is either a value or None"""
+        if not v:
+            return None
+        return v
+
+    @validator("invite")
+    def validate_invite(cls, v: str):
+        """Validates the invite is https://"""
+        if not v:
+            return None
+
+        if not v.startswith("https://"):
+            raise ValueError("Invites must start with https://")
+        return v
+
+    @validator("description")
+    def validate_description(cls, v: str):
+        """Validates the description is of sufficient length"""
+        if len(v) > 100:
+            raise ValueError("Description must be less than 100 characters")
+        elif len(v) < 10:
+            raise ValueError("Description must be more than 10 characters")
+        return v
+
+    @validator("long_description")
+    def validate_long_description(cls, v: str):
+        """Validates the long description is of sufficient length"""
+        if len(v) < 100:
+            raise ValueError("Long description must be more than 100 characters")
+        return v
+
+    @validator("tags")
+    def validate_tags(cls, v: list[str]):
+        """Validates the tags are of sufficient length"""
+        if len(v) > 10:
+            raise ValueError("You can only have a maximum of 10 tags")
+        elif len(v) < 1:
+            raise ValueError("You must have at least 1 tag")
+        return v
+
+    @validator("features")
+    def validate_features(cls, v: list[str]):
+        """Validates no more than 10 features are provided"""
+        if len(v) > 10:
+            raise ValueError("You can only have a maximum of 10 features")
+        return v
+
+    @validator("vanity")
+    def validate_vanity(cls, v: str):
+        """Validates the vanity is valid"""
+        if len(v) > 64:
+            raise ValueError("Vanity must be less than 64 characters")
+        elif v in RESTRICTED_VANITY:
+            raise ValueError("Vanity is restricted and cannot be used")
+        elif not v:
+            raise ValueError("Vanity cannot be empty")
+        return v
+
+    async def db_validate(self, mapleshade: "Mapleshade"):
+        """Validates that all tags and features are valid and in the database"""
+        for tag in self.tags:
+            if not await BotListTags.exists().where(BotListTags.id == tag):
+                Response(
+                    done=False,
+                    code=ResponseCode.INVALID_DATA,
+                    reason=f"Tag {tag} does not exist",
+                ).error(400)
+
+        for feature in self.features:
+            if not await Features.exists().where(Feature.id == feature):
+                Response(
+                    done=False,
+                    code=ResponseCode.INVALID_DATA,
+                    reason=f"Feature {feature} does not exist",
+                ).error(400)
+
+        vanity_check = await mapleshade.pool.fetchval(
+            "SELECT vanity_url FROM vanity WHERE lower(vanity_url) = $1",
+            self.vanity.lower(),
+        )
+
+        if vanity_check:
+            Response(
+                done=False,
+                code=ResponseCode.INVALID_DATA,
+                reason=f"Vanity {self.vanity} already exists",
+            ).error(400)
+
+
+class BotAddFinalize(BotUpdate):
+    """Bot add finalize response"""
+
+    ticket: str
+    """The ticket from the add ticket response"""
+
+
 class PreviewData(BaseModel):
     """Preview data for websocket"""
 
@@ -680,3 +842,18 @@ class PreviewData(BaseModel):
 
     content: str
     """The content of the long description"""
+
+
+# Circular imports...
+from fates.mapleshade import Mapleshade
+
+# Constants for the bot list
+
+# Core constants
+DEFAULT_EXC = {404: ResponseCode.NOT_FOUND}
+RESTRICTED_VANITY = (
+    "api",
+    "docs",
+    "add-bot",
+    "admin",
+)

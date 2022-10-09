@@ -1,5 +1,5 @@
 import enum
-from fates import models, consts, enums
+from fates import models, enums
 from fates import tags
 from fates.decorators import nop
 from . import tables
@@ -148,7 +148,7 @@ async def not_found(_: Request, exc: HTTPException):
         models.Response(
             done=False,
             reason=exc.detail,
-            code=consts.DEFAULT_EXC.get(exc.status_code, models.ResponseCode.UNKNOWN),
+            code=models.DEFAULT_EXC.get(exc.status_code, models.ResponseCode.UNKNOWN),
         ).dict(),
         status_code=exc.status_code,
     )

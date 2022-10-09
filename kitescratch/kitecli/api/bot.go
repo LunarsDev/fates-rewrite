@@ -56,3 +56,17 @@ func VerifyClientId(clientId string) types.BotAddTicket {
 
 	return ticket
 }
+
+func FinalizeBotAdd(data types.BotAddFinalize) types.Response {
+	var response types.Response
+
+	requests.RequestToStruct(requests.HTTPRequest{
+		Method: "POST",
+		Url:    "/bots/add/finalize",
+		Reason: Reason,
+		Auth:   state.GlobalState.Auth,
+		Data:   data,
+	}, &response)
+
+	return response
+}

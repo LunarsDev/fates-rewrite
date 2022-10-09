@@ -17,7 +17,7 @@ from fastapi.params import Depends as DependsType
 from enum import IntEnum
 from pydantic import BaseModel, validator
 from inspect import signature
-from fates import models, consts
+from fates import models
 from fates.mapleshade import Mapleshade
 import base64
 import orjson
@@ -58,7 +58,12 @@ class SharedRatelimit:
             num=200,  # Avoid ratelimiting core endpoints as far as possible
             interval=1,
             name="core",
-        )
+        ),
+        "bot_add": Ratelimit(
+            num=5,
+            interval=3,
+            name="bot_add",
+        ),
     }
 
     @staticmethod
@@ -117,6 +122,9 @@ class __RouteData:
     def extract_bm(self, bm: BaseModel) -> dict[str, Any]:
         """Extracts the fields from a BaseModel"""
         fields = {}
+
+        if get_origin(bm) is list:
+            bm = bm.__args__[0]
 
         for field in bm.__fields__.values():
             if get_origin(field.type_) is Literal:  # If it is a literal
@@ -241,9 +249,8 @@ def route(route: Route):
             raise ValueError("Function must take request")
 
         @wraps(func)
-        async def custom_route(
-            request: Request, *args, **kwargs
-        ):  # --ignore-docstrings
+        async def custom_route(request: Request, *args, **kwargs):
+            # --ignore-docstrings
             try:
                 res = await func(request, *args, **kwargs)
             except HTTPException as e:
@@ -251,7 +258,7 @@ def route(route: Route):
                     models.Response(
                         done=False,
                         reason=e.detail,
-                        code=consts.DEFAULT_EXC.get(
+                        code=models.DEFAULT_EXC.get(
                             e.status_code, models.ResponseCode.UNKNOWN
                         ),
                     ).dict(),

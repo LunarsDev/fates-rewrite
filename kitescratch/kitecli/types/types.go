@@ -358,3 +358,29 @@ type BotAddTicket struct {
 	BotID  string         `json:"bot_id"`
 	Data   map[string]any `json:"data"`
 }
+
+type LongDescriptionType int
+
+const (
+	LongDescriptionTypeHTML LongDescriptionType = iota
+	LongDescriptionTypeMarkdown
+)
+
+type BotAddFinalize struct {
+	Ticket              string              `json:"ticket"`
+	Tags                []string            `json:"tags"`
+	Features            []string            `json:"features"`
+	Prefix              string              `json:"prefix"`
+	Invite              string              `json:"invite"`
+	Vanity              string              `json:"vanity"`
+	Description         string              `json:"description"`
+	LongDescriptionType LongDescriptionType `json:"long_description_type"`
+	LongDescription     string              `json:"long_description"`
+}
+
+type Response struct {
+	Done   bool   `json:"done"`
+	Reason string `json:"reason"`
+	Code   string `json:"code"`
+	Data   any    `json:"data"`
+}

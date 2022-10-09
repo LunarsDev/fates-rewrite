@@ -31,7 +31,7 @@ def ensure_docstrings(path: str, ignore: list[str] = [], ignore_dirs: list[str] 
                                     j += 1
 
                             next_line = lines[i + j].strip().replace("\t", "").replace("    ", "")
-                            if not next_line.startswith('"""'):
+                            if not next_line.startswith('"""') and not next_line.endswith("--ignore-docstrings"):
                                 print("Missing docstring for {} in {}".format(line.strip(), file))
                                 state.will_err = True
 

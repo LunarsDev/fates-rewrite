@@ -1,6 +1,5 @@
 import asyncio
 import datetime
-import secrets
 from typing import Any
 import uuid
 from fates import models, tasks
@@ -253,7 +252,7 @@ async def finalize_bot_add(
     if auth.auth_type != models.TargetType.User:
         models.Response.invalid_auth_type(models.TargetType.User)
 
-    await data.db_validate(mapleshade)
+    await data.db_validate()
 
     if not (ticket_data := mapleshade.cache.get(f"bot_add_ticket_{data.ticket}")):
         models.Response(

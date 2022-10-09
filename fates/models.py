@@ -10,6 +10,7 @@ from .tables import (
     UserBotLogs,
     Servers,
     Features,
+    Vanity as VanityTable
 )
 from piccolo.utils.pydantic import create_pydantic_model
 from piccolo.query import Select
@@ -17,6 +18,7 @@ from pydantic import BaseModel, validator
 from pydantic.generics import GenericModel
 import silverpelt.types.types as silver_types
 from fates.enums import *
+from piccolo.columns.combination import WhereRaw
 
 # Add models here
 BotBase = create_pydantic_model(
@@ -796,7 +798,7 @@ class BotUpdate(BaseModel):
             raise ValueError("Vanity cannot be empty")
         return v
 
-    async def db_validate(self, mapleshade: "Mapleshade"):
+    async def db_validate(self):
         """Validates that all tags and features are valid and in the database"""
         for tag in self.tags:
             if not await BotListTags.exists().where(BotListTags.id == tag):
@@ -814,12 +816,13 @@ class BotUpdate(BaseModel):
                     reason=f"Feature {feature} does not exist",
                 ).error(400)
 
-        vanity_check = await mapleshade.pool.fetchval(
-            "SELECT vanity_url FROM vanity WHERE lower(vanity_url) = $1",
-            self.vanity.lower(),
+        vanity = (
+            await VanityTable.select()
+            .where(WhereRaw("lower(vanity_url) = {}", self.vanity.lower()))
+            .first()
         )
 
-        if vanity_check:
+        if vanity:
             Response(
                 done=False,
                 code=ResponseCode.INVALID_DATA,
@@ -844,12 +847,7 @@ class PreviewData(BaseModel):
     """The content of the long description"""
 
 
-# Circular imports...
-from fates.mapleshade import Mapleshade
-
 # Constants for the bot list
-
-# Core constants
 DEFAULT_EXC = {404: ResponseCode.NOT_FOUND}
 RESTRICTED_VANITY = (
     "api",

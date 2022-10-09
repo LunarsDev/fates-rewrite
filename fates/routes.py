@@ -222,7 +222,11 @@ async def verify_client_id(
 
     ticket = mapleshade.gen_secret(128)
 
-    mapleshade.cache.set(f"bot_add_ticket_{ticket}", bot_id, expiry=60 * 60 * 2)
+    mapleshade.cache.set(f"bot_add_ticket_{ticket}", {
+        "bot_id": bot_id,
+        "client_id": client_id,
+        "guild_count": data["data"]["bot"]["approximate_guild_count"],
+    }, expiry=60 * 15)
 
     return models.BotAddTicket(ticket=ticket, bot_id=bot_id, data=data)
 

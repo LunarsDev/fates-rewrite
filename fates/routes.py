@@ -275,7 +275,8 @@ async def finalize_bot_add(
             description=data.description,
             long_description=data.long_description,
             long_description_type=data.long_description_type,
-            invite=data.invite or f"https://discord.com/oauth2/authorize?client_id={ticket_json['client_id']}&scope=bot%20applications.commands",
+            invite=data.invite
+            or f"https://discord.com/oauth2/authorize?client_id={ticket_json['client_id']}&scope=bot%20applications.commands",
             prefix=data.prefix,
         )
     )
@@ -285,11 +286,7 @@ async def finalize_bot_add(
     )
 
     await tables.BotOwner.insert(
-        tables.BotOwner(
-            bot_id=ticket_json["bot_id"],
-            owner=auth.target_id,
-            main=True
-        )
+        tables.BotOwner(bot_id=ticket_json["bot_id"], owner=auth.target_id, main=True)
     )
 
     return models.Response.ok()

@@ -49,27 +49,28 @@
       endpointType: 'user',
       auth: true,
       json: {
-        tags: selectedTags.map(t => t.value),
-        features: selectedFeatures.map(t => t.value),
+        tags: selectedTags.map((t) => t.value),
+        features: selectedFeatures.map((t) => t.value),
         ticket: verifyTicket,
         prefix: prefix,
         invite: invite,
         vanity: vanity,
         description: description,
         long_description_type: longDescType,
-        long_description: longDesc,
+        long_description: longDesc
       }
-    })
+    });
 
-    if(res.ok) {
+    if (res.ok) {
       alert({
         title: 'Success',
-        message: 'Your bot has been added to the list! You can set more information such as extra owners and webhook information in Bot Settings now!',
+        message:
+          'Your bot has been added to the list! You can set more information such as extra owners and webhook information in Bot Settings now!',
         type: enums.AlertType.Success,
         close: () => {
-          window.location.href = '/bots/' + botId + "/settings";
+          window.location.href = '/bots/' + botId + '/settings';
         }
-      })
+      });
     } else {
       let json = await res.json();
       alert(genError(json));
@@ -179,11 +180,11 @@
         Portal instead.<br /><br />
       </Tip>
       <label for="invite">Bot Invite</label>
-      <input 
-        name="invite" 
-        id="invite" 
+      <input
+        name="invite"
+        id="invite"
         class="fform"
-        placeholder="https://..." 
+        placeholder="https://..."
         bind:value={invite}
       />
       <label for="bot-description">Description <RedStar /></label>
@@ -205,7 +206,7 @@
         {/if}
       </div>
 
-      <div class="spacer"></div>
+      <div class="spacer" />
 
       <Button onclick={() => finalizeBot()}>Lets Go!</Button>
     {/if}

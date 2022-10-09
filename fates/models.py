@@ -825,7 +825,6 @@ class BotUpdate(BaseModel):
                 code=ResponseCode.INVALID_DATA,
                 reason=f"Vanity {self.vanity} already exists",
             ).error(400)
-        
 
 
 class BotAddFinalize(BotUpdate):

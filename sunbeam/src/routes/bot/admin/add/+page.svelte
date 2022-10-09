@@ -64,10 +64,10 @@
     if(res.ok) {
       alert({
         title: 'Success',
-        message: 'Your bot has been added to the list!',
+        message: 'Your bot has been added to the list! You can set more information such as extra owners and webhook information in Bot Settings now!',
         type: enums.AlertType.Success,
         close: () => {
-          window.location.href = '/bots/' + botId;
+          window.location.href = '/bots/' + botId + "/settings";
         }
       })
     } else {

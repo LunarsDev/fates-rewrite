@@ -280,10 +280,7 @@ async def finalize_bot_add(
     )
 
     await tables.Vanity.insert(
-        tables.Vanity(
-            vanity_url=data.vanity,
-            redirect=ticket_json["bot_id"]
-        )
+        tables.Vanity(vanity_url=data.vanity, redirect=ticket_json["bot_id"])
     )
 
     models.Response.ok()

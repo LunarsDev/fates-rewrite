@@ -156,6 +156,9 @@ var migs = []migration{
 				if strings.HasPrefix(invite, "P:") {
 					invite = "https://discord.com/oauth2/authorize?client_id=" + strconv.Itoa(id) + "&scope=bot%20applications.commands&permissions=" + strings.TrimPrefix(invite, "P:")
 					fmt.Println(invite, botID)
+				} else if !strings.HasPrefix(invite, "https://") {
+					invite = "https://discord.com/oauth2/authorize?client_id=" + strconv.Itoa(id) + "&scope=bot%20applications.commands&permissions=0"
+					fmt.Println(invite, botID)
 				}
 
 				_, err = pgpool.Exec(ctx, "update bots set invite = $1 where bot_id = $2", invite, botID)

@@ -807,7 +807,7 @@ class BotUpdate(BaseModel):
                 ).error(400)
 
         for feature in self.features:
-            if not await Features.exists().where(Feature.id == feature):
+            if not await Features.exists().where(Features.id == feature):
                 Response(
                     done=False,
                     code=ResponseCode.INVALID_DATA,
@@ -825,6 +825,7 @@ class BotUpdate(BaseModel):
                 code=ResponseCode.INVALID_DATA,
                 reason=f"Vanity {self.vanity} already exists",
             ).error(400)
+        
 
 
 class BotAddFinalize(BotUpdate):

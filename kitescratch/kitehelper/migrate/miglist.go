@@ -166,4 +166,19 @@ var migs = []migration{
 			}
 		},
 	},
+	{
+		name: "Remove id from bots",
+		function: func() {
+			if !colExists("bots", "id") {
+				alrMigrated()
+				return
+			}
+
+			_, err := pgpool.Exec(ctx, "ALTER TABLE bots DROP COLUMN id")
+
+			if err != nil {
+				panic(err)
+			}
+		},
+	},
 }

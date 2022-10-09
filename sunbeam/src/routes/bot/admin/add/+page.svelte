@@ -25,20 +25,56 @@
   let tagOptions: Option[] = getMsOptions(data.bot.tags);
   let featureOptions: Option[] = getMsOptions(data.bot.features);
 
-  let selectedTags: Option[] = [];
-  let selectedFeatures: Option[] = [];
+  let selectedTags = [];
+  let selectedFeatures = [];
 
   let botId: string;
   let clientId: string;
   let prefix: string;
   let description: string;
   let vanity: string;
+  let invite: string;
 
   // Internal vars
   let verifyData;
   let verifyTicket: string;
   let verifiedBotClientSide: boolean;
   let nextButtonText = 'Next';
+
+  async function finalizeBot() {
+    let res = await request(`${api}/bots/add/finalize`, {
+      method: 'POST',
+      fetch: fetch,
+      session: $page.data,
+      endpointType: 'user',
+      auth: true,
+      json: {
+        tags: selectedTags.map(t => t.value),
+        features: selectedFeatures.map(t => t.value),
+        ticket: verifyTicket,
+        prefix: prefix,
+        invite: invite,
+        vanity: vanity,
+        description: description,
+        long_description_type: longDescType,
+        long_description: longDesc,
+      }
+    })
+
+    if(res.ok) {
+      alert({
+        title: 'Success',
+        message: 'Your bot has been added to the list!',
+        type: enums.AlertType.Success,
+        close: () => {
+          window.location.href = '/bots/' + botId;
+        }
+      })
+    } else {
+      let json = await res.json();
+      alert(genError(json));
+    }
+  }
 
   // Verify that Bot ID and Client ID are set correctly (which is typically a huge cause of concern and pain)
   async function verifyBot() {
@@ -75,7 +111,7 @@
 
   let previewHtml = '';
   let longDescType = enums.LongDescriptionType.Markdown;
-  let longDesc = '<h3>Start typing to generate a preview!</h3>';
+  let longDesc = '';
 </script>
 
 {#if $page.data.token}
@@ -143,7 +179,13 @@
         Portal instead.<br /><br />
       </Tip>
       <label for="invite">Bot Invite</label>
-      <input name="invite" id="invite" placeholder="https://..." />
+      <input 
+        name="invite" 
+        id="invite" 
+        class="fform"
+        placeholder="https://..." 
+        bind:value={invite}
+      />
       <label for="bot-description">Description <RedStar /></label>
       <input
         id="bot-description"
@@ -156,8 +198,16 @@
       <PreviewBox bind:textAreaVal={longDesc} bind:longDescType bind:value={previewHtml} />
 
       <div id="preview-tab" class="prose prose-zinc dark:prose-invert">
-        {@html previewHtml}
+        {#if !previewHtml}
+          <h3>Start typing to generate a preview!</h3>
+        {:else}
+          {@html previewHtml}
+        {/if}
       </div>
+
+      <div class="spacer"></div>
+
+      <Button onclick={() => finalizeBot()}>Lets Go!</Button>
     {/if}
   </div>
 {:else}

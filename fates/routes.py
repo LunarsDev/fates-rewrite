@@ -1,5 +1,6 @@
 import asyncio
 import datetime
+import secrets
 from typing import Any
 import uuid
 from fates import models, tasks
@@ -267,14 +268,14 @@ async def finalize_bot_add(
     await tables.Bots.insert(
         tables.Bots(
             bot_id=ticket_json["bot_id"],
+            api_token=mapleshade.gen_secret(128),
             client_id=ticket_json["client_id"],
             guild_count=ticket_json["guild_count"],
             tags=data.tags,
             description=data.description,
             long_description=data.long_description,
             long_description_type=data.long_description_type,
-            vanity=data.vanity,
-            invite=data.invite,
+            invite=data.invite or f"https://discord.com/oauth2/authorize?client_id={ticket_json['client_id']}&scope=bot%20applications.commands",
             prefix=data.prefix,
         )
     )
@@ -283,7 +284,15 @@ async def finalize_bot_add(
         tables.Vanity(vanity_url=data.vanity, redirect=ticket_json["bot_id"])
     )
 
-    models.Response.ok()
+    await tables.BotOwner.insert(
+        tables.BotOwner(
+            bot_id=ticket_json["bot_id"],
+            owner=auth.target_id,
+            main=True
+        )
+    )
+
+    return models.Response.ok()
 
 
 @route(

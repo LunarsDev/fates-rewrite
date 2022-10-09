@@ -197,13 +197,12 @@ class Bots(Table, tablename="bots"):
     )
     api_token = Text(
         null=False,
-        default=secrets.token_urlsafe(512),
         primary_key=False,
         unique=False,
     )
     webhook_secret = Text(
         null=False,
-        default=secrets.token_urlsafe(512),
+        default="",
         primary_key=False,
         unique=False,
     )
@@ -390,7 +389,6 @@ class Users(Table, tablename="users"):
     )
     api_token = Text(
         null=False,
-        default=secrets.token_urlsafe(512),
         primary_key=False,
         unique=False,
     )
@@ -1085,7 +1083,6 @@ class Servers(Table, tablename="servers"):
     )
     api_token = Text(
         null=False,
-        default=secrets.token_urlsafe(512),
         primary_key=False,
         unique=False,
     )

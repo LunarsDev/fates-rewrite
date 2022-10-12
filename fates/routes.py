@@ -286,7 +286,9 @@ async def finalize_bot_add(
         )
 
         await tables.BotOwner.insert(
-            tables.BotOwner(bot_id=ticket_json["bot_id"], owner=auth.target_id, main=True)
+            tables.BotOwner(
+                bot_id=ticket_json["bot_id"], owner=auth.target_id, main=True
+            )
         )
 
     return models.Response.ok()

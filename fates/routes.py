@@ -264,29 +264,30 @@ async def finalize_bot_add(
     ticket_json = ticket_data.value()
 
     # Create the bot
-    await tables.Bots.insert(
-        tables.Bots(
-            bot_id=ticket_json["bot_id"],
-            api_token=mapleshade.gen_secret(128),
-            client_id=ticket_json["client_id"],
-            guild_count=ticket_json["guild_count"],
-            tags=data.tags,
-            description=data.description,
-            long_description=data.long_description,
-            long_description_type=data.long_description_type,
-            invite=data.invite
-            or f"https://discord.com/oauth2/authorize?client_id={ticket_json['client_id']}&scope=bot%20applications.commands",
-            prefix=data.prefix,
+    async with tables.Bots._meta.db.transaction():
+        await tables.Bots.insert(
+            tables.Bots(
+                bot_id=ticket_json["bot_id"],
+                api_token=mapleshade.gen_secret(128),
+                client_id=ticket_json["client_id"],
+                guild_count=ticket_json["guild_count"],
+                tags=data.tags,
+                description=data.description,
+                long_description=data.long_description,
+                long_description_type=data.long_description_type,
+                invite=data.invite
+                or f"https://discord.com/oauth2/authorize?client_id={ticket_json['client_id']}&scope=bot%20applications.commands",
+                prefix=data.prefix,
+            )
         )
-    )
 
-    await tables.Vanity.insert(
-        tables.Vanity(vanity_url=data.vanity, redirect=ticket_json["bot_id"])
-    )
+        await tables.Vanity.insert(
+            tables.Vanity(vanity_url=data.vanity, redirect=ticket_json["bot_id"])
+        )
 
-    await tables.BotOwner.insert(
-        tables.BotOwner(bot_id=ticket_json["bot_id"], owner=auth.target_id, main=True)
-    )
+        await tables.BotOwner.insert(
+            tables.BotOwner(bot_id=ticket_json["bot_id"], owner=auth.target_id, main=True)
+        )
 
     return models.Response.ok()
 

@@ -1,8 +1,8 @@
 package tests
 
 import (
-	"bufio"
 	"fmt"
+	"kitehelper/common"
 	"os"
 	"os/exec"
 	"strconv"
@@ -19,10 +19,6 @@ var (
 	statusBoldErr    = color.New(color.Bold, color.FgRed).PrintlnFunc()
 	statusBoldBlue   = color.New(color.Bold, color.FgBlue).PrintlnFunc()
 	statusBoldBlueS  = color.New(color.Bold, color.FgBlue).SprintFunc()
-	fatal            = func(a ...any) {
-		color.New(color.FgRed, color.Bold).PrintlnFunc()(a...)
-		os.Exit(1)
-	}
 )
 
 type test struct {
@@ -37,46 +33,6 @@ type testset struct {
 	Tests []test
 }
 
-func getRepoRoot() string {
-	// Use git rev-parse --show-toplevel to get the root of the repo
-	out, err := exec.Command("git", "rev-parse", "--show-toplevel").Output()
-
-	if err != nil {
-		panic(err)
-	}
-
-	return strings.ReplaceAll(string(out), "\n", "")
-}
-
-func askInput(question string) string {
-	fmt.Print(question)
-	scanner := bufio.NewScanner(os.Stdin)
-
-	var opt string
-
-	for scanner.Scan() {
-		opt = scanner.Text()
-		break
-	}
-
-	if scanner.Err() != nil {
-		// Handle error.
-		fatal(scanner.Err())
-	}
-
-	return opt
-}
-
-func pageOutput(text string) {
-	// Custom pager using less -r
-	text = "\n" + text
-
-	cmd := exec.Command("less", "-r")
-	cmd.Stdin = strings.NewReader(text)
-	cmd.Stdout = os.Stdout
-	cmd.Run()
-}
-
 func (ts testset) Run() {
 	failed := []test{}
 	success := []test{}
@@ -86,7 +42,7 @@ func (ts testset) Run() {
 	os.Setenv("FORCE_COLOR", "1")
 
 	for i, t := range ts.Tests {
-		err := os.Chdir(getRepoRoot())
+		err := os.Chdir(common.GetRepoRoot())
 		if err != nil {
 			panic(err)
 		}
@@ -160,7 +116,7 @@ func (ts testset) Run() {
 
 			var inp string
 			if os.Getenv("NO_INTERACTION") == "" {
-				inp = askInput("Continue (y/N): ")
+				inp = common.AskInput("Continue (y/N): ")
 			}
 			if inp == "y" || inp == "Y" {
 				continue
@@ -197,7 +153,7 @@ func (ts testset) Run() {
 		}
 
 		for {
-			userOut := askInput(statusBoldBlueS("Which test number would you like to see the output of (hit ENTER to exit): "))
+			userOut := common.AskInput(statusBoldBlueS("Which test number would you like to see the output of (hit ENTER to exit): "))
 
 			if userOut != "" {
 				num, err := strconv.Atoi(userOut)
@@ -207,7 +163,7 @@ func (ts testset) Run() {
 					continue
 				}
 
-				pageOutput(outputs[num-1])
+				common.PageOutput(outputs[num-1])
 			} else {
 				break
 			}

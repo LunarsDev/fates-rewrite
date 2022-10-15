@@ -187,15 +187,15 @@
         placeholder="https://..."
         bind:value={invite}
       />
-      <label for="bot-description">Description <RedStar /></label>
+      <label for="description">Description <RedStar/></label>
       <input
-        id="bot-description"
-        name="bot-description"
+        name="description"
+        id="description"
         class="fform"
+        placeholder="https://..."
         bind:value={description}
-        placeholder="Bot Description"
-        type="text"
       />
+      <br/>
       <PreviewBox bind:textAreaVal={longDesc} bind:longDescType bind:value={previewHtml} />
 
       <div id="preview-tab" class="prose prose-zinc dark:prose-invert">

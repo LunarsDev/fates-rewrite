@@ -622,7 +622,7 @@ class TaskResponse(BaseModel):
 class AuthData(BaseModel):
     """INTERNAL: Auth struct"""
 
-    auth_type: TargetType
+    auth_type: TargetType 
     target_id: int
     token: str
     compat: bool

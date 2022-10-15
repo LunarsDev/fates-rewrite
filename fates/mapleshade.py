@@ -3,6 +3,8 @@ from datetime import datetime
 import random
 import string
 from typing import Any, Optional, Tuple
+
+from pydantic import BaseModel
 from fates import tables, models
 from ruamel.yaml import YAML
 import orjson
@@ -30,7 +32,7 @@ class SilverRespError(SilverException):
         self.endpoint = endpoint
         self.kwargs = kwargs
         super().__init__(
-            f"Silverpelt returned {resp.status} on {endpoint} with kwargs {kwargs}"
+            f"Silverpelt returned {resp.status} on {endpoint} with kwargs {kwargs} and resp of {resp}"
         )
 
 
@@ -306,21 +308,31 @@ class Mapleshade:
 
         return models.User(**user)
 
-    async def silverpelt_req(self, endpoint: str, **kwargs) -> dict:
+    async def silverpelt_req(self, endpoint: str, *, method: str = "GET", data: BaseModel = None) -> dict:
         """Makes a request to Silverpelt"""
+        if data:
+            body = orjson.dumps(data.dict())
+        else:
+            body = None
+
         async with aiohttp.ClientSession() as session:
             try:
-                async with session.get(
-                    f"http://127.0.0.1:3030/{endpoint}", **kwargs
+                async with session.request(
+                    method,
+                    f"http://127.0.0.1:3030/{endpoint}",
+                    data=body,
+                    headers={"Content-Type": "application/json"},
                 ) as resp:
                     if not resp.ok:
-                        raise SilverRespError(endpoint, kwargs, resp)
+                        body = await resp.read()
+                        print(body)
+                        raise SilverRespError(endpoint, data, resp)
                     body_bytes = await resp.read()
                     bytes: dict = msgpack.unpackb(body_bytes)
 
                     if not bytes:
                         raise SilverNoData(
-                            f"Silverpelt returned no data on {endpoint} with kwargs {kwargs}"
+                            f"Silverpelt returned no data on {endpoint} with data {data}"
                         )
 
                     return bytes

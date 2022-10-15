@@ -22,3 +22,6 @@ perms:
     roles:
       - 836349482340843572 # head admin
     index: 9
+
+channels:
+  bot_logs: 1030713957549342740

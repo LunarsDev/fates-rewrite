@@ -2,6 +2,8 @@ import asyncio
 import datetime
 from typing import Any
 import uuid
+
+from discord import Color, Embed
 from fates import models, tasks
 from fates.auth import auth
 from fates.decorators import Ratelimit, SharedRatelimit, route, Route, Method, nop
@@ -226,6 +228,7 @@ async def verify_client_id(
             "bot_id": bot_id,
             "client_id": client_id,
             "guild_count": data["data"]["bot"]["approximate_guild_count"],
+            "username": data["data"]["bot"]["username"],
         },
         expiry=60 * 15,
     )
@@ -268,6 +271,7 @@ async def finalize_bot_add(
         await tables.Bots.insert(
             tables.Bots(
                 bot_id=ticket_json["bot_id"],
+                username_cached=ticket_json["username"],
                 api_token=mapleshade.gen_secret(128),
                 client_id=ticket_json["client_id"],
                 guild_count=ticket_json["guild_count"],
@@ -290,6 +294,28 @@ async def finalize_bot_add(
                 bot_id=ticket_json["bot_id"], owner=auth.target_id, main=True
             )
         )
+    
+    await mapleshade.silverpelt_req(
+        f"channel_msg",
+        method="POST",
+        data=silver_types.ChannelMessage(
+            channel_id=mapleshade.config["channels"]["bot_logs"],
+            embeds=[
+                (
+                    Embed(
+                        title="New Bot",
+                        description=f"**{ticket_json['username']}** (`{ticket_json['bot_id']}`) was added by <@{auth.target_id}>",
+                        color=Color.blurple(),
+                    )
+                    .add_field(
+                        name="Guild Count",
+                        value=f"{ticket_json['guild_count']:,}",
+                    )
+                    .to_dict()
+                )
+            ]
+        )
+    )
 
     return models.Response.ok()
 

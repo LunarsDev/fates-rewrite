@@ -1,6 +1,7 @@
 import asyncio
-from typing import Any
-from fastapi import FastAPI
+from typing import Any, Callable
+from fastapi import FastAPI, Request, Response
+from fastapi.routing import APIRoute
 from fastapi.responses import JSONResponse
 import msgpack
 import discord
@@ -8,7 +9,7 @@ from ruamel.yaml import YAML
 import aioredis
 from pydantic import BaseModel
 
-from silverpelt.types.types import IDiscordUser, Status, check_snow
+from silverpelt.types.types import ChannelMessage, IDiscordUser, Status, check_snow
 
 # We use messagepack for serialization
 class MsgpackResponse(JSONResponse):
@@ -20,8 +21,8 @@ class MsgpackResponse(JSONResponse):
         """Renders the content"""
         return msgpack.packb(content)
 
-
 app = FastAPI(default_response_class=MsgpackResponse)
+
 bot = discord.Client(intents=discord.Intents(guilds=True, members=True, presences=True))
 
 
@@ -145,3 +146,28 @@ async def get_guild_member_roles(gid: int, uid: int):
     if not member:
         return None
     return [role.id for role in member.roles]
+
+@app.post("/channel_msg")
+async def send_channel_message(data: ChannelMessage):
+    """Send a message to a channel"""
+    channel = bot.get_channel(data.channel_id)
+    if not channel:
+        return None
+    msg = await channel.send(content=data.content, embeds=[discord.Embed.from_dict(e) for e in data.embeds])
+
+    return {
+        "content": msg.content,
+        "embeds": [e.to_dict() for e in msg.embeds],
+        "id": msg.id,
+        "channel_id": msg.channel.id,
+        "author": {
+            "id": msg.author.id,
+            "username": msg.author.name,
+            "disc": msg.author.discriminator,
+            "avatar": msg.author.avatar.url if msg.author.avatar else msg.author.default_avatar.url,
+            "bot": msg.author.bot,
+            "system": msg.author.system,
+            "status": Status.new(msg.author.status.value),
+            "flags": msg.author.public_flags.value,
+        },
+    }

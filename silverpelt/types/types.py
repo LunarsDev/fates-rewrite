@@ -1,5 +1,5 @@
 import enum
-from pydantic import BaseModel
+from pydantic import BaseModel, root_validator
 
 
 class Status(enum.IntEnum):
@@ -47,3 +47,26 @@ class DiscordUser(IDiscordUser):
 def check_snow(id: int) -> bool:
     """Checks if a snowflake is valid"""
     return len(str(id)) >= 17 and len(str(id)) <= 20
+
+class ChannelMessage(BaseModel):
+    """Represents a channel message that is sent to the client"""
+
+    channel_id: int
+
+    embeds: list[dict] = []
+
+    content: str = ""
+
+    @root_validator(pre=True)
+    def ensure_one_of_embeds_content(cls, values: dict):
+        """Ensures that either embeds or content is set"""
+        if not values.get("embeds") and not values.get("content"):
+            raise ValueError("Either embeds or content must be set")
+
+        elif len(values.get("embeds", [])) > 10:
+            raise ValueError("Cannot have more than 10 embeds")
+        
+        elif len(values.get("content", "")) > 2000:
+            raise ValueError("Content cannot be more than 2000 characters")
+
+        return values

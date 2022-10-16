@@ -1,5 +1,6 @@
 # In this test, `lint code` refers to the translations within sunbeam src/lib/strings.ts
 
+import os
 import sys
 sys.path.append(".")
 
@@ -44,26 +45,57 @@ for lint_code in string_codes:
     if lint_code.lower() != lint_code:
         raise Exception(f"Lint code {lint_code} is not lowercase")
 
+success = False
 if rc_values == string_codes:
     # Ensure rc_values is properly formatted
     for k, v in enumerate(rc_values):
         if v.upper().replace(".", "_") != rc_keys[k]:
             raise Exception(f"Lint code [{rc_keys[k]} = {v}] is not properly formatted")
 
-    # We are golden, exit early
-    exit(0)
+    success = True
 
 # string_codes is the source of truth here, all response codes must be in strings.ts
 
-print("For this lint to succeed, the following response codes must be added to models.ResponseCode (replacing already present entities):")
+if not success:
+    print("For this lint to succeed, the following response codes must be added to models.ResponseCode (replacing already present entities):")
 
-for lint_code in string_codes:
-    print(lint_code.upper().replace(".", "_") + " = '" + lint_code + "'")
+    for lint_code in string_codes:
+        print(lint_code.upper().replace(".", "_") + " = '" + lint_code + "'")
 
-print("\n\nOr, add the following keys to strings.ts:")
+    print("\n\nOr, add the following keys to strings.ts:")
 
-for lint_code in rc_values:
-    if lint_code not in string_codes:
-        print("=>",lint_code)
+    for lint_code in rc_values:
+        if lint_code not in string_codes:
+            print("=>",lint_code)
+    
+    exit(1)
 
-exit(1)
+# Now, ensure that no other ResponseCode beyond what is in the enum is used in routes.py and mapleshade.py
+
+# Open routes.py
+for f in os.listdir("fates"):
+    if not os.path.isfile(f"fates/{f}"):
+        continue
+
+    with open(f"fates/{f}") as f:
+        lines = f.readlines()
+
+    # for each line, seperate out the response code
+    i = 1
+    for line in lines:
+        if "ResponseCode." in line:
+            rc = (
+                line.split("ResponseCode.")[1]
+                .split(" ")[0]
+                .split(",")[0]
+                .split(")")[0]
+                .split("]")[0]
+                .split("}")[0]
+                .split(":")[0]
+                .replace("\n", "")
+            )
+            if rc not in rc_keys:
+                print(f"ResponseCode {rc} is not in models.ResponseCode [{f.name} (line {i})]")
+                exit(1)
+            
+        i += 1

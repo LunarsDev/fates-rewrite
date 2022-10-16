@@ -187,7 +187,7 @@
         placeholder="https://..."
         bind:value={invite}
       />
-      <label for="description">Description <RedStar/></label>
+      <label for="description">Description <RedStar /></label>
       <input
         name="description"
         id="description"
@@ -195,7 +195,7 @@
         placeholder="https://..."
         bind:value={description}
       />
-      <br/>
+      <br />
       <PreviewBox bind:textAreaVal={longDesc} bind:longDescType bind:value={previewHtml} />
 
       <div id="preview-tab" class="prose prose-zinc dark:prose-invert">

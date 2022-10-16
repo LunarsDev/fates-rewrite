@@ -308,7 +308,9 @@ class Mapleshade:
 
         return models.User(**user)
 
-    async def silverpelt_req(self, endpoint: str, *, method: str = "GET", data: BaseModel = None) -> dict:
+    async def silverpelt_req(
+        self, endpoint: str, *, method: str = "GET", data: BaseModel = None
+    ) -> dict:
         """Makes a request to Silverpelt"""
         if data:
             body = orjson.dumps(data.dict())
@@ -608,3 +610,80 @@ class Mapleshade:
                     raise Exception(
                         "Bot is not public. Please make your bot public to be able to add it to the site."
                     )
+
+    async def get_server_invite(self, guild_id: int, for_user: int) -> models.Invite:
+        """Resolves the server invite. This assumes all checks for server privacy have been done"""
+        invite_info = (
+            await tables.Servers.select(
+                tables.Servers.invite_url,
+                tables.Servers.invite_channel,
+            )
+            .where(tables.Servers.guild_id == guild_id)
+            .first()
+        )
+
+        if not invite_info:
+            models.Response(
+                done=False,
+                reason="This server is not in the database. This should not happen!",
+                code=models.ResponseCode.INTERNAL_ERROR,
+            ).error(500)
+
+        if invite_info["invite_url"]:
+            return models.Invite(
+                invite=invite_info["invite_url"],
+            )
+
+        invite = await self.silverpelt_req(f"guild_inf/{guild_id}")
+
+        print(invite)
+
+        if not invite["found"]:
+            models.Response(
+                done=False,
+                reason="This server has removed the Fates List Bot and there is no Invite URL set",
+                code=models.ResponseCode.SERVER_NO_CHANNELS,
+            ).error(400)
+
+        if (
+            invite_info["invite_channel"]
+            and invite_info["invite_channel"] in invite["invitable_channels"]
+        ):
+            if invite_info["invite_channel"] not in invite["invitable_channels"]:
+                # WHOA, the channel is not in the invitable channels, remove it from DB
+                await tables.Servers.update(invite_channel=None).where(
+                    tables.Servers.guild_id == guild_id
+                )
+            else:
+                invite_url = await self.silverpelt_req(
+                    f"guild_invite/{guild_id}/{invite_info['invite_channel']}?for_user={for_user}"
+                )
+                return models.Invite(
+                    invite=invite_url["url"],
+                )
+        else:
+            invite_url = None
+            good_chan: int | None = None
+            for channel in invite["invitable_channels"]:
+                good_chan = channel
+                try:
+                    invite_url = await self.silverpelt_req(
+                        f"guild_invite/{guild_id}/{channel}?for_user={for_user}"
+                    )
+                    break
+                except:
+                    ...
+
+            if not invite_url:
+                models.Response(
+                    done=False,
+                    reason="This server has no invitable channels",
+                    code=models.ResponseCode.SERVER_NO_CHANNELS,
+                ).error(400)
+
+            await tables.Servers.update(invite_channel=good_chan).where(
+                tables.Servers.guild_id == guild_id
+            )
+            return models.Invite(
+                invite=invite_url["url"],
+            )

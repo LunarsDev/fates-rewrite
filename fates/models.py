@@ -471,6 +471,8 @@ class ResponseCode(Enum):
     INVALID_DATA = "invalid_data"
     LOGIN_REQUIRED = "login_required"
     PRIVATE_SERVER = "private_server"
+    WHITELIST_ONLY = "whitelist_only"
+    BLACKLISTED = "blacklisted"
     SERVER_BLACKLISTED = "server_blacklisted"
     SERVER_STAFF_REVIEW = "server_staff_review"
     SERVER_BANNED = "server_banned"
@@ -622,7 +624,7 @@ class TaskResponse(BaseModel):
 class AuthData(BaseModel):
     """INTERNAL: Auth struct"""
 
-    auth_type: TargetType 
+    auth_type: TargetType
     target_id: int
     token: str
     compat: bool
@@ -743,6 +745,8 @@ class BotUpdate(BaseModel):
         """Ensure prefix is either a value or None"""
         if not v:
             return None
+        elif len(v) > 10:
+            raise ValueError("Prefix cannot be longer than 10 characters")
         return v
 
     @validator("invite")

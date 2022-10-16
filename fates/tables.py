@@ -1170,13 +1170,6 @@ class Servers(Table, tablename="servers"):
         unique=False,
         secret=False,
     )
-    nsfw = Boolean(
-        default=False,
-        null=True,
-        primary_key=False,
-        unique=False,
-        secret=False,
-    )
     guild_count = BigInt(
         default=0,
         null=True,
@@ -1200,13 +1193,6 @@ class Servers(Table, tablename="servers"):
     )
     webhook_type = Integer(
         default=1,
-        null=True,
-        primary_key=False,
-        unique=False,
-        secret=False,
-    )
-    login_required = Boolean(
-        default=True,
         null=True,
         primary_key=False,
         unique=False,
@@ -1245,13 +1231,6 @@ class Servers(Table, tablename="servers"):
     )
     autorole_votes = Array(
         base_column=BigInt(),
-        null=True,
-        primary_key=False,
-        unique=False,
-        secret=False,
-    )
-    whitelist_only = Boolean(
-        default=False,
         null=True,
         primary_key=False,
         unique=False,

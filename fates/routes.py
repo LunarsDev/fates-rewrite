@@ -294,7 +294,7 @@ async def finalize_bot_add(
                 bot_id=ticket_json["bot_id"], owner=auth.target_id, main=True
             )
         )
-    
+
     await mapleshade.silverpelt_req(
         f"channel_msg",
         method="POST",
@@ -313,8 +313,8 @@ async def finalize_bot_add(
                     )
                     .to_dict()
                 )
-            ]
-        )
+            ],
+        ),
     )
 
     return models.Response.ok()
@@ -391,6 +391,116 @@ async def get_bot_invite(request: Request, bot_id: int):
         )
     else:
         return models.Invite(invite=invite_url["invite"])
+
+
+@route(
+    Route(
+        app=app,
+        mapleshade=mapleshade,
+        url="/guilds/{guild_id}/invite",
+        response_model=models.Invite,
+        method=Method.get,
+        tags=[tags.server],
+        ratelimit=Ratelimit(num=3, interval=2, name="get_server_invite"),
+    )
+)
+async def get_guild_invite(request: Request, guild_id: int):
+    """
+    Gets the invite for a server (guild).
+
+    Authentication via normal ``Frostpaw-Auth`` is needed if a server is "login-only"
+    """
+    server = (
+        await tables.Servers.select(
+            tables.Servers.state,
+            tables.Servers.user_blacklist,
+            tables.Servers.user_whitelist,
+            tables.Servers.flags,
+            tables.Servers.whitelist_form,
+        )
+        .where(tables.Servers.guild_id == guild_id)
+        .first()
+    )
+
+    if not server:
+        models.Response(
+            done=False,
+            reason="The specified server could not be found",
+            code=models.ResponseCode.NOT_FOUND,
+        ).error(404)
+
+    login_required = models.BotServerFlag.LoginRequired in server["flags"]
+    whitelist_only = models.BotServerFlag.WhitelistOnly in server["flags"]
+
+    # Whitelist only implies login_required
+    if whitelist_only:
+        login_required = True
+
+    if login_required:
+        auth_header = request.headers.get("Frostpaw-Auth")
+
+        if not auth_header:
+            models.Response(
+                done=False,
+                reason="Login is required to join this server",
+                code=models.ResponseCode.LOGIN_REQUIRED,
+            ).error(400)
+
+        auth_data = await auth(request, auth_header, "")
+
+        if not auth_data or auth_data.auth_type != models.TargetType.User:
+            models.Response.invalid_auth_type(models.TargetType.User)
+    else:
+        auth_data = models.AuthData(
+            target_id=0, auth_type=models.TargetType.User, token="", compat=False
+        )
+
+    if (
+        server["state"] == models.BotServerState.Banned
+        or server["state"] == models.BotServerState.Denied
+    ):
+        models.Response(
+            done=False,
+            reason="The specified server is banned or denied",
+            code=models.ResponseCode.SERVER_BANNED,
+        ).error(400)
+
+    elif server["state"] == models.BotServerState.PrivateStaffOnly:
+        models.Response(
+            done=False,
+            reason="The specified server is pending review by staff",
+            code=models.ResponseCode.SERVER_STAFF_REVIEW,
+        ).error(400)
+
+    if auth_data.target_id in server["user_whitelist"]:
+        return await mapleshade.get_server_invite(guild_id, auth_data.target_id)
+
+    if server["state"] == models.BotServerState.PrivateViewable:
+        models.Response(
+            done=False,
+            reason="The specified server is private",
+            code=models.ResponseCode.PRIVATE_SERVER,
+        ).error(400)
+
+    elif whitelist_only:
+        form = (
+            f"<a href=\"{server['whitelist_form']}\">You can request to join this server by clicking here</a>"
+            or "There is no whitelist form for this server. Try asking around?"
+        )
+        models.Response(
+            done=False,
+            reason=form,
+            code=models.ResponseCode.WHITELIST_ONLY,
+        ).error(400)
+
+    elif auth_data.target_id in server["user_blacklist"]:
+        models.Response(
+            done=False,
+            reason="You are blacklisted from joining this server",
+            code=models.ResponseCode.BLACKLISTED,
+        ).error(400)
+
+    return await mapleshade.get_server_invite(guild_id, auth_data.target_id)
 
 
 @route(

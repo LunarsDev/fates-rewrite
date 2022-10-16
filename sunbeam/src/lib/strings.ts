@@ -90,11 +90,17 @@ export const translations: TranslationData = {
    "fr": "Ce serveur est privé et n'accepte pas les invitations pour le moment",
    "it": "Questo server è privato e non accetta inviti al momento"
   },
+ "whitelist_only": {
+  "en": "This server needs you to be whitelisted in order to join"
+ },
+ "blacklisted": {
+  "en": "You are blacklisted from this server"
+ },
  "server_blacklisted": {
    "en": "You are blacklisted from joining this server!",
    "fr": "Vous êtes banni de rejoindre ce serveur!",
    "it": "Sei bannato da questo server!"
-  },
+ },
  "server_staff_review": {
    "en": "This server is currently under review by Fates List Staff and not accepting invites at this time!",
    "fr": "Ce serveur est actuellement en cours de révision par les membres du staff de Fates List et n'accepte pas les invitations pour le moment!",
@@ -372,7 +378,7 @@ export function genError(json): string {
 
   return (
     getIntlString(json['code']) +
-    '<br/><br/><br/><span>Context:<br/><br/>' +
+    '<br/><br/><br/>' +
     (reason('en', json['reason']) || json['reason'] || 'No context available...') +
     '</span>'
   );

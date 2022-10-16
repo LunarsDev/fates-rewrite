@@ -121,6 +121,8 @@ func (ts testset) Run() {
 			if inp == "y" || inp == "Y" {
 				continue
 			} else {
+				fmt.Println(string(outp))
+				statusBoldYellow("Output of test", t.name, "is above.")
 				break
 			}
 		} else {

@@ -14,6 +14,7 @@ class Tag(BaseModel):
 
 
 bot = Tag(name="bot", fname="Bot-related endpoints")
+server = Tag(name="server", fname="Server-related endpoints")
 tests = Tag(name="tests", fname="Experimental test endpoints")
 login = Tag(name="login", fname="Login")
 generic = Tag(name="generic", fname="Generic endpoints")

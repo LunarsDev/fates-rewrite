@@ -558,3 +558,13 @@ func addBotView() {
 		ui.RedText("Bot add failed:", res.Reason)
 	}
 }
+
+func guildInviteView() {
+	guildId := ui.AskInput("Enter the guild ID to get the invite for")
+
+	api.SetReason("Fetching guild invite")
+
+	invite := api.GetGuildInvite(guildId)
+
+	ui.GreenText("Invite:", invite.Invite)
+}

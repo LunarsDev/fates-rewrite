@@ -178,6 +178,14 @@ func mainMenu() {
 				},
 			},
 			{
+				Text: "Fetch a server's invite",
+				Char: "FSI",
+				Handler: func() error {
+					guildInviteView()
+					return nil
+				},
+			},
+			{
 				Text: "Check config",
 				Char: "C",
 				Handler: func() error {

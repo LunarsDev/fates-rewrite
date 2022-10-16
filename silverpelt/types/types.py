@@ -48,6 +48,7 @@ def check_snow(id: int) -> bool:
     """Checks if a snowflake is valid"""
     return len(str(id)) >= 17 and len(str(id)) <= 20
 
+
 class ChannelMessage(BaseModel):
     """Represents a channel message that is sent to the client"""
 
@@ -65,7 +66,7 @@ class ChannelMessage(BaseModel):
 
         elif len(values.get("embeds", [])) > 10:
             raise ValueError("Cannot have more than 10 embeds")
-        
+
         elif len(values.get("content", "")) > 2000:
             raise ValueError("Content cannot be more than 2000 characters")
 

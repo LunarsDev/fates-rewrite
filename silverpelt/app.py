@@ -21,6 +21,7 @@ class MsgpackResponse(JSONResponse):
         """Renders the content"""
         return msgpack.packb(content)
 
+
 app = FastAPI(default_response_class=MsgpackResponse)
 
 bot = discord.Client(intents=discord.Intents(guilds=True, members=True, presences=True))
@@ -147,13 +148,16 @@ async def get_guild_member_roles(gid: int, uid: int):
         return None
     return [role.id for role in member.roles]
 
+
 @app.post("/channel_msg")
 async def send_channel_message(data: ChannelMessage):
     """Send a message to a channel"""
     channel = bot.get_channel(data.channel_id)
     if not channel:
         return None
-    msg = await channel.send(content=data.content, embeds=[discord.Embed.from_dict(e) for e in data.embeds])
+    msg = await channel.send(
+        content=data.content, embeds=[discord.Embed.from_dict(e) for e in data.embeds]
+    )
 
     return {
         "content": msg.content,
@@ -164,10 +168,52 @@ async def send_channel_message(data: ChannelMessage):
             "id": msg.author.id,
             "username": msg.author.name,
             "disc": msg.author.discriminator,
-            "avatar": msg.author.avatar.url if msg.author.avatar else msg.author.default_avatar.url,
+            "avatar": msg.author.avatar.url
+            if msg.author.avatar
+            else msg.author.default_avatar.url,
             "bot": msg.author.bot,
             "system": msg.author.system,
             "status": Status.new(msg.author.status.value),
             "flags": msg.author.public_flags.value,
         },
     }
+
+
+@app.get("/guild_inf/{id}")
+async def guild_info(id: int):
+    """Check if a guild exists and return some info about it."""
+    guild = bot.get_guild(id)
+    return {
+        "found": guild is not None,
+        "invitable_channels": [
+            channel.id
+            for channel in guild.channels
+            if channel.type
+            in (
+                discord.ChannelType.text,
+                discord.ChannelType.news,
+                discord.ChannelType.news_thread,
+            )
+            and channel.permissions_for(guild.me).create_instant_invite
+        ]
+        if guild
+        else None,
+    }
+
+
+@app.get("/guild_invite/{id}/{channel_id}")
+async def guild_invite(id: int, channel_id: int, for_user: int):
+    """Create an invite to a guild."""
+    guild = bot.get_guild(id)
+    if not guild:
+        return None
+    channel = guild.get_channel(channel_id)
+    if not channel:
+        return None
+    invite = await channel.create_invite(
+        max_age=60 * 15,
+        max_uses=1,
+        unique=True,
+        reason=f"Invite requested by {for_user or 'anonymous user'}",
+    )
+    return {"url": invite.url}

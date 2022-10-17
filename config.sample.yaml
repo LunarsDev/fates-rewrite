@@ -1,10 +1,10 @@
 secrets:
   token:  # Discord token
-  client_id: 1002789902557130792
+  client_id: 1031535884539023370
   client_secret: 
   japi_key: # From https://key.japi.rest
 
-redis_url: "redis://127.0.0.1:6379" # Redis URL
+redis_url: redis://127.0.0.1:6379 # Redis URL
 
 main_server: 789934742128558080
 

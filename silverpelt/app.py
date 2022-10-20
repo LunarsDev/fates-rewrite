@@ -34,6 +34,7 @@ async def on_ready():
     """When the bot is ready, inform the user via the console"""
     print("Connected to discord successfully!")
 
+
 # Construct redis URL
 redis_url = f"redis://{config['storage']['redis']['host'] or os.getenv('REDIS_HOST') or 'localhost'}:{config['storage']['redis']['port'] or os.getenv('REDIS_PORT') or 6379}"
 

@@ -178,3 +178,6 @@ This is the source code for [Fates List](https://fateslist.xyz/)
 
 Custom clients are supported however you are responsible for keeping them up-to-date. **See Kitescratch for a good example of how to do this**
 
+# Configuration
+
+Configuration is done via ``config.yaml``. You can generate the sample config by running ``./kitehelper cfgsample > config.yaml``.

@@ -1,6 +1,7 @@
 package config
 
 import (
+	"fmt"
 	"io"
 	"kitehelper/common"
 	"os"
@@ -41,33 +42,21 @@ func ValidateConfig(progname string, args []string) {
 }
 
 func GenConfigSample(progname string, args []string) {
-	var cfg Config
-
-	f, err := os.Create("config_sample.yaml")
-
-	if err != nil {
-		panic(err)
-	}
-
-	cfg.Perms = map[string]Perm{
-		"sample_perm_1": {
-			Roles: []uint64{123456, 192929},
+	var cfg Config = Config{
+		Misc: Misc{
+			RestrictedVanity: []string{"api", "docs", "add-bot", "admin"},
+		},
+		Perms: map[string]Perm{
+			"sudo": {
+				Index: 10,
+			},
+			"head_admin": {
+				Index: 9,
+			},
 		},
 	}
 
-	cfg.Misc = Misc{
-		RestrictedVanity: []string{"api", "docs", "add-bot", "admin"},
-	}
+	syp := simpleYamlParser{}
 
-	defer f.Close()
-
-	enc := yaml.NewEncoder(f)
-
-	err = enc.Encode(cfg)
-
-	if err != nil {
-		panic(err)
-	}
-
-	statusBold("Config sample generated")
+	fmt.Println(syp.parse(cfg))
 }

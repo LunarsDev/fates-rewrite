@@ -1,5 +1,6 @@
 **/__pycache__
 config.yaml
+config.sample.yaml
 
 # DB Seeder
 seedman/bin/**

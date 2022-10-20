@@ -1,8 +1,8 @@
 secrets:
   token:  # Discord token
   client_id: 1031535884539023370
-  client_secret: 
-  japi_key: # From https://key.japi.rest
+  client_secret: # Discord client secret
+  japi_key: # https://key.japi.rest
 
 storage:
   postgres: # Postgres database
@@ -40,6 +40,6 @@ channels:
 misc:
   restricted_vanity:
     - "api"
-    = "docs"
+    - "docs"
     - "add-bot"
     - "admin"

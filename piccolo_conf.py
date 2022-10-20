@@ -3,10 +3,9 @@ from piccolo.engine.postgres import PostgresEngine
 import os
 
 # Load config.yaml
-from ruamel.yaml import YAML
+from libcommon import config
 
-with open("config.yaml") as f:
-    config = YAML().load(f)["storage"]["postgres"]
+config = config["storage"]["postgres"]
 
 piccolo_cfg = {}
 

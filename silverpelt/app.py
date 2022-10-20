@@ -1,7 +1,7 @@
 import asyncio
-from typing import Any, Callable
-from fastapi import FastAPI, Request, Response
-from fastapi.routing import APIRoute
+import os
+from typing import Any
+from fastapi import FastAPI
 from fastapi.responses import JSONResponse
 import msgpack
 import discord
@@ -10,6 +10,8 @@ import aioredis
 from pydantic import BaseModel
 
 from silverpelt.types.types import ChannelMessage, IDiscordUser, Status, check_snow
+
+from libcommon import config
 
 # We use messagepack for serialization
 class MsgpackResponse(JSONResponse):
@@ -32,13 +34,14 @@ async def on_ready():
     """When the bot is ready, inform the user via the console"""
     print("Connected to discord successfully!")
 
+# Construct redis URL
+redis_url = f"redis://{config['storage']['redis']['host'] or os.getenv('REDIS_HOST') or 'localhost'}:{config['storage']['redis']['port'] or os.getenv('REDIS_PORT') or 6379}"
 
-yaml = YAML()
-
-with open("config.yaml") as doc:
-    config: dict = yaml.load(doc)
-
-redis = aioredis.from_url(config["redis_url"])
+redis = aioredis.from_url(
+    redis_url,
+    db=config["storage"]["redis"]["database"] or 0,
+    password=config["storage"]["redis"]["password"] or None,
+)
 
 
 async def cache(value: Any, *, key: str, expiry: int = 8 * 60 * 60) -> Any:

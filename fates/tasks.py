@@ -1,5 +1,5 @@
 from typing import Awaitable
-from fates import tables
+from libcommon import tables
 from fates.app import mapleshade
 from fastapi.encoders import jsonable_encoder
 import traceback

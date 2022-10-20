@@ -4,13 +4,15 @@
 
 ### Backend
 
-- ``Mapleshade`` - The core API implementations of fates list
+- ``Fates`` - The core API implementations of fates list
 - ``Silverpelt`` - A IPC service to handle all discord API actions (using fastapi and msgpack)
+- ``libcommon`` - Common code for all Fates List services
 
 ### Frontend
 
 - ``Sunbeam`` - Fates List Frontend
 - ``Kitescratch`` - Internal tooling including a simple CLI (`kitecli`) for Fates List (mostly for development, but may become a full cli-only replacement for sunbeam) as well as some helper functions including our test system (`kitehelper`) for developing Fates List
+
 
 ## Commits
 

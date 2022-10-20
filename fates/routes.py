@@ -7,7 +7,7 @@ from discord import Color, Embed
 from fates import models, tasks
 from fates.auth import auth
 from fates.decorators import Ratelimit, SharedRatelimit, route, Route, Method, nop
-from . import tables
+from libcommon import tables
 from . import tags
 from fastapi import Request, Depends
 from piccolo.columns.combination import WhereRaw

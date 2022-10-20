@@ -1,8 +1,8 @@
 import enum
-from fates import models, enums
+from fates import models
 from fates import tags
 from fates.decorators import nop
-from . import tables
+from libcommon import enums, tables
 import inspect
 import piccolo
 from fastapi import FastAPI, HTTPException, Request

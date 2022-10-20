@@ -9,7 +9,7 @@ from piccolo.conf.apps import AppConfig
 
 import piccolo
 
-from . import tables
+from libcommon import tables
 import inspect
 
 _tables = []

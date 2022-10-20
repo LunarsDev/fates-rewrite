@@ -2,7 +2,7 @@ import datetime
 from typing import Any, Literal, Optional, Generic, TypeVar
 import uuid
 
-from .tables import (
+from libcommon.tables import (
     BotCommands,
     BotListTags,
     Bots,
@@ -17,7 +17,8 @@ from piccolo.query import Select
 from pydantic import BaseModel, validator
 from pydantic.generics import GenericModel
 import silverpelt.types.types as silver_types
-from fates.enums import *
+from libcommon.enums import *
+from libcommon import config
 from piccolo.columns.combination import WhereRaw
 
 # Add models here
@@ -853,9 +854,4 @@ class PreviewData(BaseModel):
 
 # Constants for the bot list
 DEFAULT_EXC = {404: ResponseCode.NOT_FOUND}
-RESTRICTED_VANITY = (
-    "api",
-    "docs",
-    "add-bot",
-    "admin",
-)
+RESTRICTED_VANITY: list[str] = config["misc"]["restricted_vanity"]

@@ -1,9 +1,9 @@
 from fastapi import Depends, Request
 from fastapi.security.api_key import APIKeyHeader
+from libcommon import enums
 
-from fates import tables
-from fates import enums
-from fates.enums import TargetType
+from libcommon import tables
+from libcommon.enums import TargetType
 from .models import AuthData, Response, ResponseCode
 import secrets
 

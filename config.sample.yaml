@@ -4,7 +4,18 @@ secrets:
   client_secret: 
   japi_key: # From https://key.japi.rest
 
-redis_url: redis://127.0.0.1:6379 # Redis URL
+storage:
+  postgres: # Postgres database
+    host: # Hostname, defaults to PGHOST
+    port: 5432 # Defaults to PGPORT
+    user: # Defaults to PGUSERNAME
+    password: # Defaults to PGPASSWORD
+    database: fateslist # Must be provided
+  redis:
+    host: 127.0.0.1 # Hostname, defaults to REDIS_HOST
+    port: 6379 # Defaults to REDIS_PORT
+    password: # Defaults to REDIS_PASSWORD
+    database: 0 # Defaults to REDIS_DB
 
 main_server: 789934742128558080
 
@@ -25,3 +36,10 @@ perms:
 
 channels:
   bot_logs: 1030713957549342740
+
+misc:
+  restricted_vanity:
+    - "api"
+    = "docs"
+    - "add-bot"
+    - "admin"

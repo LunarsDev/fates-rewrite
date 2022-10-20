@@ -17,8 +17,7 @@ from piccolo.columns.defaults.timestamptz import TimestamptzNow
 from piccolo.columns.defaults.uuid import UUID4
 from piccolo.table import Table
 from decimal import Decimal
-import secrets
-from fates import enums
+from libcommon import enums
 
 
 class Bots(Table, tablename="bots"):

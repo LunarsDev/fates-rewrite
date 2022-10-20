@@ -4,6 +4,7 @@
 MODULES = (
     "fates",
     "silverpelt",
+    "libcommon"
 )
 
 ALLOWED_UNUSED = (

@@ -58,5 +58,9 @@ var testList = testset{
 			name: "silverpelt (black)",
 			cmd:  []string{"black", "silverpelt"},
 		},
+		{
+			name: "libcommon (black)",
+			cmd:  []string{"black", "libcommon"},
+		},
 	},
 }

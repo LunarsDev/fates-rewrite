@@ -5,7 +5,7 @@ import string
 from typing import Any, Optional, Tuple
 
 from pydantic import BaseModel
-from fates import tables, models
+from fates import models
 from ruamel.yaml import YAML
 import orjson
 import bleach
@@ -16,6 +16,8 @@ from cmarkgfm.cmark import Options as cmarkgfmOptions
 from maplecache import *
 import pytz
 import asyncpg
+
+from libcommon import tables, config, yaml
 
 
 class SilverException(Exception):
@@ -80,10 +82,9 @@ class Mapleshade:
         # In memory cache for bot data
         self.cache = Cache()
 
-        self.yaml = YAML()
+        self.yaml = yaml
 
-        with open("config.yaml") as doc:
-            self.config: dict[str, Any] = self.yaml.load(doc)
+        self.config: dict[str, Any] = config
 
         self.perms = {
             "default": models.Permission(index=0, roles=[], name="default"),

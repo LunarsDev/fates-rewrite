@@ -40,8 +40,8 @@ redis_url = f"redis://"
 
 redis = aioredis.from_url(
     redis_url,
-    host=config['storage']['redis']['host'] or os.getenv('REDIS_HOST') or 'localhost',
-    port=config['storage']['redis']['port'] or os.getenv('REDIS_PORT') or 6379,
+    host=config["storage"]["redis"]["host"] or os.getenv("REDIS_HOST") or "localhost",
+    port=config["storage"]["redis"]["port"] or os.getenv("REDIS_PORT") or 6379,
     db=config["storage"]["redis"]["database"] or 0,
     password=config["storage"]["redis"]["password"] or None,
 )

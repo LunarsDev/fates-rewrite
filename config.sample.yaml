@@ -17,10 +17,8 @@ storage:
     password: # Defaults to REDIS_PASSWORD
     database: 0 # Defaults to REDIS_DB
 
-main_server: 789934742128558080
-
-static: http://localhost:1010 # Change this in prod
-sunbeam: http://localhost:5001 # Change this in prod
+servers:
+  main: 789934742128558080
 
 perms:
   sudo: 

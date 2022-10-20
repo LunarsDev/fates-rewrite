@@ -169,7 +169,7 @@ class Mapleshade:
             user_roles: list[str] = [
                 str(v)
                 for v in await self.silverpelt_req(
-                    f"roles/{self.config['main_server']}/{user_id}"
+                    f"roles/{self.config['servers']['main']}/{user_id}"
                 )
             ]
         except SilverNoData:

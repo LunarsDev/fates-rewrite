@@ -2,6 +2,7 @@ package main
 
 import (
 	"fmt"
+	"kitehelper/config"
 	"kitehelper/migrate"
 	"kitehelper/sveltekit"
 	"kitehelper/tests"
@@ -25,6 +26,14 @@ var cmds = map[string]command{
 	"migrate": {
 		Func: migrate.Migrate,
 		Help: "Run custom migrations",
+	},
+	"cfgvalidate": {
+		Func: config.ValidateConfig,
+		Help: "Validate config.yaml",
+	},
+	"cfgsample": {
+		Func: config.GenConfigSample,
+		Help: "Generate config_sample.yaml",
 	},
 }
 

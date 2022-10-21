@@ -46,12 +46,18 @@ func GenConfigSample(progname string, args []string) {
 		Misc: Misc{
 			RestrictedVanity: []string{"api", "docs", "add-bot", "admin"},
 		},
-		Perms: map[string]Perm{
-			"sudo": {
+		Perms: PermList{
+			Sudo: Perm{
 				Index: 10,
 			},
-			"head_admin": {
+			HeadAdmin: Perm{
 				Index: 9,
+			},
+			Admin: Perm{
+				Index: 8,
+			},
+			Moderator: Perm{
+				Index: 7,
 			},
 		},
 	}
@@ -88,6 +94,9 @@ func UpdateConfig(progname string, args []string) {
 	if err != nil {
 		panic(err)
 	}
+
+	// Ensure config updates are done
+	cfg.Fixup()
 
 	syp := simpleYamlParser{}
 

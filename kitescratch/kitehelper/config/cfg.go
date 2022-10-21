@@ -4,6 +4,7 @@ type Config struct {
 	Secrets  Secrets         `yaml:"secrets"`
 	Storage  Storage         `yaml:"storage"`
 	Servers  Servers         `yaml:"servers"`
+	Deploy   Deploy          `yaml:"deploy"`
 	Perms    map[string]Perm `yaml:"perms"`
 	Channels Channels        `yaml:"channels"`
 	Misc     Misc            `yaml:"misc"`
@@ -34,6 +35,10 @@ type Redis struct {
 	Port     uint16 `yaml:"port" default:"6379" comment:"Port, defaults to REDIS_PORT" required:"false"`
 	Password string `yaml:"password" comment:"Password, defaults to REDIS_PASSWORD" required:"false"`
 	Database uint32 `yaml:"database" default:"0" comment:"Database, defaults to REDIS_DB" required:"false"`
+}
+
+type Deploy struct {
+	Sunbeam string `yaml:"sunbeam" default:"http://localhost:5001" comment:"Sunbeam URL"`
 }
 
 type Servers struct {

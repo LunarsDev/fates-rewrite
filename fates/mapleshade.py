@@ -94,6 +94,9 @@ class Mapleshade:
             self.perms[name] = models.Permission(
                 index=perm["index"], roles=perm["roles"], name=name
             )
+        
+        # Ensure perms are sorted by index in decreasing order (10, 9, 8)
+        self.perms = dict(sorted(self.perms.items(), key=lambda item: item[1].index, reverse=True))
 
         # CMark options
         self.cmark_opts = (

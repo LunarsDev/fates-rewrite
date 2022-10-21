@@ -62,8 +62,8 @@ func GenConfigSample(progname string, args []string) {
 }
 
 func UpdateConfig(progname string, args []string) {
-	if len(args) != 1 {
-		fmt.Println("Usage:", progname, " cfgupdate <path-to-old-config>")
+	if len(args) != 2 {
+		fmt.Println("Usage:", progname, " cfgupdate <path-to-old-config> <path-to-new-config>")
 		os.Exit(1)
 	}
 
@@ -91,5 +91,15 @@ func UpdateConfig(progname string, args []string) {
 
 	syp := simpleYamlParser{}
 
-	fmt.Println(syp.parse(cfg))
+	f, err = os.Create(args[1])
+
+	if err != nil {
+		panic(err)
+	}
+
+	_, err = f.WriteString(syp.parse(cfg))
+
+	if err != nil {
+		panic(err)
+	}
 }

@@ -35,6 +35,10 @@ var cmds = map[string]command{
 		Func: config.GenConfigSample,
 		Help: "Generate config_sample.yaml",
 	},
+	"cfgupdate": {
+		Func: config.UpdateConfig,
+		Help: "Update config.yaml to the latest version",
+	},
 }
 
 func cmdList() {

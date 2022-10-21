@@ -6,6 +6,58 @@ import (
 	"strings"
 )
 
+func _retArrInt[T comparable](t []T) []string {
+	var arr []string
+	for _, v := range t {
+		arr = append(arr, fmt.Sprint(v))
+	}
+	return arr
+}
+
+// Casts a array of type any to []string
+func arrayCast(v any) []string {
+	switch t := v.(type) {
+	// String type
+	case []string:
+		return t
+	// Any type
+	case []any:
+		var arr []string
+		for _, v := range t {
+			arr = append(arr, v.(string))
+		}
+		return arr
+	// All the int types
+	case []int:
+		return _retArrInt(t)
+	case []int8:
+		return _retArrInt(t)
+	case []int16:
+		return _retArrInt(t)
+	case []int32:
+		return _retArrInt(t)
+	case []int64:
+		return _retArrInt(t)
+	// All the uint types
+	case []uint:
+		return _retArrInt(t)
+	case []uint8:
+		return _retArrInt(t)
+	case []uint16:
+		return _retArrInt(t)
+	case []uint32:
+		return _retArrInt(t)
+	case []uint64:
+		return _retArrInt(t)
+	// All the float types
+	case []float32:
+		return _retArrInt(t)
+	case []float64:
+		return _retArrInt(t)
+	}
+	panic(fmt.Sprintf("arrayCast: invalid type %T", v))
+}
+
 type simpleYamlParser struct {
 	indent        int
 	originalValue any
@@ -54,7 +106,10 @@ func (c *simpleYamlParser) vToYaml(v reflect.StructField) string {
 		c.indent++
 		// For every field in the struct, call vToYaml
 		for i := 0; i < v.Type.NumField(); i++ {
+			currVal := c.currVal
+			c.currVal = c._getValue(v.Name).Interface()
 			str += c.vToYaml(v.Type.Field(i))
+			c.currVal = currVal
 		}
 		c.indent--
 
@@ -81,13 +136,14 @@ func (c *simpleYamlParser) vToYaml(v reflect.StructField) string {
 			// Get the struct value
 			structValue := reflect.ValueOf(reflect.ValueOf(mapValue).MapIndex(key).Interface())
 
+			currVal := c.currVal
 			c.currVal = structValue.Interface()
 
 			for j := 0; j < structValue.NumField(); j++ {
 				str += c.vToYaml(structValue.Type().Field(j))
 			}
 
-			c.currVal = nil
+			c.currVal = currVal
 			c.indent--
 			c.indent--
 		}
@@ -96,22 +152,39 @@ func (c *simpleYamlParser) vToYaml(v reflect.StructField) string {
 			str += "\n" // Add a newline after each struct/map
 		}
 	case reflect.Slice:
+		// Get value of the slice
+		sliceValue := c._getValue(v.Name).Interface()
 		vName := v.Tag.Get("yaml")
+		comment := v.Tag.Get("comment")
+		var split []string = []string{}
 
-		// Get the default tag
-		defTag := v.Tag.Get("default")
+		splitValueCasted := arrayCast(reflect.ValueOf(sliceValue).Interface())
 
-		if defTag == "" {
-			panic("default tag is empty")
+		if len(splitValueCasted) == 0 {
+			// Get the default tag
+			defTag := v.Tag.Get("default")
+
+			if defTag == "" {
+				panic("default tag is empty")
+			}
+
+			// Split the default tag by commas
+			split = strings.Split(defTag, ",")
+		} else {
+
+			for _, v := range splitValueCasted {
+				if comment == "" {
+					split = append(split, fmt.Sprintf("%v", v))
+				} else {
+					split = append(split, fmt.Sprintf("%v # %v", v, comment))
+				}
+			}
 		}
-
-		// Split the default tag by commas
-		defTagSplit := strings.Split(defTag, ",")
 
 		str += strings.Repeat(" ", c.indent*2) + vName + ":\n"
 
 		c.indent++
-		for _, s := range defTagSplit {
+		for _, s := range split {
 			str += strings.Repeat(" ", c.indent*2) + "- " + strings.TrimSpace(s) + "\n"
 		}
 		c.indent--

@@ -60,3 +60,36 @@ func GenConfigSample(progname string, args []string) {
 
 	fmt.Println(syp.parse(cfg))
 }
+
+func UpdateConfig(progname string, args []string) {
+	if len(args) != 1 {
+		fmt.Println("Usage:", progname, " cfgupdate <path-to-old-config>")
+		os.Exit(1)
+	}
+
+	// Open old config as yaml
+	f, err := os.Open(args[0])
+
+	if err != nil {
+		panic(err)
+	}
+
+	// Open using go-yaml
+	fileBytes, err := io.ReadAll(f)
+
+	if err != nil {
+		panic(err)
+	}
+
+	var cfg Config
+
+	err = yaml.Unmarshal(fileBytes, &cfg)
+
+	if err != nil {
+		panic(err)
+	}
+
+	syp := simpleYamlParser{}
+
+	fmt.Println(syp.parse(cfg))
+}

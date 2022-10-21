@@ -41,8 +41,9 @@ type Servers struct {
 }
 
 type Perm struct {
-	Roles []uint64 `yaml:"roles" default:"976891305336655903 # role A, 836326299223195738 # role B etc."`
-	Index uint8    `yaml:"index"`
+	RoleComments []string `yaml:"role_comments" default:"dev,overseer,owner" comment:"Comments for the roles above corresponding to index"`
+	Roles        []uint64 `yaml:"roles" default:"976891305336655903 # role A, 836326299223195738 # role B etc."`
+	Index        uint8    `yaml:"index"`
 }
 
 type Channels struct {
@@ -51,13 +52,12 @@ type Channels struct {
 
 type Misc struct {
 	RestrictedVanity []string `yaml:"restricted_vanity" default:"api,docs,add-bot,admin"`
-	Test             string   `yaml:"test" default:"test"`
 }
 
 func (c Config) Validate() {
-	/*if c.Secrets.Token {
+	if c.Secrets.Token == "" {
 		panic("Token is required")
-	}*/
+	}
 	if c.Secrets.ClientID == "" {
 		panic("Client ID is required")
 	}
